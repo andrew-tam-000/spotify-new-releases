@@ -1,7 +1,6 @@
 import spotifyApi from '../../spotifyApi';
 import _ from 'lodash';
 
-
 // TODO: Deprecate this file
 
 import {
@@ -10,10 +9,21 @@ import {
     playlistUriSelector
 } from '../../selectors';
 
-export function play(trackUri) {
+export function playSongStart(trackUri) {
     return {
-        type: 'PLAY_SONG',
+        type: 'PLAY_SONG_START',
         payload: trackUri
+    }
+}
+export function playSongSuccess() {
+    return {
+        type: 'PLAY_SONG_SUCCESS',
+    }
+}
+export function playSongError(message) {
+    return {
+        type: 'PLAY_SONG_ERROR',
+        payload: message
     }
 }
 
