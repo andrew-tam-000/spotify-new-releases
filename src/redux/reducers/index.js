@@ -38,7 +38,7 @@ export default (state = initialState, { type, payload }) => {
             }
         }
     }
-    else if (type == 'SET_PLAYLIST') {
+    else if (type == 'SET_PLAYLIST_SUCCESS') {
         return {
             ...state,
             playlist: payload

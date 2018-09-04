@@ -1,8 +1,6 @@
 import spotifyApi from '../../spotifyApi';
 import _ from 'lodash';
 
-// TODO: Deprecate this file
-
 import {
     searchTextSelector,
     playlistIdSelector,
@@ -27,9 +25,20 @@ export function playSongError(message) {
     }
 }
 
-export function refreshPlaylist() {
+export function setPlaylistStart() {
     return {
-        type: 'REFRESH_PLAYLIST',
+        type: 'SET_PLAYLIST_START',
+    }
+}
+export function setPlaylistSuccess(playlist) {
+    return {
+        type: 'SET_PLAYLIST_SUCCESS',
+        payload: playlist,
+    }
+}
+export function setPlaylistError() {
+    return {
+        type: 'SET_PLAYLIST_ERROR',
     }
 }
 
@@ -117,6 +126,7 @@ export function addTracksToPlaylist(uris) {
     }
 }
 
+/*
 export function removeTracksToPlaylistAsync(uris) {
     return (dispatch, getState) => {
         const playlistId = playlistIdSelector(getState());
@@ -129,3 +139,4 @@ export function removeTracksToPlaylistAsync(uris) {
 
     }
 }
+*/

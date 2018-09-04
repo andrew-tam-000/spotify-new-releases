@@ -19,26 +19,17 @@ import {
     timer,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
-import uuid from 'uuid/v1';
-import {
-    push
-} from 'react-router-redux';
-import Promise from 'bluebird';
-import spotifyApi from '../spotifyApi'
-import { getAccessTokenFromUrl } from '../utils';
 import { playlistIdSelector } from '../selectors';
-import { setPlaylist } from '../redux/actions';
+import { setPlaylistSuccess, setPlaylistError } from '../redux/actions';
 
 export default function addTracksToPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
-        ofType('REFRESH_PLAYLIST'),
+        ofType('SET_PLAYLIST_START'),
         mergeMap( action => (
             from(spotifyApi.getPlaylist(playlistIdSelector(state$.value)))
                 .pipe(
-                    mergeMap( playlist  => of(setPlaylist(playlist))),
-                    catchError( e => {
-                        return of({type: 'error', payload: JSON.parse(e.response).error.message})
-                    })
+                    mergeMap( playlist  => of(setPlaylistSuccess(playlist))),
+                    catchError( e => of(setPlaylistError(JSON.parse(e.response).error.message))),
                 )
         )),
     );

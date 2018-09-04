@@ -28,8 +28,9 @@ import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
 import { spotifyUserIdSelector, firebaseUserPlaylistIdSelector } from '../selectors';
 import firebase from '../firebase';
-import { setPlaylist } from '../redux/actions';
+import { setPlaylistSuccess } from '../redux/actions';
 
+// TODO: Refactor this to use refresh playlist
 export default function fetchUserData(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
         ofType('SET_SPOTIFY_USER'),
@@ -38,7 +39,7 @@ export default function fetchUserData(action$, state$, { firebaseApp, spotifyApi
             if (existingPlaylist) {
                 return from(spotifyApi.getPlaylist(existingPlaylist))
                     .pipe(
-                        mergeMap( playlist => of(setPlaylist(playlist))),
+                        mergeMap( playlist => of(setPlaylistSuccess(playlist))),
                         catchError( e => {
                             return of({type: 'error', payload: JSON.parse(e.response).error.message})
                         })
@@ -47,7 +48,7 @@ export default function fetchUserData(action$, state$, { firebaseApp, spotifyApi
             else {
                 return from(spotifyApi.createPlaylist(spotifyUserIdSelector(state$.value), {name: `Custom List - ${new Date().toLocaleString()}`}))
                     .pipe(
-                        mergeMap( playlist => of(setPlaylist(playlist))),
+                        mergeMap( playlist => of(setPlaylistSuccess(playlist))),
                         catchError( e => {
                             return of({type: 'error', payload: JSON.parse(e.response).error.message})
                         })
