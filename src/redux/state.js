@@ -1,3 +1,5 @@
+import spotifyApi from '../spotifyApi';
+
 export default {
     playlist: {},
     search: {
@@ -6,6 +8,7 @@ export default {
         albums: [],
         text: ''
     },
-    accessToken: '',
     user: {},
 }
+
+

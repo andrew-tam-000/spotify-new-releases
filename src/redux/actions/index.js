@@ -1,11 +1,48 @@
 import spotifyApi from '../../spotifyApi';
 import _ from 'lodash';
 
+
+// TODO: Deprecate this file
+
 import {
     searchTextSelector,
     playlistIdSelector,
     playlistUriSelector
 } from '../../selectors';
+
+export function play(trackUri) {
+    return {
+        type: 'PLAY_SONG',
+        payload: trackUri
+    }
+}
+
+export function refreshPlaylist() {
+    return {
+        type: 'REFRESH_PLAYLIST',
+    }
+}
+
+export function setFirebaseUserId(id) {
+    return {
+        type: 'SET_FIREBASE_USER_ID',
+        payload: id,
+    }
+}
+
+export function updateFirebaseUser(firebaseUser) {
+    return {
+        type: 'UPDATE_FIREBASE_USER',
+        payload: firebaseUser
+    }
+}
+
+export function setFirebaseUser(firebaseUser) {
+    return {
+        type: 'SET_FIREBASE_USER',
+        payload: firebaseUser
+    }
+}
 
 
 export function fetchAccessToken() {
@@ -14,70 +51,45 @@ export function fetchAccessToken() {
     }
 }
 
-function setAccessToken(hash) {
+export function setUserUrl(url) {
+    return {
+        type: 'SET_USER_URL',
+        payload: url,
+    }
+}
+
+export function fetchUserData(userId) {
+    return {
+        type: 'FETCH_USER_DATA',
+        payload: userId
+    }
+}
+
+export function setAccessToken(hash) {
     return {
         type: 'SET_ACCESS_TOKEN',
         payload: hash
     }
 }
 
-function setUser(user) {
+export function setSpotifyUser(spotifyUser) {
     return {
-        type: 'SET_USER',
-        payload: user
+        type: 'SET_SPOTIFY_USER',
+        payload: spotifyUser
     }
 }
 
-function setPlaylist(playlist) {
+export function setPlaylist(playlist) {
     return {
         type: 'SET_PLAYLIST',
         payload: playlist
     }
 }
 
-function setSearchResults(searchResults) {
+export function setSearchResults(searchResults) {
     return {
         type: 'SET_SEARCH_RESULTS',
         payload: searchResults
-    }
-}
-
-export function setAccessTokenAsync(hash) { return (dispatch, getState) => {
-        spotifyApi.setAccessToken(hash);
-        dispatch(setAccessToken(hash));
-        return dispatch(setUserAsync())
-            .then( () => dispatch(createPlaylistAsync()))
-        ;
-    }
-}
-
-export function setUserAsync() {
-    return dispatch => {
-        return spotifyApi
-            .getMe()
-            .then( user => dispatch(setUser(user)))
-    }
-}
-
-export function createPlaylistAsync() {
-    return (dispatch, getState) => {
-        const state = getState();
-        const userId = _.get(state, 'user.id');
-
-        if (userId) {
-            return spotifyApi
-                .createPlaylist(userId, {name: 'Random'})
-                .then( playlist => dispatch(setPlaylist(playlist)))
-        }
-    }
-}
-
-export function searchAsync() {
-    return (dispatch, getState) => {
-        const q = searchTextSelector(getState());
-        return spotifyApi
-            .search(q, ['artist', 'track', 'album'])
-            .then( searchResults => dispatch(setSearchResults(searchResults)))
     }
 }
 
@@ -88,16 +100,10 @@ export function setSearchText(text) {
     }
 }
 
-export function addTracksToPlaylistAsync(uris) {
-    return (dispatch, getState) => {
-        const playlistId = playlistIdSelector(getState());
-        return spotifyApi
-            .addTracksToPlaylist(
-                playlistId,
-                uris
-            )
-            .then( () => dispatch(refreshPlaylist()))
-
+export function addTracksToPlaylist(uris) {
+    return {
+        type: 'ADD_TRACKS_TO_PLAYLIST',
+        payload: uris,
     }
 }
 
@@ -110,30 +116,6 @@ export function removeTracksToPlaylistAsync(uris) {
                 uris
             )
             .then( () => dispatch(refreshPlaylist()))
-
-    }
-}
-
-export function refreshPlaylist() {
-    return (dispatch, getState) => {
-        const playlistId = playlistIdSelector(getState());
-        return spotifyApi
-            .getPlaylist(playlistId)
-            .then(playlist => dispatch(setPlaylist(playlist)))
-        ;
-    }
-}
-
-export function play(trackUri) {
-    return (dispatch, getState) => {
-        const playlistUri = playlistUriSelector(getState());
-        return spotifyApi
-            .play({
-                context_uri: playlistUri,
-                offset: {
-                    uri: trackUri
-                }
-            })
 
     }
 }

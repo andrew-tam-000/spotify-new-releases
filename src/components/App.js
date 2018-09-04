@@ -8,51 +8,6 @@ import { connect } from 'react-redux';
 import { fetchAccessToken } from '../redux/actions';
 
 class App extends Component {
-    constructor(props) {
-
-        super(props);
-        this.state = {
-            isRequesting: false,
-            token: null,
-        }
-    }
-
-    requestToken = () => {
-        this.props.fetchAccessToken();
-        return;
-        //if (this.state.isRequesting) return;
-
-        ////this.setState({isRequesting: true});
-
-        //const external = window.open(tokenUrl);
-        //const interval = setInterval(
-        //    () => {
-        //        try {
-        //            // If the window was closed
-        //            if (!external.window) {
-        //                clearInterval(interval);
-        //                /*
-        //                this.setState({
-        //                    isRequesting: false
-        //                })
-        //                */
-        //            }
-
-        //            const hash = getAccessTokenFromUrl(external);
-        //            if (hash) {
-        //                clearInterval(interval);
-        //                this.props.fetchAccessToken(hash);
-        //                external.close();
-        //            }
-        //        }
-        //        catch (e) {
-        //            console.error(e);
-        //        }
-        //    },
-        //    1000
-        //);
-    }
-
     render() {
         return (
             <div className="App">
@@ -60,7 +15,7 @@ class App extends Component {
                 <img src={logo} className="App-logo" alt="logo" />
                 <h1 className="App-title">Welcome to React</h1>
                 </header>
-                <button onClick={this.requestToken}>
+                <button onClick={() => this.props.fetchAccessToken()}>
                     RequestToken!
                 </button>
 

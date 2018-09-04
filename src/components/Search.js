@@ -9,33 +9,24 @@ import ListItemText from '@material-ui/core/ListItemText';
 import _ from 'lodash';
 
 import { connect } from 'react-redux';
-import { searchAsync, setSearchText, addTracksToPlaylistAsync  } from '../redux/actions';
+import { setSearchText, addTracksToPlaylist } from '../redux/actions';
 import { searchTracksSelector, searchTextSelector } from '../selectors';
 
 import spotifyApi from '../spotifyApi';
 
-
-
-const Search = ({searchTracks, searchText, setSearchText, searchAsync, addTracksToPlaylistAsync }) => {
+const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylist }) => {
     return (
         <div>
             <TextField
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
             />
-            <Button
-                onClick={searchAsync}
-                variant="contained"
-                color="primary"
-            >
-                Submit
-            </Button>
             <List>
                 {
                     _.map(
                         searchTracks,
                         track => (
-                            <ListItem button onClick={() => addTracksToPlaylistAsync([track.uri])}>
+                            <ListItem key={track.id} button onClick={() => addTracksToPlaylist([track.uri])}>
                                 <ListItemText primary={track.name} secondary={track.artists.map(artist => artist.name).join(', ')}/>
                             </ListItem>
                         )
@@ -51,5 +42,5 @@ export default connect(
         searchTracks: searchTracksSelector,
         searchText: searchTextSelector,
     }),
-    { setSearchText, searchAsync, addTracksToPlaylistAsync }
+    { setSearchText, addTracksToPlaylist }
 )(Search);

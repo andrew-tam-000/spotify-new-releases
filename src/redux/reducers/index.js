@@ -8,11 +8,35 @@ export default (state = initialState, { type, payload }) => {
             accessToken: payload
         };
     }
-    else if (type == 'SET_USER') {
+    else if (type == 'SET_SPOTIFY_USER') {
         return {
             ...state,
-            user: payload
+            spotifyUser: payload
         };
+    }
+    else if (type == 'SET_FIREBASE_USER') {
+        return {
+            ...state,
+            firebase: payload,
+        }
+    }
+    else if (type == 'UPDATE_FIREBASE_USER') {
+        return {
+            ...state,
+            firebase: {
+                ...state.firebase,
+                ...payload,
+            }
+        }
+    }
+    else if (type == 'SET_FIREBASE_USER_ID') {
+        return {
+            ...state,
+            firebase: {
+                ...state.firebase,
+                id: payload
+            }
+        }
     }
     else if (type == 'SET_PLAYLIST') {
         return {

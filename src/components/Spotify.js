@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import spotifyApi from '../spotifyApi';
 import Search from './Search';
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
 import { playlistTracksSelector } from '../selectors';
 
-import { play } from '../redux/actions';
+import { play, fetchUserData } from '../redux/actions';
 
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
@@ -15,23 +15,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-class Spotify extends Component {
-    state = {
-        playlistId: null,
-        playlist: {},
-    }
 
+class Spotify extends Component {
     componentDidMount() {
-        if (!spotifyApi.getAccessToken()) {
-            //this.props.history.push('/');
-        }
-        /*
-        window.addEventListener("beforeunload", function(e){
-            alert('CLOSING');
-            spotifyApi.unfollowPlaylist(playlist.id);
-            return;
-        });
-        */
+        this.props.fetchUserData(get(this.props, 'match.params.id'))
     }
 
     render() {
@@ -65,5 +52,5 @@ export default connect(
     createStructuredSelector({
         playlistTracks: playlistTracksSelector
     }),
-    { play }
+    { play, fetchUserData }
 )(Spotify);
