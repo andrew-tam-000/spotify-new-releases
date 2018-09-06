@@ -9,12 +9,12 @@ import ListItemText from '@material-ui/core/ListItemText';
 import _ from 'lodash';
 
 import { connect } from 'react-redux';
-import { setSearchText, addTracksToPlaylist } from '../redux/actions';
+import { setSearchText, addTracksToPlaylistStart } from '../redux/actions';
 import { searchTracksSelector, searchTextSelector } from '../selectors';
 
 import spotifyApi from '../spotifyApi';
 
-const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylist }) => {
+const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylistStart }) => {
     return (
         <div>
             <TextField
@@ -26,7 +26,7 @@ const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylist })
                     _.map(
                         searchTracks,
                         track => (
-                            <ListItem key={track.id} button onClick={() => addTracksToPlaylist([track.uri])}>
+                            <ListItem key={track.id} button onClick={() => addTracksToPlaylistStart([track.uri])}>
                                 <ListItemText primary={track.name} secondary={track.artists.map(artist => artist.name).join(', ')}/>
                             </ListItem>
                         )
@@ -42,5 +42,5 @@ export default connect(
         searchTracks: searchTracksSelector,
         searchText: searchTextSelector,
     }),
-    { setSearchText, addTracksToPlaylist }
+    { setSearchText, addTracksToPlaylistStart }
 )(Search);

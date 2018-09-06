@@ -12,6 +12,7 @@ import playSong from './playSong';
 import updateUserData from './updateUserData';
 import createUserId from './createUserId';
 import initializeApp from './initializeApp';
+import initializeOnPlaylist from './initializeOnPlaylist';
 
 // Root page
 // 1) User needs to fetch access token
@@ -45,6 +46,7 @@ export default (...args) => merge(
     updateUserData(...args),
     createUserId(...args),
     initializeApp(...args),
+    initializeOnPlaylist(...args),
 );
 
 /*

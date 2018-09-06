@@ -30,6 +30,7 @@ export default (state = initialState, { type, payload }) => {
                     ...payload,
                 }
             }
+        case 'REFRESH_PLAYLIST_SUCCESS':
         case 'CREATE_PLAYLIST_SUCCESS':
             return {
                 ...state,

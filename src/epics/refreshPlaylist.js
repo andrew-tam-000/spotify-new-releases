@@ -20,15 +20,15 @@ import {
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { playlistIdSelector } from '../selectors';
-import { setPlaylistSuccess, setPlaylistError } from '../redux/actions';
+import { refreshPlaylistSuccess, setPlaylistError } from '../redux/actions';
 
-export default function addTracksToPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
+export default function refreshPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
-        ofType('SET_PLAYLIST_SUCCESS///'),
+        ofType('REFRESH_PLAYLIST_START'),
         mergeMap( action => (
             from(spotifyApi.getPlaylist(playlistIdSelector(state$.value)))
                 .pipe(
-                    mergeMap( playlist  => of(setPlaylistSuccess(playlist))),
+                    mergeMap( playlist => of(refreshPlaylistSuccess(playlist))),
                     catchError( e => of(setPlaylistError(JSON.parse(e.response).error.message))),
                 )
         )),

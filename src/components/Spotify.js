@@ -7,7 +7,7 @@ import { createStructuredSelector } from 'reselect';
 
 import { playlistTracksSelector } from '../selectors';
 
-import { playSongStart, setSpotifyUserStart } from '../redux/actions';
+import { playSongStart, initializeOnPlaylist } from '../redux/actions';
 
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
@@ -17,6 +17,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 
 class Spotify extends Component {
+    componentDidMount() {
+        //this.props.initializeOnPlaylist();
+    }
+
     render() {
         return (
             <div>
@@ -48,5 +52,5 @@ export default connect(
     createStructuredSelector({
         playlistTracks: playlistTracksSelector
     }),
-    { playSongStart }
+    { playSongStart, initializeOnPlaylist }
 )(Spotify);

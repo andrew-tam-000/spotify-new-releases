@@ -158,12 +158,58 @@ export function initializeAppStart() {
     }
 }
 
+export function initializeOnPlaylist() {
+    return {
+        type: 'INITIALIZE_ON_PLAYLIST',
+    }
+}
+
+///////////////////////////////////////////////
+//
+// ADD_TRACKS_TO_PLAYLIST
+//
+///////////////////////////////////////////////
+export function addTracksToPlaylistStart(uris) {
+    return {
+        type: 'ADD_TRACKS_TO_PLAYLIST_START',
+        payload: uris,
+    }
+}
+export function addTracksToPlaylistSuccess() {
+    return {
+        type: 'ADD_TRACKS_TO_PLAYLIST_SUCCESS',
+    }
+}
+
+///////////////////////////////////////////////
+//
+// REFRESH_PLAYLIST
+//
+///////////////////////////////////////////////
+export function refreshPlaylistStart() {
+    return {
+        type: 'REFRESH_PLAYLIST_START'
+    }
+}
+export function refreshPlaylistSuccess(playlist) {
+    return {
+        type: 'REFRESH_PLAYLIST_SUCCESS',
+        payload: playlist,
+    }
+}
 
 
 
 
 
 
+
+export function updateFirebaseUser(firebaseUser) {
+    return {
+        type: 'UPDATE_FIREBASE_USER',
+        payload: firebaseUser
+    }
+}
 
 export function setUserUrl(url) {
     return {
@@ -186,32 +232,4 @@ export function setSearchText(text) {
     }
 }
 
-export function addTracksToPlaylist(uris) {
-    return {
-        type: 'ADD_TRACKS_TO_PLAYLIST',
-        payload: uris,
-    }
-}
-export function updateFirebaseUser(firebaseUser) {
-    return {
-        type: 'UPDATE_FIREBASE_USER',
-        payload: firebaseUser
-    }
-}
 
-
-
-/*
-export function removeTracksToPlaylistAsync(uris) {
-    return (dispatch, getState) => {
-        const playlistId = playlistIdSelector(getState());
-        return spotifyApi
-            .removeTracksFromPlaylist(
-                playlistId,
-                uris
-            )
-            .then( () => dispatch(refreshPlaylist()))
-
-    }
-}
-*/
