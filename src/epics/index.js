@@ -1,6 +1,6 @@
 import { merge } from 'rxjs/observable/merge';
 import fetchAccessToken from './fetchAccessToken';
-import initializeConnections from './initializeConnections';
+import storeFirebaseData from './storeFirebaseData';
 import redirectToPlaylist from './redirectToPlaylist';
 import populateSearch from './populateSearch';
 import fetchFirebaseUserData from './fetchFirebaseUserData';
@@ -10,6 +10,8 @@ import addTracksToPlaylist from './addTracksToPlaylist';
 import refreshPlaylist from './refreshPlaylist';
 import playSong from './playSong';
 import updateUserData from './updateUserData';
+import createUserId from './createUserId';
+import initializeApp from './initializeApp';
 
 // Root page
 // 1) User needs to fetch access token
@@ -30,17 +32,19 @@ import updateUserData from './updateUserData';
 // What happens when non-host user comes to specific url
 
 export default (...args) => merge(
-    initializeConnections(...args),
+    storeFirebaseData(...args),
     fetchAccessToken(...args),
     fetchFirebaseUserData(...args),
     fetchSpotifyUserData(...args),
     createSharedPlayilst(...args),
-    //redirectToPlaylist(...args),
+    redirectToPlaylist(...args),
     populateSearch(...args),
     addTracksToPlaylist(...args),
     refreshPlaylist(...args),
     playSong(...args),
     updateUserData(...args),
+    createUserId(...args),
+    initializeApp(...args),
 );
 
 /*

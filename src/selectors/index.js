@@ -6,8 +6,8 @@ export const accessTokenSelector = createSelector(
     accessToken => accessToken
 );
 
-export const firebaseUserPlaylistIdSelector = createSelector(
-    state => _.get(state, 'app.firebase.playlistId'),
+export const spotifyPlaylistIdSelector = createSelector(
+    state => _.get(state, 'app.playlist.id'),
     playlistId => playlistId
 );
 

@@ -24,7 +24,7 @@ import { setPlaylistSuccess, setPlaylistError } from '../redux/actions';
 
 export default function addTracksToPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
-        ofType('SET_PLAYLIST_START'),
+        ofType('SET_PLAYLIST_SUCCESS///'),
         mergeMap( action => (
             from(spotifyApi.getPlaylist(playlistIdSelector(state$.value)))
                 .pipe(

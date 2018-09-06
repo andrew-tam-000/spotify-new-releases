@@ -7,6 +7,11 @@ import {
     playlistUriSelector
 } from '../../selectors';
 
+///////////////////////////////////////////////
+//
+// PLAY_SONG
+//
+///////////////////////////////////////////////
 export function playSongStart(trackUri) {
     return {
         type: 'PLAY_SONG_START',
@@ -25,6 +30,33 @@ export function playSongError(message) {
     }
 }
 
+///////////////////////////////////////////////
+//
+// CREATE_PLAYLIST
+//
+///////////////////////////////////////////////
+export function createPlaylistStart() {
+    return {
+        type: 'CREATE_PLAYLIST_START',
+    }
+}
+export function createPlaylistSuccess(playlist) {
+    return {
+        type: 'CREATE_PLAYLIST_SUCCESS',
+        payload: playlist,
+    }
+}
+export function createPlaylistError() {
+    return {
+        type: 'CREATE_PLAYLIST_ERROR',
+    }
+}
+
+///////////////////////////////////////////////
+//
+// SET_PLAYLIST
+//
+///////////////////////////////////////////////
 export function setPlaylistStart() {
     return {
         type: 'SET_PLAYLIST_START',
@@ -42,39 +74,34 @@ export function setPlaylistError() {
     }
 }
 
-export function setFirebaseUserIdStart() {
+///////////////////////////////////////////////
+//
+// SET_FIREBASE_USER
+//
+///////////////////////////////////////////////
+export function storeFirebaseUserStart() {
     return {
-        type: 'SET_FIREBASE_USER_ID_START',
+        type: 'STORE_FIREBASE_USER_START',
     }
 }
-export function setFirebaseUserIdSuccess(id) {
+export function storeFirebaseUserSuccess(firebaseUser) {
     return {
-        type: 'SET_FIREBASE_USER_ID_SUCCESS',
-        payload: id,
-    }
-}
-export function setFirebaseUserIdError(message) {
-    return {
-        type: 'SET_FIREBASE_USER_ID_ERROR',
-        payload: message,
-    }
-}
-
-export function updateFirebaseUser(firebaseUser) {
-    return {
-        type: 'UPDATE_FIREBASE_USER',
+        type: 'STORE_FIREBASE_USER_SUCCESS',
         payload: firebaseUser
     }
 }
-
-export function setFirebaseUser(firebaseUser) {
+export function storeFirebaseUserError() {
     return {
-        type: 'SET_FIREBASE_USER',
-        payload: firebaseUser
+        type: 'STORE_FIREBASE_USER_ERROR',
     }
 }
 
 
+///////////////////////////////////////////////
+//
+// SET_ACCESS_TOKEN
+//
+///////////////////////////////////////////////
 export function setAccessTokenStart() {
     return {
         type: 'SET_ACCESS_TOKEN_START'
@@ -87,32 +114,61 @@ export function setAccessTokenSuccess(token) {
     }
 }
 
-export function setUserUrl(url) {
+///////////////////////////////////////////////
+//
+// CREATE_USER_ID
+//
+///////////////////////////////////////////////
+export function createUserIdStart() {
     return {
-        type: 'SET_USER_URL',
-        payload: url,
+        type: 'CREATE_USER_ID_START',
+    }
+}
+export function createUserIdSuccess() {
+    return {
+        type: 'CREATE_USER_ID_SUCCESS',
     }
 }
 
-export function fetchUserData(userId) {
+///////////////////////////////////////////////
+//
+// SET_SPOTIFY_USER
+//
+///////////////////////////////////////////////
+export function setSpotifyUserStart() {
     return {
-        type: 'FETCH_USER_DATA',
-        payload: userId
+        type: 'SET_SPOTIFY_USER_START',
     }
 }
-
-
-export function setSpotifyUser(spotifyUser) {
+export function setSpotifyUserSuccess(spotifyUser) {
     return {
-        type: 'SET_SPOTIFY_USER',
+        type: 'SET_SPOTIFY_USER_SUCCESS',
         payload: spotifyUser
     }
 }
 
-export function setPlaylist(playlist) {
+///////////////////////////////////////////////
+//
+// INITIALIZE_APP
+//
+///////////////////////////////////////////////
+export function initializeAppStart() {
     return {
-        type: 'SET_PLAYLIST',
-        payload: playlist
+        type: 'INITIALIZE_APP_START',
+    }
+}
+
+
+
+
+
+
+
+
+export function setUserUrl(url) {
+    return {
+        type: 'SET_USER_URL',
+        payload: url,
     }
 }
 
@@ -136,6 +192,14 @@ export function addTracksToPlaylist(uris) {
         payload: uris,
     }
 }
+export function updateFirebaseUser(firebaseUser) {
+    return {
+        type: 'UPDATE_FIREBASE_USER',
+        payload: firebaseUser
+    }
+}
+
+
 
 /*
 export function removeTracksToPlaylistAsync(uris) {

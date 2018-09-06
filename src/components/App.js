@@ -5,7 +5,7 @@ import { getAccessTokenFromUrl } from '../utils';
 import _ from 'lodash';
 import spotifyApi from '../spotifyApi';
 import { connect } from 'react-redux';
-import { setAccessTokenStart} from '../redux/actions';
+import { initializeAppStart } from '../redux/actions';
 
 class App extends Component {
     render() {
@@ -15,7 +15,7 @@ class App extends Component {
                 <img src={logo} className="App-logo" alt="logo" />
                 <h1 className="App-title">Welcome to React</h1>
                 </header>
-                <button onClick={() => this.props.setAccessTokenStart()}>
+                <button onClick={() => this.props.initializeAppStart()}>
                     RequestToken!
                 </button>
 
@@ -29,5 +29,5 @@ class App extends Component {
 
 export default connect(
     null,
-    { setAccessTokenStart }
+    { initializeAppStart }
 )(App);

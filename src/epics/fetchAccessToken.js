@@ -26,7 +26,7 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setAccessTokenSuccess, setFirebaseUserIdStart } from '../redux/actions';
+import { setAccessTokenSuccess, setSpotifyUserStart } from '../redux/actions';
 
 const scopes = [
     'user-modify-playback-state',
@@ -68,7 +68,6 @@ export default function fetchAccessToken(action$, state$, { firebaseApp, spotify
         ),
         mergeMap( token => ([
             setAccessTokenSuccess(token),
-            setFirebaseUserIdStart(token),
         ])),
     );
 }

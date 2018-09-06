@@ -26,18 +26,35 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setFirebaseUserIdSuccess, setFirebaseUserIdError } from '../redux/actions';
-import { accessTokenSelector } from '../selectors';
+import { storeFirebaseUserSuccess, storeFirebaseUserError } from '../redux/actions';
+import { accessTokenSelector, spotifyPlaylistIdSelector  } from '../selectors';
 
 export default function initializeConnections(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('SET_FIREBASE_USER_ID_START'),
+        ofType('STORE_FIREBASE_USER_START'),
+        switchMap(
+            () => (
+                action$.ofType('SET_SPOTIFY_USER_SUCCESS')
+                    .pipe(
+                        take(1)
+                    )
+            )
+        ),
+        switchMap(
+            () => (
+                action$.ofType('CREATE_PLAYLIST_SUCCESS')
+                    .pipe(
+                        take(1)
+                    )
+            )
+        ),
         mergeMap(
             action => {
                 const id = uuid();
                 const doc = {
                     id,
-                    token: accessTokenSelector(state$.value)
+                    token: accessTokenSelector(state$.value),
+                    playlistId: spotifyPlaylistIdSelector(state$.value),
                 };
                 return from(
                     firebaseApp.setUserData(doc)
@@ -47,10 +64,9 @@ export default function initializeConnections(action$, state$, { firebaseApp }) 
         ),
         mergeMap( doc => (
             [
-                setFirebaseUserIdSuccess(doc.id),
-                push(doc.id)
+                storeFirebaseUserSuccess(doc),
             ]
         )),
-        catchError(e => of(setFirebaseUserIdError(e.message)))
+        catchError(e => of(storeFirebaseUserError(e.message)))
     );
 }

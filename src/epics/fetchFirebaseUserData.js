@@ -28,16 +28,16 @@ import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
 import { firebaseUserIdSelector } from '../selectors';
 import firebase from '../firebase';
-import { setFirebaseUser } from '../redux/actions';
+import { storeFirebaseUserSuccess } from '../redux/actions';
 
 export default function fetchUserData(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('FETCH_USER_DATA'),
+        ofType('SET_FIREBASE_USER_START//'),
         mergeMap( action => (
             from(firebaseApp.retrieveUserData(action.payload))
                 .pipe(
                     mergeMap( doc => doc.exists
-                        ?  of(setFirebaseUser(doc.data()))
+                        ?  of(storeFirebaseUserSuccess(doc.data()))
                         : of({type: 'error', payload: 'User does not exist'})
                     ),
                     catchError( e => of({type: 'error', payload: e.message})),

@@ -28,18 +28,30 @@ import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
 import { firebaseUserIdSelector, accessTokenSelector } from '../selectors';
 import firebase from '../firebase';
-import { setSpotifyUser } from '../redux/actions';
+import { setSpotifyUserSuccess, createPlaylistStart } from '../redux/actions';
 
 export default function fetchUserData(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
-        ofType('SET_FIREBASE_USER'),
-        mergeMap( action => {
-            spotifyApi.setAccessToken(accessTokenSelector(state$.value));
-            return from(spotifyApi.getMe())
+        ofType('SET_SPOTIFY_USER_START'),
+        // Only do this if the access token has been set
+        switchMap( action => (
+            action$
+                .ofType('SET_ACCESS_TOKEN_SUCCESS')
                 .pipe(
-                    mergeMap( user => of(setSpotifyUser(user))),
-                    catchError( e => of({type: 'error', payload: JSON.parse(e.response).error.message}))
+                    take(1),
+                    mergeMap(
+                        action => {
+                            spotifyApi.setAccessToken(accessTokenSelector(state$.value));
+                            return from(spotifyApi.getMe())
+                                .pipe(
+                                    mergeMap( user => of(
+                                        setSpotifyUserSuccess(user),
+                                    )),
+                                    catchError( e => of({type: 'error', payload: JSON.parse(e.response).error.message}))
+                                )
+                        }
+                    )
                 )
-        }),
+        )),
     );
 }
