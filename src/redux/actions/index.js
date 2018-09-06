@@ -42,10 +42,21 @@ export function setPlaylistError() {
     }
 }
 
-export function setFirebaseUserId(id) {
+export function setFirebaseUserIdStart() {
     return {
-        type: 'SET_FIREBASE_USER_ID',
+        type: 'SET_FIREBASE_USER_ID_START',
+    }
+}
+export function setFirebaseUserIdSuccess(id) {
+    return {
+        type: 'SET_FIREBASE_USER_ID_SUCCESS',
         payload: id,
+    }
+}
+export function setFirebaseUserIdError(message) {
+    return {
+        type: 'SET_FIREBASE_USER_ID_ERROR',
+        payload: message,
     }
 }
 
@@ -64,9 +75,15 @@ export function setFirebaseUser(firebaseUser) {
 }
 
 
-export function fetchAccessToken() {
+export function setAccessTokenStart() {
     return {
-        type: 'FETCH_ACCESS_TOKEN'
+        type: 'SET_ACCESS_TOKEN_START'
+    }
+}
+export function setAccessTokenSuccess(token) {
+    return {
+        type: 'SET_ACCESS_TOKEN_SUCCESS',
+        payload: token
     }
 }
 
@@ -84,12 +101,6 @@ export function fetchUserData(userId) {
     }
 }
 
-export function setAccessToken(hash) {
-    return {
-        type: 'SET_ACCESS_TOKEN',
-        payload: hash
-    }
-}
 
 export function setSpotifyUser(spotifyUser) {
     return {

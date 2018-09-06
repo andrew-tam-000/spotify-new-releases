@@ -26,23 +26,18 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setFirebaseUserId } from '../redux/actions';
+import { setFirebaseUserIdSuccess, setFirebaseUserIdError } from '../redux/actions';
+import { accessTokenSelector } from '../selectors';
 
 export default function initializeConnections(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('FETCH_ACCESS_TOKEN'),
-        mergeMap(
-            () => action$.pipe(
-                ofType('SET_ACCESS_TOKEN'),
-                take(1)
-            )
-        ),
+        ofType('SET_FIREBASE_USER_ID_START'),
         mergeMap(
             action => {
                 const id = uuid();
                 const doc = {
                     id,
-                    token: action.payload
+                    token: accessTokenSelector(state$.value)
                 };
                 return from(
                     firebaseApp.setUserData(doc)
@@ -52,10 +47,10 @@ export default function initializeConnections(action$, state$, { firebaseApp }) 
         ),
         mergeMap( doc => (
             [
-                setFirebaseUserId(doc.id),
+                setFirebaseUserIdSuccess(doc.id),
                 push(doc.id)
             ]
         )),
-        catchError(e => of({type: 'error', payload: e.message}))
+        catchError(e => of(setFirebaseUserIdError(e.message)))
     );
 }

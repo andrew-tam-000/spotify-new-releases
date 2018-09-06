@@ -2,10 +2,13 @@ import _ from 'lodash';
 import initialState from '../state';
 
 export default (state = initialState, { type, payload }) => {
-    if (type == 'SET_ACCESS_TOKEN') {
+    if (type == 'SET_ACCESS_TOKEN_SUCCESS') {
         return {
             ...state,
-            accessToken: payload
+            firebase: {
+                ...state.firebase,
+                token: payload,
+            }
         };
     }
     else if (type == 'SET_SPOTIFY_USER') {
@@ -29,7 +32,7 @@ export default (state = initialState, { type, payload }) => {
             }
         }
     }
-    else if (type == 'SET_FIREBASE_USER_ID') {
+    else if (type == 'SET_FIREBASE_USER_ID_SUCCESS') {
         return {
             ...state,
             firebase: {
