@@ -27,7 +27,7 @@ import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
 import { playlistIdSelector } from '../selectors';
-import { setPlaylistStart, addTracksToPlaylistSuccess, refreshPlaylistStart } from '../redux/actions';
+import { setPlaylistStart, addTracksToPlaylistSuccess, refreshPlaylistStart, updateFirebaseUserStart } from '../redux/actions';
 
 export default function addTracksToPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
@@ -38,6 +38,7 @@ export default function addTracksToPlaylist(action$, state$, { firebaseApp, spot
                     mergeMap( playlist => ([
                         addTracksToPlaylistSuccess(),
                         refreshPlaylistStart(),
+                        updateFirebaseUserStart({songAdded: _.join(action.payload, ',')}),
                     ])),
                     catchError( e => {
                         return of({type: 'error', payload: JSON.parse(e.response).error.message})

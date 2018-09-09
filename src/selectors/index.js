@@ -46,3 +46,8 @@ export const spotifyUserIdSelector = createSelector(
     spotifyUserId => spotifyUserId
 )
 
+export const playStatusSelector = createSelector(
+    state => _.get(state, 'app.firebase.playStatus') || '',
+    playStatus => playStatus
+)
+

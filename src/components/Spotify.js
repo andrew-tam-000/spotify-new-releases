@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
 import { createStructuredSelector } from 'reselect';
 
-import { playlistTracksSelector } from '../selectors';
+import { playlistTracksSelector, playStatusSelector } from '../selectors';
 
 import { playSongStart, initializeOnPlaylist } from '../redux/actions';
 
@@ -20,6 +20,8 @@ import Drawer from '@material-ui/core/Drawer';
 
 import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import PauseCircleOutlineIcon  from '@material-ui/icons/PauseCircleOutline';
 
 const styles = theme => ({
     searchButton: {
@@ -57,6 +59,7 @@ class Spotify extends Component {
     }
 
     render() {
+        console.log(this.props);
         return (
             <div>
                 <Drawer
@@ -79,6 +82,7 @@ class Spotify extends Component {
                                     onClick={() => this.props.playSongStart(_.get(track, 'track.uri'))}
                                     key={idx}
                                 >
+                                    {_.get(track, 'track.uri') === this.props.playStatus ? <PauseCircleOutlineIcon color='secondary'/> : <PlayCircleOutlineIcon/>}
                                     <ListItemText
                                         primary={_.get(track, 'track.name')}
                                         secondary={ _.join(
@@ -111,7 +115,8 @@ export default compose(
     withStyles(styles),
     connect(
         createStructuredSelector({
-            playlistTracks: playlistTracksSelector
+            playlistTracks: playlistTracksSelector,
+            playStatus: playStatusSelector
         }),
         { playSongStart, initializeOnPlaylist }
     )
