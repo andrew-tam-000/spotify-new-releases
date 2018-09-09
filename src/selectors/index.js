@@ -51,3 +51,7 @@ export const playStatusSelector = createSelector(
     playStatus => playStatus
 )
 
+export const songAddedSelector = createSelector(
+    state => _.get(state, 'app.firebase.songAdded') || '',
+    songAdded => songAdded,
+)

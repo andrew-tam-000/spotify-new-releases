@@ -7,6 +7,13 @@ import {
     playlistUriSelector
 } from '../../selectors';
 
+export function realtimeFirebaseUserSuccess(userData) {
+    return {
+        type: 'REALTIME_FIREBASE_USER_SUCCESS',
+        payload: userData,
+    }
+}
+
 ///////////////////////////////////////////////
 //
 // GET_FIREBASE_USER
@@ -257,12 +264,6 @@ export function refreshPlaylistSuccess(playlist) {
         payload: playlist,
     }
 }
-
-
-
-
-
-
 
 export function updateFirebaseUser(firebaseUser) {
     return {

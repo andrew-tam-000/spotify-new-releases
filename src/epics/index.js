@@ -15,6 +15,7 @@ import getFirebaseUser from './getFirebaseUser';
 import updateFirebaseUser from './updateFirebaseUser';
 import deletePlaylist from './deletePlaylist';
 import setSpotifyApiToken from './setSpotifyApiToken';
+import firebaseListener from './firebaseListener';
 
 // Root page // 1) User needs to fetch access token
 // 2) When access token is fetched
@@ -50,6 +51,7 @@ export default (...args) => merge(
     deletePlaylist(...args),
     setSpotifyApiToken(...args),
     updateFirebaseUser(...args),
+    firebaseListener(...args),
 );
 
 /*

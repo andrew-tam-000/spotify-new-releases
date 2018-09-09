@@ -1,6 +1,7 @@
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import Promise from 'bluebird';
+import { Observable } from 'rxjs';
 
 
 const config = {
@@ -60,8 +61,28 @@ function setUserData(doc) {
         .set(doc)
 }
 
+function subscribeToDoc(docId) {
+    try {
+        console.log("CREATEING SUBSCRIPTIONG");
+        return new Observable.create(function(observer) {
+            firebaseApp
+                .firestore()
+                .collection("connections")
+                .doc(docId)
+                .onSnapshot(doc => {
+                    console.log("CHANGED", doc);
+                    observer.next(doc.data());
+                })
+        });
+    }
+    catch(e) {
+        throw e;
+    }
+}
+
 export default {
     retrieveUserData,
     setUserData,
     updateUserData,
+    subscribeToDoc,
 };

@@ -16,6 +16,7 @@ export default (state = initialState, { type, payload }) => {
                 ...state,
                 spotifyUser: payload
             };
+        case 'REALTIME_FIREBASE_USER_SUCCESS':
         case 'GET_FIREBASE_USER_SUCCESS':
         case 'STORE_FIREBASE_USER_SUCCESS':
             return {
