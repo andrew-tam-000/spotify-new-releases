@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -11,17 +12,38 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import { setSearchText, addTracksToPlaylistStart } from '../redux/actions';
 import { searchTracksSelector, searchTextSelector } from '../selectors';
+import { withStyles } from '@material-ui/core/styles';
 
 import spotifyApi from '../spotifyApi';
 
-const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylistStart }) => {
+const StyledSearch = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+`;
+
+const SearchTextField = withStyles({
+    root: {
+        padding: '10px',
+        display: 'block'
+    }
+})(TextField);
+
+const SearchResultsList = withStyles({
+    root: {
+        overflow: 'auto'
+    }
+})(List);
+
+const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylistStart, ...props }) => {
     return (
-        <div>
-            <TextField
+        <StyledSearch {...props}>
+            <SearchTextField
                 value={searchText}
                 onChange={e => setSearchText(e.target.value)}
             />
-            <List>
+            <SearchResultsList>
                 {
                     _.map(
                         searchTracks,
@@ -32,8 +54,8 @@ const Search = ({searchTracks, searchText, setSearchText, addTracksToPlaylistSta
                         )
                     )
                 }
-            </List>
-        </div>
+            </SearchResultsList>
+        </StyledSearch>
     )
 }
 

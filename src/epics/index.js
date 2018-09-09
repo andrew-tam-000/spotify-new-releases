@@ -1,21 +1,22 @@
 import { merge } from 'rxjs/observable/merge';
-import fetchAccessToken from './fetchAccessToken';
+import setAccessToken from './setAccessToken';
 import storeFirebaseData from './storeFirebaseData';
 import redirectToPlaylist from './redirectToPlaylist';
 import populateSearch from './populateSearch';
-import fetchFirebaseUserData from './fetchFirebaseUserData';
-import fetchSpotifyUserData from './fetchSpotifyUserData';
+import getSpotifyUserData from './getSpotifyUserData';
 import createSharedPlayilst from './createSharedPlaylist';
 import addTracksToPlaylist from './addTracksToPlaylist';
 import refreshPlaylist from './refreshPlaylist';
 import playSong from './playSong';
-import updateUserData from './updateUserData';
 import createUserId from './createUserId';
 import initializeApp from './initializeApp';
 import initializeOnPlaylist from './initializeOnPlaylist';
+import getFirebaseUser from './getFirebaseUser';
+import updateFirebaseUser from './updateFirebaseUser';
+import deletePlaylist from './deletePlaylist';
+import setSpotifyApiToken from './setSpotifyApiToken';
 
-// Root page
-// 1) User needs to fetch access token
+// Root page // 1) User needs to fetch access token
 // 2) When access token is fetched
 // ** Crate a uuid and store it in the cookie
 // ** Create a unique url for the user
@@ -34,19 +35,21 @@ import initializeOnPlaylist from './initializeOnPlaylist';
 
 export default (...args) => merge(
     storeFirebaseData(...args),
-    fetchAccessToken(...args),
-    fetchFirebaseUserData(...args),
-    fetchSpotifyUserData(...args),
+    setAccessToken(...args),
+    getSpotifyUserData(...args),
     createSharedPlayilst(...args),
     redirectToPlaylist(...args),
     populateSearch(...args),
     addTracksToPlaylist(...args),
     refreshPlaylist(...args),
     playSong(...args),
-    updateUserData(...args),
     createUserId(...args),
     initializeApp(...args),
     initializeOnPlaylist(...args),
+    getFirebaseUser(...args),
+    deletePlaylist(...args),
+    setSpotifyApiToken(...args),
+    updateFirebaseUser(...args),
 );
 
 /*

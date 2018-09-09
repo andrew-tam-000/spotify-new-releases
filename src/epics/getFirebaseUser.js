@@ -11,6 +11,7 @@ import {
     map,
     catchError,
     takeWhile,
+    filter,
 } from 'rxjs/operators';
 import {
     from,
@@ -26,20 +27,28 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setAccessTokenStart, getSpotifyUserStart, createPlaylistStart, createUserIdStart, storeFirebaseUserStart } from '../redux/actions';
+import { getFirebaseUserSuccess } from '../redux/actions';
 import { accessTokenSelector } from '../selectors';
 
 export default function initializeConnections(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('INITIALIZE_APP_START'),
+        ofType('GET_FIREBASE_USER_START'),
         mergeMap(
-            action => ([
-                setAccessTokenStart(),
-                getSpotifyUserStart(),
-                createPlaylistStart(),
-                createUserIdStart(),
-                storeFirebaseUserStart(),
-            ])
+            action => (
+                from(firebaseApp.retrieveUserData(action.payload))
+                    .pipe(
+                        mergeMap(doc => (
+                            doc.exists ? (
+                                of(getFirebaseUserSuccess(doc.data()))
+                            ) : (
+                                of({
+                                    type: 'error',
+                                    payload: 'User does not exist'
+                                })
+                            )
+                        ))
+                    )
+            )
         )
     );
 }

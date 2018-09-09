@@ -11,12 +11,14 @@ import {
     map,
     catchError,
     takeWhile,
+    skipWhile,
 } from 'rxjs/operators';
 import {
     from,
     of,
     interval,
     timer,
+    EMPTY,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import uuid from 'uuid/v1';
@@ -26,20 +28,16 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setAccessTokenStart, getSpotifyUserStart, createPlaylistStart, createUserIdStart, storeFirebaseUserStart } from '../redux/actions';
+import { setAccessTokenSuccess } from '../redux/actions';
 import { accessTokenSelector } from '../selectors';
 
-export default function initializeConnections(action$, state$, { firebaseApp }) {
-    return action$.pipe(
-        ofType('INITIALIZE_APP_START'),
-        mergeMap(
-            action => ([
-                setAccessTokenStart(),
-                getSpotifyUserStart(),
-                createPlaylistStart(),
-                createUserIdStart(),
-                storeFirebaseUserStart(),
-            ])
-        )
+export default function setSpotifyApiToken(action$, state$, { firebaseApp, spotifyApi }) {
+    return state$.pipe(
+        skipWhile(state => !accessTokenSelector(state)),
+        take(1),
+        mergeMap( () => {
+            spotifyApi.setAccessToken(accessTokenSelector(state$.value));
+            return EMPTY;
+        })
     );
 }

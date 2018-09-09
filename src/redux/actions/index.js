@@ -9,6 +9,24 @@ import {
 
 ///////////////////////////////////////////////
 //
+// GET_FIREBASE_USER
+//
+///////////////////////////////////////////////
+export function getFirebaseUserStart(userId) {
+    return {
+        type: 'GET_FIREBASE_USER_START',
+        payload: userId,
+    }
+}
+export function getFirebaseUserSuccess(userData) {
+    return {
+        type: 'GET_FIREBASE_USER_SUCCESS',
+        payload: userData,
+    }
+}
+
+///////////////////////////////////////////////
+//
 // PLAY_SONG
 //
 ///////////////////////////////////////////////
@@ -54,6 +72,23 @@ export function createPlaylistError() {
 
 ///////////////////////////////////////////////
 //
+// CREATE_PLAYLIST
+//
+///////////////////////////////////////////////
+export function deletePlaylistStart(playlistId) {
+    return {
+        type: 'DELETE_PLAYLIST_START',
+        payload: playlistId,
+    }
+}
+export function deletePlaylistSuccess() {
+    return {
+        type: 'DELETE_PLAYLIST_SUCCESS'
+    }
+}
+
+///////////////////////////////////////////////
+//
 // SET_PLAYLIST
 //
 ///////////////////////////////////////////////
@@ -76,7 +111,31 @@ export function setPlaylistError() {
 
 ///////////////////////////////////////////////
 //
-// SET_FIREBASE_USER
+// UPDATE_FIREBASE_USER
+//
+///////////////////////////////////////////////
+export function updateFirebaseUserStart(userData) {
+    return {
+        type: 'UPDATE_FIREBASE_USER_START',
+        payload: userData
+    }
+}
+export function updateFirebaseUserSuccess(userData) {
+    return {
+        type: 'UPDATE_FIREBASE_USER_SUCCESS',
+        payload: userData
+    }
+}
+export function updateFirebaseUserError(errorMessage) {
+    return {
+        type: 'UPDATE_FIREBASE_USER_ERROR',
+        payload: errorMessage
+    }
+}
+
+///////////////////////////////////////////////
+//
+// STORE_FIREBASE_USER
 //
 ///////////////////////////////////////////////
 export function storeFirebaseUserStart() {
@@ -132,17 +191,17 @@ export function createUserIdSuccess() {
 
 ///////////////////////////////////////////////
 //
-// SET_SPOTIFY_USER
+// GET_SPOTIFY_USER
 //
 ///////////////////////////////////////////////
-export function setSpotifyUserStart() {
+export function getSpotifyUserStart() {
     return {
-        type: 'SET_SPOTIFY_USER_START',
+        type: 'GET_SPOTIFY_USER_START',
     }
 }
-export function setSpotifyUserSuccess(spotifyUser) {
+export function getSpotifyUserSuccess(spotifyUser) {
     return {
-        type: 'SET_SPOTIFY_USER_SUCCESS',
+        type: 'GET_SPOTIFY_USER_SUCCESS',
         payload: spotifyUser
     }
 }
@@ -158,9 +217,10 @@ export function initializeAppStart() {
     }
 }
 
-export function initializeOnPlaylist() {
+export function initializeOnPlaylist(userId) {
     return {
         type: 'INITIALIZE_ON_PLAYLIST',
+        payload: userId,
     }
 }
 

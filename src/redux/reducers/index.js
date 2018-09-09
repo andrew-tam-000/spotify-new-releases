@@ -11,17 +11,18 @@ export default (state = initialState, { type, payload }) => {
                     token: payload,
                 }
             };
-        case 'SET_SPOTIFY_USER_SUCCESS':
+        case 'GET_SPOTIFY_USER_SUCCESS':
             return {
                 ...state,
                 spotifyUser: payload
             };
+        case 'GET_FIREBASE_USER_SUCCESS':
         case 'STORE_FIREBASE_USER_SUCCESS':
-        case 'SET_FIREBASE_USER_SUCCESS':
             return {
                 ...state,
                 firebase: payload,
             }
+        case 'UPDATE_FIREBASE_USER_SUCCESS':
         case 'UPDATE_FIREBASE_USER':
             return {
                 ...state,

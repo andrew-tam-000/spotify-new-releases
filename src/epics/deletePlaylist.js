@@ -11,6 +11,7 @@ import {
     map,
     catchError,
     takeWhile,
+    filter,
 } from 'rxjs/operators';
 import {
     from,
@@ -26,20 +27,19 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setAccessTokenStart, getSpotifyUserStart, createPlaylistStart, createUserIdStart, storeFirebaseUserStart } from '../redux/actions';
-import { accessTokenSelector } from '../selectors';
+import { deletePlaylistSuccess } from '../redux/actions';
+import { playlistIdSelector } from '../selectors';
 
 export default function initializeConnections(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('INITIALIZE_APP_START'),
+        ofType('DELETE_PLAYLIST_START'),
         mergeMap(
-            action => ([
-                setAccessTokenStart(),
-                getSpotifyUserStart(),
-                createPlaylistStart(),
-                createUserIdStart(),
-                storeFirebaseUserStart(),
-            ])
+            action => (
+                from(spotifyApi.unfollowPlaylist(action.payload))
+                    .pipe(
+                        mergeMap(req => of(deletePlaylistSuccess()))
+                    )
+            )
         )
     );
 }

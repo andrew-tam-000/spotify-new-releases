@@ -15,7 +15,7 @@ import { routerMiddleware, push } from 'react-router-redux'
 export default function redirectToPlaylist(action$, state$, { firebaseApp }) {
 
     return action$.pipe(
-        ofType('SET_SPOTIFY_USER_SUCCESS'),
+        ofType('GET_SPOTIFY_USER_SUCCESS'),
         switchMap(
             () => action$
             .pipe(

@@ -20,7 +20,7 @@ import {
     timer,
 } from 'rxjs';
 import { playlistUriSelector } from '../selectors';
-import { playSongSuccess, playSongError } from '../redux/actions';
+import { playSongSuccess, playSongError, updateFirebaseUserStart } from '../redux/actions';
 
 export default function addTracksToPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
@@ -33,7 +33,10 @@ export default function addTracksToPlaylist(action$, state$, { firebaseApp, spot
                 }
             }))
                 .pipe(
-                    mergeMap(() => of(playSongSuccess())),
+                    mergeMap(() => ([
+                        playSongSuccess(),
+                        updateFirebaseUserStart({playStatus: 'play'})
+                    ])),
                     catchError( e => of(playSongError(JSON.parse(e.response).error.message))),
                 )
         )),

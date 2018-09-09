@@ -11,6 +11,7 @@ import {
     map,
     catchError,
     takeWhile,
+    skipWhile,
 } from 'rxjs/operators';
 import {
     from,
@@ -26,44 +27,30 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { spotifyUserIdSelector, spotifyPlaylistIdSelector } from '../selectors';
 import firebase from '../firebase';
-import { createPlaylistSuccess, createUserIdStart } from '../redux/actions';
+import { playlistIdSelector, accessTokenSelector, spotifyUserIdSelector  } from '../selectors';
+import { createPlaylistSuccess, createUserIdStart, deletePlaylistStart } from '../redux/actions';
 
 // TODO: Refactor this to use refresh playlist
+// TODO: Also use this to delete the playlist right awawy
 export default function createSharedPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
         ofType('CREATE_PLAYLIST_START'),
-        switchMap(
-            action => (
-                action$
-                    .ofType('SET_SPOTIFY_USER_SUCCESS')
+        mergeMap( action => (
+            state$.pipe(
+                skipWhile(state => !accessTokenSelector(state) || !spotifyUserIdSelector(state)),
+                take(1),
+                mergeMap( action => from(spotifyApi.createPlaylist(spotifyUserIdSelector(state$.value), {name: `Custom List - ${new Date().toLocaleString()}`}))
                     .pipe(
-                        mergeMap( action => (
-                            from(spotifyApi.createPlaylist(spotifyUserIdSelector(state$.value), {name: `Custom List - ${new Date().toLocaleString()}`}))
-                                .pipe(
-                                    mergeMap( playlist => ([
-                                        createPlaylistSuccess(playlist),
-                                    ])),
-                                    catchError( e => {
-                                        return of({type: 'error', payload: e})
-                                    })
-                                )
-                        ))
+                        catchError( e => of({type: 'error', payload: e}))
                     )
+                )
             )
-        )
-        /*
-            const existingPlaylist = spotifyPlaylistIdSelector(state$.value);
-            if (existingPlaylist) {
-                return from(spotifyApi.getPlaylist(existingPlaylist))
-                    .pipe(
-                        mergeMap( playlist => of(setPlaylistSuccess(playlist))),
-                        catchError( e => {
-                            return of({type: 'error', payload: JSON.parse(e.response).error.message})
-                        })
-                    )
-            }
-            */
+        )),
+        mergeMap( playlist => ([
+            createPlaylistSuccess(playlist),
+            deletePlaylistStart(playlist.id),
+        ])),
+        catchError( e =>of({type: 'error', payload: e}))
     )
 }

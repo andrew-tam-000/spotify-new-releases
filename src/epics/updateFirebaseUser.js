@@ -11,6 +11,7 @@ import {
     map,
     catchError,
     takeWhile,
+    skipWhile,
 } from 'rxjs/operators';
 import {
     from,
@@ -26,22 +27,20 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
+import { updateFirebaseUserSuccess, updateFirebaseUserError } from '../redux/actions';
 import { firebaseUserIdSelector } from '../selectors';
-import firebase from '../firebase';
-import { storeFirebaseUserSuccess } from '../redux/actions';
 
-export default function fetchUserData(action$, state$, { firebaseApp }) {
+export default function updateFirebaseUser(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('SET_FIREBASE_USER_START//'),
-        mergeMap( action => (
-            from(firebaseApp.retrieveUserData(action.payload))
-                .pipe(
-                    mergeMap( doc => doc.exists
-                        ?  of(storeFirebaseUserSuccess(doc.data()))
-                        : of({type: 'error', payload: 'User does not exist'})
-                    ),
-                    catchError( e => of({type: 'error', payload: e.message})),
-                )
-        )),
+        ofType('UPDATE_FIREBASE_USER_START'),
+        mergeMap( action => from(
+            firebaseApp.updateUserData(firebaseUserIdSelector(state$.value), action.payload)
+        )
+            .pipe(
+                mergeMap( userData => of(updateFirebaseUserSuccess(userData))),
+                catchError(e => of(updateFirebaseUserError(e.message)))
+            )
+        ),
+        catchError(e => of(updateFirebaseUserError(e.message)))
     );
 }

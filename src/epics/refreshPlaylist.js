@@ -11,6 +11,7 @@ import {
     map,
     catchError,
     takeWhile,
+    skipWhile,
 } from 'rxjs/operators';
 import {
     from,
@@ -19,17 +20,24 @@ import {
     timer,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
-import { playlistIdSelector } from '../selectors';
+import { playlistIdSelector, accessTokenSelector } from '../selectors';
 import { refreshPlaylistSuccess, setPlaylistError } from '../redux/actions';
 
 export default function refreshPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
         ofType('REFRESH_PLAYLIST_START'),
-        mergeMap( action => (
-            from(spotifyApi.getPlaylist(playlistIdSelector(state$.value)))
+        switchMap(action => (
+            state$
                 .pipe(
-                    mergeMap( playlist => of(refreshPlaylistSuccess(playlist))),
-                    catchError( e => of(setPlaylistError(JSON.parse(e.response).error.message))),
+                    skipWhile(state => !playlistIdSelector(state) || !accessTokenSelector(state)),
+                    take(1),
+                    switchMap(
+                        action => from(spotifyApi.getPlaylist(playlistIdSelector(state$.value)))
+                            .pipe(
+                                mergeMap( playlist => of(refreshPlaylistSuccess(playlist))),
+                                catchError( e => of(setPlaylistError(JSON.parse(e.response).error.message))),
+                            )
+                    )
                 )
         )),
     );

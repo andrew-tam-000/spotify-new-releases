@@ -27,7 +27,7 @@ export const searchTextSelector = createSelector(
 );
 
 export const playlistIdSelector = createSelector(
-    state => _.get(state, 'app.playlist.id') || '',
+    state => _.get(state, 'app.firebase.playlistId') || '',
     playlistId => playlistId
 )
 
