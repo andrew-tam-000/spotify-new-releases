@@ -1,6 +1,6 @@
 import { merge } from 'rxjs/observable/merge';
 import setAccessToken from './setAccessToken';
-import storeFirebaseData from './storeFirebaseData';
+import createFirebaseUser from './createFirebaseUser';
 import redirectToPlaylist from './redirectToPlaylist';
 import populateSearch from './populateSearch';
 import getSpotifyUserData from './getSpotifyUserData';
@@ -17,25 +17,8 @@ import deletePlaylist from './deletePlaylist';
 import setSpotifyApiToken from './setSpotifyApiToken';
 import firebaseListener from './firebaseListener';
 
-// Root page // 1) User needs to fetch access token
-// 2) When access token is fetched
-// ** Crate a uuid and store it in the cookie
-// ** Create a unique url for the user
-// ** store the token into firebase
-// ** create a playlist
-//
-// Page with ID
-// * Fetch the access token from firebasec
-// * Create actions for interacting with spotify
-//
-//
-//
-//
-// Need to reate epics to listen to firebase events as well
-// What happens when non-host user comes to specific url
-
 export default (...args) => merge(
-    storeFirebaseData(...args),
+    createFirebaseUser(...args),
     setAccessToken(...args),
     getSpotifyUserData(...args),
     createSharedPlayilst(...args),
@@ -53,18 +36,3 @@ export default (...args) => merge(
     updateFirebaseUser(...args),
     firebaseListener(...args),
 );
-
-/*
-{
-    connections: {
-        [key]: {
-            id
-            token:
-            playlistUri
-            refreshPlaylist
-            isPlaying
-            hostHash: Store cookie and pass it to server (potential to transfer ownership)
-        }
-    }
-}
-*/

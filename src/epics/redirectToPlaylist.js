@@ -5,26 +5,20 @@ import {
     mergeMap,
     switchMap,
     map,
+    concat,
 } from 'rxjs/operators';
 import {
-    of
+    of,
+    forkJoin,
+    zip
 } from 'rxjs';
 import { firebaseUserIdSelector } from '../selectors';
+import { initializeAppSuccess, } from '../redux/actions';
 import { routerMiddleware, push } from 'react-router-redux'
 
 export default function redirectToPlaylist(action$, state$, { firebaseApp }) {
-
     return action$.pipe(
-        ofType('GET_SPOTIFY_USER_SUCCESS'),
-        switchMap(
-            () => action$
-            .pipe(
-                ofType('STORE_FIREBASE_USER_SUCCESS'),
-                take(1),
-            )
-        ),
-        map(
-            () => push(firebaseUserIdSelector(state$.value))
-        ),
+        ofType(initializeAppSuccess().type),
+        map(() => push(firebaseUserIdSelector(state$.value))),
     )
 }

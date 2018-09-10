@@ -18,7 +18,7 @@ export default (state = initialState, { type, payload }) => {
             };
         case 'REALTIME_FIREBASE_USER_SUCCESS':
         case 'GET_FIREBASE_USER_SUCCESS':
-        case 'STORE_FIREBASE_USER_SUCCESS':
+        case 'CREATE_FIREBASE_USER_SUCCESS':
             return {
                 ...state,
                 firebase: payload,

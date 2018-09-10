@@ -142,23 +142,23 @@ export function updateFirebaseUserError(errorMessage) {
 
 ///////////////////////////////////////////////
 //
-// STORE_FIREBASE_USER
+// CREATE_FIREBASE_USER
 //
 ///////////////////////////////////////////////
-export function storeFirebaseUserStart() {
+export function createFirebaseUserStart() {
     return {
-        type: 'STORE_FIREBASE_USER_START',
+        type: 'CREATE_FIREBASE_USER_START',
     }
 }
-export function storeFirebaseUserSuccess(firebaseUser) {
+export function createFirebaseUserSuccess(firebaseUser) {
     return {
-        type: 'STORE_FIREBASE_USER_SUCCESS',
+        type: 'CREATE_FIREBASE_USER_SUCCESS',
         payload: firebaseUser
     }
 }
-export function storeFirebaseUserError() {
+export function createFirebaseUserError() {
     return {
-        type: 'STORE_FIREBASE_USER_ERROR',
+        type: 'CREATE_FIREBASE_USER_ERROR',
     }
 }
 
@@ -221,6 +221,11 @@ export function getSpotifyUserSuccess(spotifyUser) {
 export function initializeAppStart() {
     return {
         type: 'INITIALIZE_APP_START',
+    }
+}
+export function initializeAppSuccess() {
+    return {
+        type: 'INITIALIZE_APP_SUCCESS',
     }
 }
 

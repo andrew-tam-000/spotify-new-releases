@@ -27,12 +27,12 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { storeFirebaseUserSuccess, storeFirebaseUserError } from '../redux/actions';
+import { createFirebaseUserSuccess, createFirebaseUserError } from '../redux/actions';
 import { spotifyUserIdSelector, spotifyPlaylistIdSelector, accessTokenSelector } from '../selectors';
 
-export default function initializeConnections(action$, state$, { firebaseApp }) {
+export default function createFirebaseUser(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType('STORE_FIREBASE_USER_START'),
+        ofType('CREATE_FIREBASE_USER_START'),
         mergeMap(() => state$.pipe(
             skipWhile( state => !spotifyUserIdSelector(state) || !spotifyPlaylistIdSelector(state)),
             take(1),
@@ -50,8 +50,8 @@ export default function initializeConnections(action$, state$, { firebaseApp }) 
                         .then(() => doc)
                 )
             }),
-            mergeMap(doc => of(storeFirebaseUserSuccess(doc)))
+            mergeMap(doc => of(createFirebaseUserSuccess(doc)))
         )),
-        catchError(e => of(storeFirebaseUserError(e.message)))
+        catchError(e => of(createFirebaseUserError(e.message)))
     );
 }
