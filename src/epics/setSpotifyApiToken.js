@@ -28,7 +28,7 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setAccessTokenSuccess } from '../redux/actions';
+import { createAccessTokenSuccess } from '../redux/actions';
 import { accessTokenSelector } from '../selectors';
 
 export default function setSpotifyApiToken(action$, state$, { firebaseApp, spotifyApi }) {

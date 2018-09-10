@@ -3,7 +3,7 @@ import initialState from '../state';
 
 export default (state = initialState, { type, payload }) => {
     switch (type) {
-        case 'SET_ACCESS_TOKEN_SUCCESS':
+        case 'CREATE_ACCESS_TOKEN_SUCCESS':
             return {
                 ...state,
                 firebase: {

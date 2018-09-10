@@ -168,14 +168,14 @@ export function createFirebaseUserError() {
 // SET_ACCESS_TOKEN
 //
 ///////////////////////////////////////////////
-export function setAccessTokenStart() {
+export function createAccessTokenStart() {
     return {
-        type: 'SET_ACCESS_TOKEN_START'
+        type: 'CREATE_ACCESS_TOKEN_START'
     }
 }
-export function setAccessTokenSuccess(token) {
+export function createAccessTokenSuccess(token) {
     return {
-        type: 'SET_ACCESS_TOKEN_SUCCESS',
+        type: 'CREATE_ACCESS_TOKEN_SUCCESS',
         payload: token
     }
 }

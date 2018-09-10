@@ -29,38 +29,43 @@ import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
 import {
-    setAccessTokenStart,
+    createAccessTokenStart,
     getSpotifyUserStart,
     createPlaylistStart,
     createUserIdStart,
     createFirebaseUserStart,
     initializeAppStart,
 
-    setAccessTokenSuccess,
+    createAccessTokenSuccess,
     getSpotifyUserSuccess,
     createPlaylistSuccess,
     createUserIdSuccess,
     createFirebaseUserSuccess,
     initializeAppSuccess,
     } from '../redux/actions';
-import { accessTokenSelector } from '../selectors';
+import { accessTokenSelector, firebaseUserIdSelector} from '../selectors';
 
 export default function initializeApp(action$, state$, { firebaseApp }) {
     return action$.pipe(
         ofType(initializeAppStart().type),
         mergeMap( action => concat(
-            of(setAccessTokenStart()),
+            of(createAccessTokenStart()),
             of(getSpotifyUserStart()),
             of(createPlaylistStart()),
             of(createUserIdStart()),
             of(createFirebaseUserStart()),
             zip(
-                action$.pipe(ofType(setAccessTokenSuccess().type)),
+                action$.pipe(ofType(createAccessTokenSuccess().type)),
                 action$.pipe(ofType(getSpotifyUserSuccess().type)),
                 action$.pipe(ofType(createPlaylistSuccess().type)),
                 action$.pipe(ofType(createUserIdSuccess().type)),
                 action$.pipe(ofType(createFirebaseUserSuccess().type))
-            ).pipe(mapTo(initializeAppSuccess()))
+            ).pipe(
+                mergeMap( () => ([
+                    initializeAppSuccess(),
+                    push(firebaseUserIdSelector(state$.value)),
+                ]))
+            )
         )),
         catchError(e => ({type: 'error', payload: e.message})),
     );

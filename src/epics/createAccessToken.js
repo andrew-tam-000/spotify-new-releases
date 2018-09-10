@@ -26,7 +26,7 @@ import {
 import Promise from 'bluebird';
 import spotifyApi from '../spotifyApi'
 import { getAccessTokenFromUrl } from '../utils';
-import { setAccessTokenSuccess } from '../redux/actions';
+import { createAccessTokenSuccess } from '../redux/actions';
 import { accessTokenSelector } from '../selectors';
 
 const scopes = [
@@ -44,9 +44,9 @@ const scopes = [
 
 const tokenUrl = `https://accounts.spotify.com/authorize?client_id=27135c7bda1c48f3ba0f6be1161b0561&redirect_uri=http://localhost:3000&response_type=token&show_dialog=true&scope=${_.join(scopes, ' ')}`;
 
-export default function setAccessToken(action$, state$, { firebaseApp, spotifyApi }) {
+export default function createAccessToken(action$, state$, { firebaseApp, spotifyApi }) {
     return action$.pipe(
-        ofType('SET_ACCESS_TOKEN_START'),
+        ofType('CREATE_ACCESS_TOKEN_START'),
         mergeMap(
             action => {
                 const external = window.open(tokenUrl);
@@ -61,7 +61,6 @@ export default function setAccessToken(action$, state$, { firebaseApp, spotifyAp
                         mergeMap(
                             token => {
                                 external.close();
-                                spotifyApi.setAccessToken(token);
                                 return of(token);
                             }
                         ),
@@ -69,7 +68,7 @@ export default function setAccessToken(action$, state$, { firebaseApp, spotifyAp
             }
         ),
         mergeMap( token => ([
-            setAccessTokenSuccess(token),
+            createAccessTokenSuccess(token),
         ])),
     );
 }

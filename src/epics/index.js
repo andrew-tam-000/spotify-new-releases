@@ -1,7 +1,6 @@
 import { merge } from 'rxjs/observable/merge';
-import setAccessToken from './setAccessToken';
+import createAccessToken from './createAccessToken';
 import createFirebaseUser from './createFirebaseUser';
-import redirectToPlaylist from './redirectToPlaylist';
 import populateSearch from './populateSearch';
 import getSpotifyUserData from './getSpotifyUserData';
 import createSharedPlayilst from './createSharedPlaylist';
@@ -19,10 +18,9 @@ import firebaseListener from './firebaseListener';
 
 export default (...args) => merge(
     createFirebaseUser(...args),
-    setAccessToken(...args),
+    createAccessToken(...args),
     getSpotifyUserData(...args),
     createSharedPlayilst(...args),
-    redirectToPlaylist(...args),
     populateSearch(...args),
     addTracksToPlaylist(...args),
     refreshPlaylist(...args),
