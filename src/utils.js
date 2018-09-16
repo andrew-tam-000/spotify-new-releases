@@ -1,5 +1,6 @@
-import qs from 'query-string';
+import qs from "query-string";
 
 export function getAccessTokenFromUrl(win) {
-    return qs.parse((win.location.hash||'').substr(2)).access_token;
+  const hash = win.location.hash || "";
+  return qs.parse(hash.substr(hash.indexOf("access_token"))).access_token;
 }

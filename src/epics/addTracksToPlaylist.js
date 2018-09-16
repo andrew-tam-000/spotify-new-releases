@@ -1,49 +1,28 @@
-import { ofType, combineEpics } from 'redux-observable';
-import _ from 'lodash';
-import { merge } from 'rxjs/observable/merge';
+import { ofType } from "redux-observable";
+import _ from "lodash";
+import { mergeMap, catchError } from "rxjs/operators";
+import { from, of } from "rxjs";
+import { playlistIdSelector } from "../selectors";
 import {
-    take,
-    takeUntil,
-    mergeMap,
-    switchMap,
-    mapTo,
-    delay,
-    map,
-    catchError,
-    takeWhile,
-} from 'rxjs/operators';
-import {
-    from,
-    of,
-    interval,
-    timer,
-} from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import uuid from 'uuid/v1';
-import {
-    push
-} from 'react-router-redux';
-import Promise from 'bluebird';
-import spotifyApi from '../spotifyApi'
-import { getAccessTokenFromUrl } from '../utils';
-import { playlistIdSelector } from '../selectors';
-import { setPlaylistStart, addTracksToPlaylistSuccess, refreshPlaylistStart, updateFirebaseUserStart } from '../redux/actions';
+  addTracksToPlaylistSuccess,
+  refreshPlaylistStart,
+  updateFirebaseUserStart
+} from "../redux/actions";
 
-export default function addTracksToPlaylist(action$, state$, { firebaseApp, spotifyApi }) {
-    return action$.pipe(
-        ofType('ADD_TRACKS_TO_PLAYLIST_START'),
-        mergeMap( action => (
-            from(spotifyApi.addTracksToPlaylist(playlistIdSelector(state$.value), action.payload))
-                .pipe(
-                    mergeMap( playlist => ([
-                        addTracksToPlaylistSuccess(),
-                        refreshPlaylistStart(),
-                        updateFirebaseUserStart({songAdded: _.join(action.payload, ',')}),
-                    ])),
-                    catchError( e => {
-                        return of({type: 'error', payload: JSON.parse(e.response).error.message})
-                    })
-                )
-        )),
-    );
+export default function addTracksToPlaylist(action$, state$, { spotifyApi }) {
+  return action$.pipe(
+    ofType("ADD_TRACKS_TO_PLAYLIST_START"),
+    mergeMap(action =>
+      from(spotifyApi.addTracksToPlaylist(playlistIdSelector(state$.value), action.payload)).pipe(
+        mergeMap(playlist => [
+          addTracksToPlaylistSuccess(),
+          refreshPlaylistStart(),
+          updateFirebaseUserStart({ songAdded: _.join(action.payload, ",") })
+        ]),
+        catchError(e => {
+          return of({ type: "error", payload: JSON.parse(e.response).error.message });
+        })
+      )
+    )
+  );
 }

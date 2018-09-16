@@ -1,17 +1,19 @@
-import spotifyApi from '../../spotifyApi';
-import _ from 'lodash';
+import spotifyApi from "../../spotifyApi";
+import _ from "lodash";
 
-import {
-    searchTextSelector,
-    playlistIdSelector,
-    playlistUriSelector
-} from '../../selectors';
+import { searchTextSelector, playlistIdSelector, playlistUriSelector } from "../../selectors";
 
 export function realtimeFirebaseUserSuccess(userData) {
     return {
-        type: 'REALTIME_FIREBASE_USER_SUCCESS',
-        payload: userData,
-    }
+        type: "REALTIME_FIREBASE_USER_SUCCESS",
+        payload: userData
+    };
+}
+export function realtimeFirebaseUserError(errMsg) {
+    return {
+        type: "REALTIME_FIREBASE_USER_ERROR",
+        payload: errMsg
+    };
 }
 
 ///////////////////////////////////////////////
@@ -21,15 +23,15 @@ export function realtimeFirebaseUserSuccess(userData) {
 ///////////////////////////////////////////////
 export function getFirebaseUserStart(userId) {
     return {
-        type: 'GET_FIREBASE_USER_START',
-        payload: userId,
-    }
+        type: "GET_FIREBASE_USER_START",
+        payload: userId
+    };
 }
 export function getFirebaseUserSuccess(userData) {
     return {
-        type: 'GET_FIREBASE_USER_SUCCESS',
-        payload: userData,
-    }
+        type: "GET_FIREBASE_USER_SUCCESS",
+        payload: userData
+    };
 }
 
 ///////////////////////////////////////////////
@@ -39,20 +41,20 @@ export function getFirebaseUserSuccess(userData) {
 ///////////////////////////////////////////////
 export function playSongStart(trackUri) {
     return {
-        type: 'PLAY_SONG_START',
+        type: "PLAY_SONG_START",
         payload: trackUri
-    }
+    };
 }
 export function playSongSuccess() {
     return {
-        type: 'PLAY_SONG_SUCCESS',
-    }
+        type: "PLAY_SONG_SUCCESS"
+    };
 }
 export function playSongError(message) {
     return {
-        type: 'PLAY_SONG_ERROR',
+        type: "PLAY_SONG_ERROR",
         payload: message
-    }
+    };
 }
 
 ///////////////////////////////////////////////
@@ -62,19 +64,19 @@ export function playSongError(message) {
 ///////////////////////////////////////////////
 export function createPlaylistStart() {
     return {
-        type: 'CREATE_PLAYLIST_START',
-    }
+        type: "CREATE_PLAYLIST_START"
+    };
 }
 export function createPlaylistSuccess(playlist) {
     return {
-        type: 'CREATE_PLAYLIST_SUCCESS',
-        payload: playlist,
-    }
+        type: "CREATE_PLAYLIST_SUCCESS",
+        payload: playlist
+    };
 }
 export function createPlaylistError() {
     return {
-        type: 'CREATE_PLAYLIST_ERROR',
-    }
+        type: "CREATE_PLAYLIST_ERROR"
+    };
 }
 
 ///////////////////////////////////////////////
@@ -84,14 +86,14 @@ export function createPlaylistError() {
 ///////////////////////////////////////////////
 export function deletePlaylistStart(playlistId) {
     return {
-        type: 'DELETE_PLAYLIST_START',
-        payload: playlistId,
-    }
+        type: "DELETE_PLAYLIST_START",
+        payload: playlistId
+    };
 }
 export function deletePlaylistSuccess() {
     return {
-        type: 'DELETE_PLAYLIST_SUCCESS'
-    }
+        type: "DELETE_PLAYLIST_SUCCESS"
+    };
 }
 
 ///////////////////////////////////////////////
@@ -101,19 +103,19 @@ export function deletePlaylistSuccess() {
 ///////////////////////////////////////////////
 export function setPlaylistStart() {
     return {
-        type: 'SET_PLAYLIST_START',
-    }
+        type: "SET_PLAYLIST_START"
+    };
 }
 export function setPlaylistSuccess(playlist) {
     return {
-        type: 'SET_PLAYLIST_SUCCESS',
-        payload: playlist,
-    }
+        type: "SET_PLAYLIST_SUCCESS",
+        payload: playlist
+    };
 }
 export function setPlaylistError() {
     return {
-        type: 'SET_PLAYLIST_ERROR',
-    }
+        type: "SET_PLAYLIST_ERROR"
+    };
 }
 
 ///////////////////////////////////////////////
@@ -123,21 +125,21 @@ export function setPlaylistError() {
 ///////////////////////////////////////////////
 export function updateFirebaseUserStart(userData) {
     return {
-        type: 'UPDATE_FIREBASE_USER_START',
+        type: "UPDATE_FIREBASE_USER_START",
         payload: userData
-    }
+    };
 }
 export function updateFirebaseUserSuccess(userData) {
     return {
-        type: 'UPDATE_FIREBASE_USER_SUCCESS',
+        type: "UPDATE_FIREBASE_USER_SUCCESS",
         payload: userData
-    }
+    };
 }
 export function updateFirebaseUserError(errorMessage) {
     return {
-        type: 'UPDATE_FIREBASE_USER_ERROR',
+        type: "UPDATE_FIREBASE_USER_ERROR",
         payload: errorMessage
-    }
+    };
 }
 
 ///////////////////////////////////////////////
@@ -147,21 +149,20 @@ export function updateFirebaseUserError(errorMessage) {
 ///////////////////////////////////////////////
 export function createFirebaseUserStart() {
     return {
-        type: 'CREATE_FIREBASE_USER_START',
-    }
+        type: "CREATE_FIREBASE_USER_START"
+    };
 }
 export function createFirebaseUserSuccess(firebaseUser) {
     return {
-        type: 'CREATE_FIREBASE_USER_SUCCESS',
+        type: "CREATE_FIREBASE_USER_SUCCESS",
         payload: firebaseUser
-    }
+    };
 }
 export function createFirebaseUserError() {
     return {
-        type: 'CREATE_FIREBASE_USER_ERROR',
-    }
+        type: "CREATE_FIREBASE_USER_ERROR"
+    };
 }
-
 
 ///////////////////////////////////////////////
 //
@@ -170,30 +171,14 @@ export function createFirebaseUserError() {
 ///////////////////////////////////////////////
 export function createAccessTokenStart() {
     return {
-        type: 'CREATE_ACCESS_TOKEN_START'
-    }
+        type: "CREATE_ACCESS_TOKEN_START"
+    };
 }
 export function createAccessTokenSuccess(token) {
     return {
-        type: 'CREATE_ACCESS_TOKEN_SUCCESS',
+        type: "CREATE_ACCESS_TOKEN_SUCCESS",
         payload: token
-    }
-}
-
-///////////////////////////////////////////////
-//
-// CREATE_USER_ID
-//
-///////////////////////////////////////////////
-export function createUserIdStart() {
-    return {
-        type: 'CREATE_USER_ID_START',
-    }
-}
-export function createUserIdSuccess() {
-    return {
-        type: 'CREATE_USER_ID_SUCCESS',
-    }
+    };
 }
 
 ///////////////////////////////////////////////
@@ -203,14 +188,14 @@ export function createUserIdSuccess() {
 ///////////////////////////////////////////////
 export function getSpotifyUserStart() {
     return {
-        type: 'GET_SPOTIFY_USER_START',
-    }
+        type: "GET_SPOTIFY_USER_START"
+    };
 }
 export function getSpotifyUserSuccess(spotifyUser) {
     return {
-        type: 'GET_SPOTIFY_USER_SUCCESS',
+        type: "GET_SPOTIFY_USER_SUCCESS",
         payload: spotifyUser
-    }
+    };
 }
 
 ///////////////////////////////////////////////
@@ -220,20 +205,20 @@ export function getSpotifyUserSuccess(spotifyUser) {
 ///////////////////////////////////////////////
 export function initializeAppStart() {
     return {
-        type: 'INITIALIZE_APP_START',
-    }
+        type: "INITIALIZE_APP_START"
+    };
 }
 export function initializeAppSuccess() {
     return {
-        type: 'INITIALIZE_APP_SUCCESS',
-    }
+        type: "INITIALIZE_APP_SUCCESS"
+    };
 }
 
 export function initializeOnPlaylist(userId) {
     return {
-        type: 'INITIALIZE_ON_PLAYLIST',
-        payload: userId,
-    }
+        type: "INITIALIZE_ON_PLAYLIST",
+        payload: userId
+    };
 }
 
 ///////////////////////////////////////////////
@@ -243,14 +228,14 @@ export function initializeOnPlaylist(userId) {
 ///////////////////////////////////////////////
 export function addTracksToPlaylistStart(uris) {
     return {
-        type: 'ADD_TRACKS_TO_PLAYLIST_START',
-        payload: uris,
-    }
+        type: "ADD_TRACKS_TO_PLAYLIST_START",
+        payload: uris
+    };
 }
 export function addTracksToPlaylistSuccess() {
     return {
-        type: 'ADD_TRACKS_TO_PLAYLIST_SUCCESS',
-    }
+        type: "ADD_TRACKS_TO_PLAYLIST_SUCCESS"
+    };
 }
 
 ///////////////////////////////////////////////
@@ -260,42 +245,109 @@ export function addTracksToPlaylistSuccess() {
 ///////////////////////////////////////////////
 export function refreshPlaylistStart() {
     return {
-        type: 'REFRESH_PLAYLIST_START'
-    }
+        type: "REFRESH_PLAYLIST_START"
+    };
 }
 export function refreshPlaylistSuccess(playlist) {
     return {
-        type: 'REFRESH_PLAYLIST_SUCCESS',
-        payload: playlist,
-    }
+        type: "REFRESH_PLAYLIST_SUCCESS",
+        payload: playlist
+    };
+}
+
+///////////////////////////////////////////////
+//
+// INITIALIZE_ON_ANALYZER
+//
+///////////////////////////////////////////////
+export function initializeOnAnalyzerStart() {
+    return {
+        type: "INITIALIZE_ON_ANALYZER_START"
+    };
+}
+export function initializeOnAnalyzerSuccess() {
+    return {
+        type: "INITIALIZE_ON_ANALYZER_SUCCESS"
+    };
+}
+
+///////////////////////////////////////////////
+//
+// GET_SONGS
+//
+///////////////////////////////////////////////
+export function getSongsStart() {
+    return {
+        type: "GET_SONGS_START"
+    };
+}
+export function getSongsSuccess(songs) {
+    return {
+        type: "GET_SONGS_SUCCESS",
+        payload: songs
+    };
+}
+
+///////////////////////////////////////////////
+//
+// GET_SONG_DATA
+//
+///////////////////////////////////////////////
+export function getSongDataStart() {
+    return {
+        type: "GET_SONG_DATA_START"
+    };
+}
+
+export function getSongDataSuccess(songData) {
+    return {
+        type: "GET_SONG_DATA_SUCCESS",
+        payload: songData
+    };
+}
+
+///////////////////////////////////////////////
+//
+// GET_ARTIST_DATA
+//
+///////////////////////////////////////////////
+export function getArtistDataStart() {
+    return {
+        type: "GET_ARTIST_DATA_START"
+    };
+}
+
+export function getArtistDataSuccess(songData) {
+    return {
+        type: "GET_ARTIST_DATA_SUCCESS",
+        payload: songData
+    };
 }
 
 export function updateFirebaseUser(firebaseUser) {
     return {
-        type: 'UPDATE_FIREBASE_USER',
+        type: "UPDATE_FIREBASE_USER",
         payload: firebaseUser
-    }
+    };
 }
 
 export function setUserUrl(url) {
     return {
-        type: 'SET_USER_URL',
-        payload: url,
-    }
+        type: "SET_USER_URL",
+        payload: url
+    };
 }
 
 export function setSearchResults(searchResults) {
     return {
-        type: 'SET_SEARCH_RESULTS',
+        type: "SET_SEARCH_RESULTS",
         payload: searchResults
-    }
+    };
 }
 
 export function setSearchText(text) {
     return {
-        type: 'SET_SEARCH_TEXT',
+        type: "SET_SEARCH_TEXT",
         payload: text
-    }
+    };
 }
-
-
