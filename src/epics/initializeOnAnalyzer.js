@@ -21,6 +21,7 @@ export default function initializeOnAnalyzer(action$, state$) {
         ofType(initializeOnAnalyzerStart().type),
         mergeMap(() =>
             concat(
+                false &&
                 window.localStorage.getItem("artistData") &&
                 window.localStorage.getItem("songs") &&
                 window.localStorage.getItem("songData")

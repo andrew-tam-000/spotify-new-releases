@@ -8,17 +8,34 @@ import { Column, Table, SortIndicator } from "react-virtualized";
 import { songsWithDataByIdSelector } from "../../selectors";
 import createMultiSort from "./createMultiSort";
 import _ from "lodash";
+import PlayButton from "./PlayButton";
 
 const tableConfig = [
     {
         label: "Title",
         dataKey: "title",
-        getter: () => "songDetails.track.name"
+        getter: () => "songDetails.track.name",
+        cellRenderer: ({ cellData, rowData: { uri } }) => (
+            <React.Fragment>
+                <PlayButton uri={uri} />
+                {cellData}
+            </React.Fragment>
+        )
+    },
+    {
+        dataKey: "uri",
+        getter: () => "songDetails.track.uri",
+        hidden: true
     },
     {
         label: "Artist",
         dataKey: "artist",
         getter: () => "songDetails.track.artists.0.name"
+    },
+    {
+        label: "Genre",
+        dataKey: "genre",
+        getter: () => "artistDetails.genres.0"
     },
     {
         label: "Danceability",
@@ -59,6 +76,11 @@ const tableConfig = [
         label: "Valence",
         dataKey: "valence",
         getter: () => "songAnalysis.valence"
+    },
+    {
+        label: "Tempo",
+        dataKey: "tempo",
+        getter: () => "songAnalysis.tempo"
     },
     {
         label: "Tempo",
@@ -116,7 +138,7 @@ class SongTable extends Component {
                 rowCount={this.state.sortedList.length}
                 rowGetter={({ index }) => this.state.sortedList[index]}
             >
-                {_.map(tableConfig, config => (
+                {_.map(_.filter(tableConfig, config => !_.get(config, "hidden")), config => (
                     <Column
                         headerRenderer={this.headerRenderer}
                         key={config.dataKey}

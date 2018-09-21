@@ -26,7 +26,6 @@ function accumulateArtistDataFromApi(spotifyApi, state$) {
             artistData: []
         }),
         expand(({ artistIds, artistData }) => {
-            console.log(artistIds, artistData);
             const wantedArtistIds = _.slice(artistIds, 0, 50);
             const remainingArtistIds = _.slice(artistIds, 50);
             return artistIds.length
@@ -43,7 +42,6 @@ function accumulateArtistDataFromApi(spotifyApi, state$) {
         }),
         last(),
         mergeMap(({ artistData }) => {
-            console.log(artistData);
             localStorage.setItem(
                 "artistData",
                 lzString.compressToUTF16(JSON.stringify(artistData))

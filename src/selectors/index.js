@@ -70,22 +70,46 @@ export const songDataSelector = createSelector(
     songData => songData
 );
 
-export const songsWithDataByIdSelector = createSelector(
-    songDataSelector,
-    songsSelector,
-    (songData, songs) =>
-        _.merge(
-            {},
-            _.keyBy(_.map(songs, songDetails => ({ songDetails })), "songDetails.track.id"),
-            _.keyBy(_.map(songData, songAnalysis => ({ songAnalysis })), "songAnalysis.id")
-        )
-);
-
 export const artistIdsSelector = createSelector(songsSelector, songs => {
-    console.log(songs);
     return _.uniq(
         _.map(_.flatten(_.map(songs, song => _.get(song, "track.artists"))), artist =>
             _.get(artist, "id")
         )
     );
 });
+
+export const artistDataSelector = createSelector(
+    state => _.get(state, "app.analyzer.artistData") || [],
+    artistData => artistData
+);
+
+export const artistDataByIdSelector = createSelector(artistDataSelector, artistData =>
+    _.keyBy(artistData, "id")
+);
+export const songsWithDataByIdSelector = createSelector(
+    songDataSelector,
+    songsSelector,
+    artistDataByIdSelector,
+    (songData, songs, artistData) => {
+        const songDetailsById = _.keyBy(
+            _.map(songs, songDetails => ({ songDetails })),
+            "songDetails.track.id"
+        );
+        const songsById = _.keyBy(
+            _.map(songData, songAnalysis => ({ songAnalysis })),
+            "songAnalysis.id"
+        );
+
+        const artistsBySongId = _.keyBy(
+            _.map(songs, song => ({
+                artistDetails: {
+                    ..._.get(artistData, _.get(song, "track.artists.0.id")),
+                    songId: _.get(song, "track.id")
+                }
+            })),
+            "artistDetails.songId"
+        );
+
+        return _.merge({}, songDetailsById, songsById, artistsBySongId);
+    }
+);

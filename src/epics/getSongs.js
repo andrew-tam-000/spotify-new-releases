@@ -46,10 +46,7 @@ export default function getSongs(action$, state$, { spotifyApi }) {
     return action$.pipe(
         ofType(getSongsStart().type),
         mergeMap(() => merge(accumulateSongsFromApi(spotifyApi), accumulateSongsFromStorage())),
-        mergeMap(songs => {
-            console.log(songs);
-            return of(getSongsSuccess(songs));
-        }),
+        mergeMap(songs => of(getSongsSuccess(songs))),
         catchError(e => ({ type: "errorp", payload: e.message }))
     );
 }
