@@ -18,6 +18,7 @@ import initializeOnAnalyzer from "./initializeOnAnalyzer";
 import getSongs from "./getSongs";
 import getSongData from "./getSongData";
 import getArtistData from "./getArtistData";
+import getAdvancedSearchResults from "./getAdvancedSearchResults";
 
 export default (...args) =>
     merge(
@@ -39,5 +40,6 @@ export default (...args) =>
         initializeOnAnalyzer(...args),
         getSongs(...args),
         getSongData(...args),
-        getArtistData(...args)
+        getArtistData(...args),
+        getAdvancedSearchResults(...args)
     );

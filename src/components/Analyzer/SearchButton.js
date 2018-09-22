@@ -1,5 +1,5 @@
 import React from "react";
-import { reduce, set, get } from "lodash";
+import { reduce, set, get, filter, reject } from "lodash";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { compose, mapProps } from "recompose";
@@ -33,11 +33,25 @@ export default compose(
         mapDispatchToProps
     ),
     mapProps(({ songsWithDataById, id, ...props }) => ({
-        trackDetails: reduce(
-            tableConfig,
-            (acc, config) => set(acc, config.dataKey, get(songsWithDataById[id], config.getter())),
-            {}
-        ),
+        trackDetails: {
+            ...reduce(
+                filter(tableConfig, "tunable"),
+                (acc, config) =>
+                    set(
+                        acc,
+                        `min_${config.dataKey}`,
+                        get(songsWithDataById[id], config.getter())
+                    ) &&
+                    set(acc, `max_${config.dataKey}`, get(songsWithDataById[id], config.getter())),
+                {}
+            ),
+            ...reduce(
+                reject(tableConfig, "tunable"),
+                (acc, config) =>
+                    set(acc, config.dataKey, get(songsWithDataById[id], config.getter())),
+                {}
+            )
+        },
         ...props
     }))
 )(SearchButton);

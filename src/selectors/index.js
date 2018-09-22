@@ -113,3 +113,18 @@ export const songsWithDataByIdSelector = createSelector(
         return _.merge({}, songDetailsById, songsById, artistsBySongId);
     }
 );
+
+export const advancedSearchSelector = createSelector(
+    state => _.get(state, "app.analyzer.advancedSearch") || {},
+    advancedSearch => advancedSearch
+);
+
+export const advancedSearchTracksSelector = createSelector(advancedSearchSelector, advancedSearch =>
+    _.get(advancedSearch, "tracks")
+);
+
+export const advancedSearchActiveSelector = createSelector(
+    advancedSearchSelector,
+    advancedSearch => advancedSearchSelector,
+    advancedSearch => _.get(advancedSearch, "active")
+);

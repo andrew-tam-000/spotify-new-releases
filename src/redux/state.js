@@ -11,7 +11,8 @@ export default {
     user: {},
     analyzer: {
         advancedSearch: {
-            tracks: []
+            tracks: [],
+            active: null
         }
     }
 };

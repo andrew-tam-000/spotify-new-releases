@@ -42,7 +42,10 @@ export const tableConfig = [
     {
         label: "Popularity",
         dataKey: "popularity",
-        getter: () => "songDetails.track.popularity"
+        getter: () => "songDetails.track.popularity",
+        tunable: true,
+        min: 0,
+        max: 100
     },
     {
         label: "Genre",
@@ -52,47 +55,60 @@ export const tableConfig = [
     {
         label: "Danceability",
         dataKey: "danceability",
-        getter: () => "songAnalysis.danceability"
+        getter: () => "songAnalysis.danceability",
+        tunable: true
     },
     {
         label: "Energy",
         dataKey: "energy",
-        getter: () => "songAnalysis.energy"
+        getter: () => "songAnalysis.energy",
+        tunable: true
     },
     {
         label: "Loudness",
         dataKey: "loudness",
-        getter: () => "songAnalysis.loudness"
+        getter: () => "songAnalysis.loudness",
+        tunable: true,
+        min: -60,
+        max: 0
     },
     {
         label: "Speechiness",
         dataKey: "speechiness",
-        getter: () => "songAnalysis.speechiness"
+        getter: () => "songAnalysis.speechiness",
+        tunable: true
     },
     {
         label: "Acousticness",
         dataKey: "acousticness",
-        getter: () => "songAnalysis.acousticness"
+        getter: () => "songAnalysis.acousticness",
+        tunable: true
     },
     {
         label: "Instrumentalness",
         dataKey: "instrumentalness",
-        getter: () => "songAnalysis.instrumentalness"
+        getter: () => "songAnalysis.instrumentalness",
+        tunable: true
     },
     {
         label: "Liveness",
         dataKey: "liveness",
-        getter: () => "songAnalysis.liveness"
+        getter: () => "songAnalysis.liveness",
+        tunable: true
     },
     {
         label: "Valence",
         dataKey: "valence",
-        getter: () => "songAnalysis.valence"
+        getter: () => "songAnalysis.valence",
+        tunable: true
     },
     {
         label: "Tempo",
         dataKey: "tempo",
-        getter: () => "songAnalysis.tempo"
+        getter: () => "songAnalysis.tempo",
+        tunable: true,
+        min: 0,
+        max: 300
     }
 ];
 

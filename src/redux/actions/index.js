@@ -349,12 +349,31 @@ export function advancedSearchUpdateTrack(index, trackDetails) {
 export function advancedSearchRemoveTrack(index) {
     return {
         type: "advanced-search|REMOVE_TRACK",
-        payload: {
-            index
-        }
+        payload: index
     };
 }
 
+export function advancedSearchGetResultsStart(params) {
+    return {
+        type: "advanced-search|GET_RESULTS_START",
+        payload: params
+    };
+}
+
+export function advancedSearchGetResultsSuccess(results) {
+    return {
+        type: "advanced-search|GET_RESULTS_SUCCESS",
+        payload: results
+    };
+}
+
+export function advancedSearchGetResultsError(errMsg) {
+    return {
+        type: "advanced-search|GET_RESULTS_ERROR",
+        payload: errMsg
+    };
+}
+////////////////////////////////////////////////////
 export function updateFirebaseUser(firebaseUser) {
     return {
         type: "UPDATE_FIREBASE_USER",

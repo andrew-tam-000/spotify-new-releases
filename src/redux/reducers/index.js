@@ -83,6 +83,7 @@ export default (state = initialState, { type, payload }) => {
                 analyzer: {
                     ...state.analyzer,
                     advancedSearch: {
+                        ...state.analyzer.advancedSearch,
                         tracks: _.slice([payload, ...state.analyzer.advancedSearch.tracks], 0, 5)
                     }
                 }
@@ -93,13 +94,14 @@ export default (state = initialState, { type, payload }) => {
                 analyzer: {
                     ...state.analyzer,
                     advancedSearch: {
+                        ...state.analyzer.advancedSearch,
                         tracks: [
                             ..._.slice(state.analyzer.advancedSearch.tracks, 0, payload.index),
                             {
                                 ...state.analyzer.advancedSearch.tracks[payload.index],
                                 ...payload.trackDetails
                             },
-                            ..._.slice(state.analyzer.advancedSearch.tracks, payload.index)
+                            ..._.slice(state.analyzer.advancedSearch.tracks, payload.index + 1)
                         ]
                     }
                 }
@@ -110,10 +112,22 @@ export default (state = initialState, { type, payload }) => {
                 analyzer: {
                     ...state.analyzer,
                     advancedSearch: {
+                        ...state.analyzer.advancedSearch,
                         tracks: [
                             ..._.slice(state.analyzer.advancedSearch.tracks, 0, payload.index),
                             ..._.slice(state.analyzer.advancedSearch.tracks, payload.index + 1)
                         ]
+                    }
+                }
+            };
+        case "advanced-search|GET_RESULTS_SUCCESS":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    advancedSearch: {
+                        ...state.analyzer.advancedSearch,
+                        results: payload
                     }
                 }
             };
