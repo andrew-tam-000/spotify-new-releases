@@ -9,15 +9,17 @@ import { songsWithDataByIdSelector } from "../../selectors";
 import createMultiSort from "./createMultiSort";
 import _ from "lodash";
 import PlayButton from "./PlayButton";
+import SearchButton from "./SearchButton";
 
-const tableConfig = [
+export const tableConfig = [
     {
         label: "Title",
         dataKey: "title",
         getter: () => "songDetails.track.name",
-        cellRenderer: ({ cellData, rowData: { uri } }) => (
+        cellRenderer: ({ cellData, rowData: { uri, id } }) => (
             <React.Fragment>
                 <PlayButton uri={uri} />
+                <SearchButton id={id} />
                 {cellData}
             </React.Fragment>
         )
@@ -28,9 +30,19 @@ const tableConfig = [
         hidden: true
     },
     {
+        dataKey: "id",
+        getter: () => "songDetails.track.id",
+        hidden: true
+    },
+    {
         label: "Artist",
         dataKey: "artist",
         getter: () => "songDetails.track.artists.0.name"
+    },
+    {
+        label: "Popularity",
+        dataKey: "popularity",
+        getter: () => "songDetails.track.popularity"
     },
     {
         label: "Genre",
@@ -76,11 +88,6 @@ const tableConfig = [
         label: "Valence",
         dataKey: "valence",
         getter: () => "songAnalysis.valence"
-    },
-    {
-        label: "Tempo",
-        dataKey: "tempo",
-        getter: () => "songAnalysis.tempo"
     },
     {
         label: "Tempo",

@@ -1,4 +1,5 @@
 import initialState from "../state";
+import _ from "lodash";
 
 export default (state = initialState, { type, payload }) => {
     switch (type) {
@@ -74,6 +75,46 @@ export default (state = initialState, { type, payload }) => {
                 analyzer: {
                     ...state.analyzer,
                     artistData: payload
+                }
+            };
+        case "advanced-search|ADD_TRACK":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    advancedSearch: {
+                        tracks: _.slice([payload, ...state.analyzer.advancedSearch.tracks], 0, 5)
+                    }
+                }
+            };
+        case "advanced-search|UPDATE_TRACK":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    advancedSearch: {
+                        tracks: [
+                            ..._.slice(state.analyzer.advancedSearch.tracks, 0, payload.index),
+                            {
+                                ...state.analyzer.advancedSearch.tracks[payload.index],
+                                ...payload.trackDetails
+                            },
+                            ..._.slice(state.analyzer.advancedSearch.tracks, payload.index)
+                        ]
+                    }
+                }
+            };
+        case "advanced-search|REMOVE_TRACK":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    advancedSearch: {
+                        tracks: [
+                            ..._.slice(state.analyzer.advancedSearch.tracks, 0, payload.index),
+                            ..._.slice(state.analyzer.advancedSearch.tracks, payload.index + 1)
+                        ]
+                    }
                 }
             };
         default:

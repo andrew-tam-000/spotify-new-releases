@@ -1,4 +1,4 @@
-import spotifyApi from '../spotifyApi';
+import spotifyApi from "../spotifyApi";
 
 export default {
     playlist: {},
@@ -6,9 +6,12 @@ export default {
         artists: [],
         tracks: [],
         albums: [],
-        text: ''
+        text: ""
     },
     user: {},
-}
-
-
+    analyzer: {
+        advancedSearch: {
+            tracks: []
+        }
+    }
+};

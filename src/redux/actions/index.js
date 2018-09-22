@@ -324,6 +324,37 @@ export function getArtistDataSuccess(songData) {
     };
 }
 
+///////////////////////////////////////////////
+//
+// advanced-search
+//
+///////////////////////////////////////////////
+export function advancedSearchAddTrack(trackDetails) {
+    return {
+        type: "advanced-search|ADD_TRACK",
+        payload: trackDetails
+    };
+}
+
+export function advancedSearchUpdateTrack(index, trackDetails) {
+    return {
+        type: "advanced-search|UPDATE_TRACK",
+        payload: {
+            index,
+            trackDetails
+        }
+    };
+}
+
+export function advancedSearchRemoveTrack(index) {
+    return {
+        type: "advanced-search|REMOVE_TRACK",
+        payload: {
+            index
+        }
+    };
+}
+
 export function updateFirebaseUser(firebaseUser) {
     return {
         type: "UPDATE_FIREBASE_USER",

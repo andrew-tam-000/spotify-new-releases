@@ -4,6 +4,7 @@ import { createStructuredSelector } from "reselect";
 import { initializeOnAnalyzerStart } from "../redux/actions";
 import { songsWithDataByIdSelector } from "../selectors";
 import SongTable from "./Analyzer/SongTable";
+import RelatedSearch from "./Analyzer/RelatedSearch";
 
 class Analyzer extends Component {
     componentDidMount() {
@@ -11,7 +12,7 @@ class Analyzer extends Component {
     }
 
     render() {
-        return <SongTable />;
+        return [<SongTable />, <RelatedSearch />];
     }
 }
 
