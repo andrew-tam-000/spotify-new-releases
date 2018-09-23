@@ -1,10 +1,11 @@
 import React, { Component } from "react";
+import styled from "styled-components";
 import { compose, withPropsOnChange } from "recompose";
 import "react-virtualized/styles.css";
 
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
-import { Column, Table, SortIndicator } from "react-virtualized";
+import { Column, Table as _Table, SortIndicator } from "react-virtualized";
 import {
     songsWithDataByIdSelector,
     analyzerSearchTermSelector,
@@ -17,6 +18,12 @@ import TextField from "@material-ui/core/TextField";
 import tableConfig from "../../tableConfig";
 import PlayButton from "./PlayButton";
 import SearchButton from "./SearchButton";
+
+const Table = styled(_Table)`
+    .ReactVirtualized__Table__rowColumn:first-child {
+        overflow: initial !important;
+    }
+`;
 
 class SongTable extends Component {
     sortState = createMultiSort(sortParams => this.props.analyzerUpdateSort(sortParams), {
@@ -55,13 +62,13 @@ class SongTable extends Component {
                     width={2000}
                     height={300}
                     headerHeight={20}
-                    rowHeight={30}
+                    rowHeight={60}
                     rowCount={songList.length}
                     rowGetter={({ index }) => songList[index]}
                 >
                     <Column
                         headerRenderer={this.headerRenderer}
-                        width={300}
+                        width={200}
                         cellRenderer={({ cellData, rowData: { uri, id } }) => (
                             <React.Fragment>
                                 <PlayButton uri={uri} />

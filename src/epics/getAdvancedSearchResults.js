@@ -11,7 +11,8 @@ import {
 import {
     advancedSearchGetResultsStart,
     advancedSearchGetResultsSuccess,
-    advancedSearchGetResultsError
+    advancedSearchGetResultsError,
+    advancedSearchChangeTab
 } from "../redux/actions";
 
 export default function getAdvancedSearchResults(action$, state$, { spotifyApi }) {
@@ -39,7 +40,10 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
                     )
                 )
             ).pipe(
-                mergeMap(resp => of(advancedSearchGetResultsSuccess(resp))),
+                mergeMap(resp => [
+                    advancedSearchGetResultsSuccess(resp),
+                    advancedSearchChangeTab(2)
+                ]),
                 catchError(e => of(advancedSearchGetResultsError(e.message)))
             );
         })
