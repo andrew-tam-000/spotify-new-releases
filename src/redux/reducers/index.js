@@ -138,6 +138,17 @@ export default (state = initialState, { type, payload }) => {
                     }
                 }
             };
+        case "advanced-search|SET_GENRES":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    advancedSearch: {
+                        ...state.analyzer.advancedSearch,
+                        genres: payload
+                    }
+                }
+            };
         case "analyzer|UPDATE_SEARCH_TERM":
             return {
                 ...state,

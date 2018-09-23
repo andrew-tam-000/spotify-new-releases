@@ -396,6 +396,13 @@ export function advancedSearchChangeTab(index) {
     };
 }
 
+export function advancedSearchSetGenres(genres) {
+    return {
+        type: "advanced-search|SET_GENRES",
+        payload: genres
+    };
+}
+
 ////////////////////////////////////////////////////
 export function updateFirebaseUser(firebaseUser) {
     return {

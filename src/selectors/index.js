@@ -188,3 +188,7 @@ export const advancedSearchActiveTabSelector = createSelector(
     advancedSearchSelector,
     advancedSearch => get(advancedSearch, "activeTab")
 );
+
+export const advancedSearchGenresSelector = createSelector(advancedSearchSelector, advancedSearch =>
+    get(advancedSearch, "genres")
+);

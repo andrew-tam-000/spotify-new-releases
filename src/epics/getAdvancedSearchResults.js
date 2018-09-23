@@ -6,7 +6,8 @@ import {
     advancedSearchSelector,
     songsWithDataByIdSelector,
     advancedSearchTracksSelector,
-    advancedSearchAttributesSelector
+    advancedSearchAttributesSelector,
+    advancedSearchGenresSelector
 } from "../selectors";
 import {
     advancedSearchGetResultsStart,
@@ -23,6 +24,7 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
             const advancedSearchAttributes = advancedSearchAttributesSelector(state$.value);
             const tracks = advancedSearchTracksSelector(state$.value);
             const songsWithDataById = songsWithDataByIdSelector(state$.value);
+            const seedGenres = advancedSearchGenresSelector(state$.value);
             const seedTracks = tracks;
             const seedArtists = map(tracks, track =>
                 get(songsWithDataById, `${track}.songDetails.track.artists.0.id`)
@@ -32,8 +34,9 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
                     omitBy(
                         {
                             ...advancedSearchAttributes,
-                            seed_tracks: size(seedTracks) && seedTracks,
-                            seed_artists: size(seedArtists) && seedArtists,
+                            seed_tracks: size(seedTracks) ? seedTracks : undefined,
+                            seed_artists: size(seedArtists) ? seedArtists : undefined,
+                            seed_genres: size(seedGenres) ? seedGenres : undefined,
                             limit: 99
                         },
                         isUndefined

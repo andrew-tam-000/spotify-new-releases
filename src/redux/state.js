@@ -13,6 +13,7 @@ export default {
         searchTerm: "",
         sort: {},
         advancedSearch: {
+            genres: [],
             tracks: [],
             attributes: {},
             activeTab: 0
