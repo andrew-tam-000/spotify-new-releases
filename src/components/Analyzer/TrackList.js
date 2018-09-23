@@ -21,14 +21,10 @@ const TrackList = ({ advancedSearchTracks, songsWithDataById }) => (
     <List>
         {map(advancedSearchTracks, (id, index) => (
             <ListItem key={index}>
+                <DeleteButton index={index} />
+                <PopulateButton songData={songsWithDataById[id]} />
                 <SmallListItemText
-                    primary={
-                        <React.Fragment>
-                            {get(songsWithDataById[id], "songDetails.track.name")}
-                            <DeleteButton index={index} />
-                            <PopulateButton songData={songsWithDataById[id]} />
-                        </React.Fragment>
-                    }
+                    primary={get(songsWithDataById[id], "songDetails.track.name")}
                     secondary={get(songsWithDataById[id], "songDetails.track.artists.0.name")}
                 />
             </ListItem>
