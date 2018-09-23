@@ -146,6 +146,14 @@ export default (state = initialState, { type, payload }) => {
                     searchTerm: payload
                 }
             };
+        case "analyzer|UPDATE_SORT":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    sort: payload
+                }
+            };
         default:
             return state;
     }

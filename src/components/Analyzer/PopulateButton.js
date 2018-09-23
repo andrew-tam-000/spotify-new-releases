@@ -7,7 +7,7 @@ import PlaylistAdd from "@material-ui/icons/PlaylistAdd";
 import Button from "@material-ui/core/Button";
 import { songsWithDataByIdSelector } from "../../selectors";
 import { advancedSearchUpdateAttributes } from "../../redux/actions";
-import { tableConfig } from "./SongTable";
+import tableConfig from "../../tableConfig";
 
 const PopulateButton = ({ advancedSearchUpdateAttributes, trackDetails }) => (
     <Button

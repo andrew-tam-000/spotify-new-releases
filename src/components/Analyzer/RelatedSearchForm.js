@@ -1,7 +1,7 @@
 import React from "react";
 import { set, map, reduce, filter } from "lodash";
 import { createStructuredSelector } from "reselect";
-import { tableConfig } from "./SongTable";
+import tableConfig from "../../tableConfig";
 import { advancedSearchUpdateAttributes } from "../../redux/actions";
 import { advancedSearchAttributesSelector } from "../../selectors";
 import { connect } from "react-redux";

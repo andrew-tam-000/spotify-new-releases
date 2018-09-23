@@ -1,144 +1,190 @@
-import _ from "lodash";
+import {
+    orderBy,
+    map,
+    get,
+    values,
+    keyBy,
+    merge,
+    uniq,
+    flatten,
+    reduce,
+    filter,
+    includes,
+    toLower
+} from "lodash";
 import { createSelector } from "reselect";
+import tableConfig from "../tableConfig";
 
 export const accessTokenSelector = createSelector(
-    state => _.get(state, "app.firebase.token"),
+    state => get(state, "app.firebase.token"),
     accessToken => accessToken
 );
 
 export const spotifyPlaylistIdSelector = createSelector(
-    state => _.get(state, "app.playlist.id"),
+    state => get(state, "app.playlist.id"),
     playlistId => playlistId
 );
 
 export const firebaseUserIdSelector = createSelector(
-    state => _.get(state, "app.firebase.id"),
+    state => get(state, "app.firebase.id"),
     userId => userId
 );
 
 export const searchTracksSelector = createSelector(
-    state => _.get(state, "app.search.tracks.items") || [],
+    state => get(state, "app.search.tracks.items") || [],
     tracks => tracks
 );
 
 export const searchTextSelector = createSelector(
-    state => _.get(state, "app.search.text") || "",
+    state => get(state, "app.search.text") || "",
     text => text
 );
 
 export const playlistIdSelector = createSelector(
-    state => _.get(state, "app.firebase.playlistId") || "",
+    state => get(state, "app.firebase.playlistId") || "",
     playlistId => playlistId
 );
 
 export const playlistTracksSelector = createSelector(
-    state => _.get(state, "app.playlist.tracks.items") || [],
+    state => get(state, "app.playlist.tracks.items") || [],
     tracks => tracks
 );
 
 export const playlistUriSelector = createSelector(
-    state => _.get(state, "app.playlist.uri") || "",
+    state => get(state, "app.playlist.uri") || "",
     playlistId => playlistId
 );
 
 export const spotifyUserIdSelector = createSelector(
-    state => _.get(state, "app.spotifyUser.id") || "",
+    state => get(state, "app.spotifyUser.id") || "",
     spotifyUserId => spotifyUserId
 );
 
 export const playStatusSelector = createSelector(
-    state => _.get(state, "app.firebase.playStatus") || "",
+    state => get(state, "app.firebase.playStatus") || "",
     playStatus => playStatus
 );
 
 export const songAddedSelector = createSelector(
-    state => _.get(state, "app.firebase.songAdded") || "",
+    state => get(state, "app.firebase.songAdded") || "",
     songAdded => songAdded
 );
 
 export const songsSelector = createSelector(
-    state => _.get(state, "app.analyzer.songs") || [],
+    state => get(state, "app.analyzer.songs") || [],
     songs => songs
 );
 
 export const songIdsSelector = createSelector(songsSelector, songs =>
-    _.map(songs, song => _.get(song, "track.id"))
+    map(songs, song => get(song, "track.id"))
 );
 
 export const songDataSelector = createSelector(
-    state => _.get(state, "app.analyzer.songData") || [],
+    state => get(state, "app.analyzer.songData") || [],
     songData => songData
 );
 
 export const analyzerSearchTermSelector = createSelector(
-    state => _.get(state, "app.analyzer.searchTerm"),
+    state => get(state, "app.analyzer.searchTerm"),
     searchTerm => searchTerm
 );
 
 export const artistIdsSelector = createSelector(songsSelector, songs => {
-    return _.uniq(
-        _.map(_.flatten(_.map(songs, song => _.get(song, "track.artists"))), artist =>
-            _.get(artist, "id")
-        )
+    return uniq(
+        map(flatten(map(songs, song => get(song, "track.artists"))), artist => get(artist, "id"))
     );
 });
 
 export const artistDataSelector = createSelector(
-    state => _.get(state, "app.analyzer.artistData") || [],
+    state => get(state, "app.analyzer.artistData") || [],
     artistData => artistData
 );
 
+export const analyzerSortSelector = createSelector(
+    state => get(state, "app.analyzer.sort") || [],
+    sort => sort
+);
+
 export const artistDataByIdSelector = createSelector(artistDataSelector, artistData =>
-    _.keyBy(artistData, "id")
+    keyBy(artistData, "id")
 );
 export const songsWithDataByIdSelector = createSelector(
     songDataSelector,
     songsSelector,
     artistDataByIdSelector,
     (songData, songs, artistData) => {
-        const songDetailsById = _.keyBy(
-            _.map(songs, songDetails => ({ songDetails })),
+        const songDetailsById = keyBy(
+            map(songs, songDetails => ({ songDetails })),
             "songDetails.track.id"
         );
-        const songsById = _.keyBy(
-            _.map(songData, songAnalysis => ({ songAnalysis })),
+        const songsById = keyBy(
+            map(songData, songAnalysis => ({ songAnalysis })),
             "songAnalysis.id"
         );
 
-        const artistsBySongId = _.keyBy(
-            _.map(songs, song => ({
+        const artistsBySongId = keyBy(
+            map(songs, song => ({
                 artistDetails: {
-                    ..._.get(artistData, _.get(song, "track.artists.0.id")),
-                    songId: _.get(song, "track.id")
+                    ...get(artistData, get(song, "track.artists.0.id")),
+                    songId: get(song, "track.id")
                 }
             })),
             "artistDetails.songId"
         );
 
-        return _.merge({}, songDetailsById, songsById, artistsBySongId);
+        return merge({}, songDetailsById, songsById, artistsBySongId);
     }
 );
 
+export const songListSelector = createSelector(
+    songsWithDataByIdSelector,
+    analyzerSearchTermSelector,
+    analyzerSortSelector,
+    (songsWithDataById, analyzerSearchTerm, { sortBy, sortDirection }) =>
+        orderBy(
+            filter(
+                map(values(songsWithDataById), song =>
+                    reduce(
+                        tableConfig,
+                        (agg, { getter, dataKey, ...props }) => ({
+                            ...agg,
+                            ...props,
+                            [dataKey]: get(song, getter())
+                        }),
+                        {}
+                    )
+                ),
+                rowData =>
+                    analyzerSearchTerm
+                        ? includes(toLower(rowData.title), toLower(analyzerSearchTerm)) ||
+                          includes(toLower(rowData.artist), toLower(analyzerSearchTerm))
+                        : true
+            ),
+            sortBy,
+            map(sortBy, sort => toLower(sortDirection[sort]))
+        )
+);
+
 export const advancedSearchSelector = createSelector(
-    state => _.get(state, "app.analyzer.advancedSearch") || {},
+    state => get(state, "app.analyzer.advancedSearch") || {},
     advancedSearch => advancedSearch
 );
 
 export const advancedSearchTracksSelector = createSelector(advancedSearchSelector, advancedSearch =>
-    _.get(advancedSearch, "tracks")
+    get(advancedSearch, "tracks")
 );
 
 export const advancedSearchAttributesSelector = createSelector(
     advancedSearchSelector,
-    advancedSearch => _.get(advancedSearch, "attributes")
+    advancedSearch => get(advancedSearch, "attributes")
 );
 
 export const advancedSearchResultsSelector = createSelector(
     advancedSearchSelector,
-    advancedSearch => _.get(advancedSearch, "results")
+    advancedSearch => get(advancedSearch, "results")
 );
 
 export const advancedSearchActiveTabSelector = createSelector(
     advancedSearchSelector,
-    advancedSearch => _.get(advancedSearch, "activeTab")
+    advancedSearch => get(advancedSearch, "activeTab")
 );

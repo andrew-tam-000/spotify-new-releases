@@ -335,6 +335,13 @@ export function analyzerUpdateSearchTerm(term) {
         payload: term
     };
 }
+
+export function analyzerUpdateSort(term) {
+    return {
+        type: "analyzer|UPDATE_SORT",
+        payload: term
+    };
+}
 ///////////////////////////////////////////////
 //
 // advanced-search

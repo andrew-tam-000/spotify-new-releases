@@ -11,11 +11,15 @@ const SliderWrapper = styled.div`
 class CustomSlider extends Component {
     handleUpdateMin = val =>
         this.props.handleChange({
-            [join(["min", this.props.dataKey], "_")]: Number(val.toFixed(this.props.tolerance))
+            [join(["min", this.props.dataKey], "_")]: val
+                ? Number(val.toFixed(this.props.tolerance))
+                : undefined
         });
     handleUpdateMax = val =>
         this.props.handleChange({
-            [join(["max", this.props.dataKey], "_")]: Number(val.toFixed(this.props.tolerance))
+            [join(["max", this.props.dataKey], "_")]: val
+                ? Number(val.toFixed(this.props.tolerance))
+                : undefined
         });
     handleUpdateMinSlider = (e, val) => this.handleUpdateMin(val);
     handleUpdateMaxSlider = (e, val) => this.handleUpdateMax(val);

@@ -11,7 +11,7 @@ export default {
     user: {},
     analyzer: {
         searchTerm: "",
-        sort: [],
+        sort: {},
         advancedSearch: {
             tracks: [],
             attributes: {},
