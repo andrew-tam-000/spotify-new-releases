@@ -6,18 +6,14 @@ import "react-virtualized/styles.css";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { Column, Table as _Table, SortIndicator } from "react-virtualized";
-import {
-    songsWithDataByIdSelector,
-    analyzerSearchTermSelector,
-    songListSelector
-} from "../../selectors";
-import { analyzerUpdateSearchTerm, analyzerUpdateSort } from "../../redux/actions";
+import { songsWithDataByIdSelector, analyzerSortSelector, songListSelector } from "../../selectors";
+import { analyzerUpdateSort } from "../../redux/actions";
 import createMultiSort from "./createMultiSort";
-import { reduce, values, map, orderBy, toLower, filter, get } from "lodash";
-import TextField from "@material-ui/core/TextField";
+import { reduce, values, map, filter, get, mapKeys } from "lodash";
 import tableConfig from "../../tableConfig";
 import PlayButton from "./PlayButton";
 import SearchButton from "./SearchButton";
+import SearchField from "./SearchField";
 
 const Table = styled(_Table)`
     .ReactVirtualized__Table__rowColumn:first-child {
@@ -26,13 +22,13 @@ const Table = styled(_Table)`
 `;
 
 class SongTable extends Component {
-    sortState = createMultiSort(sortParams => this.props.analyzerUpdateSort(sortParams), {
-        defaultSortBy: ["title", "artist"],
-        defaultSortDirection: {
-            artist: "ASC",
-            title: "ASC"
-        }
-    });
+    sortState = createMultiSort(
+        sortParams => this.props.analyzerUpdateSort(sortParams),
+        mapKeys(
+            this.props.analyzerSort,
+            (val, key) => (key === "sortBy" ? "defaultSortBy" : "defaultSortDirection")
+        )
+    );
 
     state = {
         sortedList: this.props.songsAsList
@@ -51,10 +47,10 @@ class SongTable extends Component {
     };
 
     render() {
-        const { analyzerSearchTerm, analyzerUpdateSearchTerm, songList } = this.props;
+        const { songList } = this.props;
         return (
             <React.Fragment>
-                <TextField value={analyzerSearchTerm} onChange={analyzerUpdateSearchTerm} />
+                <SearchField />
                 <Table
                     sortBy={undefined}
                     sortDirection={undefined}
@@ -93,7 +89,7 @@ class SongTable extends Component {
 
 const mapStateToProps = createStructuredSelector({
     songsWithDataById: songsWithDataByIdSelector,
-    analyzerSearchTerm: analyzerSearchTermSelector,
+    analyzerSort: analyzerSortSelector,
     songList: songListSelector
 });
 
@@ -101,7 +97,6 @@ export default compose(
     connect(
         mapStateToProps,
         dispatch => ({
-            analyzerUpdateSearchTerm: e => dispatch(analyzerUpdateSearchTerm(e.target.value)),
             analyzerUpdateSort: sortParams => dispatch(analyzerUpdateSort(sortParams))
         })
     ),

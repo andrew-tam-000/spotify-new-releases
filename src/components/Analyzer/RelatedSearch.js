@@ -18,6 +18,10 @@ const RelatedSearchForm = styled(_RelatedSearchForm)`
     flex-wrap: wrap;
 `;
 
+const SubmitButton = styled(Button)`
+    margin: 10px !important;
+`;
+
 const TabContainer = ({ children, ...props }) => <div {...props}>{children}</div>;
 
 class RelatedSearch extends Component {
@@ -36,9 +40,13 @@ class RelatedSearch extends Component {
                         <Tab label="Results" />
                     </Tabs>
                 </AppBar>
-                <Button variant="contained" color="primary" onClick={advancedSearchGetResultsStart}>
+                <SubmitButton
+                    variant="contained"
+                    color="primary"
+                    onClick={advancedSearchGetResultsStart}
+                >
                     Submit
-                </Button>
+                </SubmitButton>
                 {advancedSearchActiveTab === 0 && (
                     <TabContainer>
                         <TrackList />

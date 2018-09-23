@@ -11,7 +11,13 @@ export default {
     user: {},
     analyzer: {
         searchTerm: "",
-        sort: {},
+        sort: {
+            sortBy: ["artist", "popularity"],
+            sortDirection: {
+                popularity: "DESC",
+                artist: "ASC"
+            }
+        },
         advancedSearch: {
             genres: [],
             tracks: [],

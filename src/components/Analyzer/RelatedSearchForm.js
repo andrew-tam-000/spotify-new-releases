@@ -152,6 +152,7 @@ const CustomSlider = styled(_CustomSlider)`
 
 const GenreFormControl = styled(FormControl)`
     display: block !important;
+    min-width: 100px;
 `;
 
 // TODO: Each slider should be connceted directly;
@@ -160,6 +161,7 @@ const RelatedSearchForm = ({
     advancedSearchAttributes,
     advancedSearchGenres,
     advancedSearchSetGenres,
+    clearAttributes,
     ...props
 }) => (
     <React.Fragment>
@@ -186,7 +188,7 @@ const RelatedSearchForm = ({
             </Select>
         </GenreFormControl>
 
-        <Button onClick={advancedSearchUpdateAttributes}>Clear Filters</Button>
+        <Button onClick={clearAttributes}>Clear Filters</Button>
         <form {...props}>
             {map(filter(tableConfig, "tunable"), ({ dataKey, label, min, max, tolerance }) => (
                 <CustomSlider
