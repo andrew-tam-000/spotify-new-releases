@@ -9,24 +9,30 @@ const SliderWrapper = styled.div`
     display: flex;
 `;
 class CustomSlider extends Component {
-    handleUpdateMin = val => {
-        this.props.handleChange(this.props.index, {
-            [join(["min", this.props.dataKey], "_")]: val
+    handleUpdateMin = val =>
+        this.props.handleChange({
+            [join(["min", this.props.dataKey], "_")]: Number(val.toFixed(this.props.tolerance))
         });
-    };
     handleUpdateMax = val =>
-        this.props.handleChange(this.props.index, {
-            [join(["max", this.props.dataKey], "_")]: val
+        this.props.handleChange({
+            [join(["max", this.props.dataKey], "_")]: Number(val.toFixed(this.props.tolerance))
         });
     handleUpdateMinSlider = (e, val) => this.handleUpdateMin(val);
     handleUpdateMaxSlider = (e, val) => this.handleUpdateMax(val);
     handleUpdateMinText = e => this.handleUpdateMin(Number(e.target.value));
     handleUpdateMaxText = e => this.handleUpdateMax(Number(e.target.value));
+    handleUpdateClear = e => {
+        this.handleUpdateMin(undefined);
+        this.handleUpdateMax(undefined);
+    };
     render() {
         const { min, max, minValue, maxValue, label, ...props } = this.props;
         return (
             <div {...props}>
-                <Typography id="label">{label}</Typography>
+                <div>
+                    <Typography id="label">{label}</Typography>
+                    <div onClick={this.handleUpdateClear}>CLEAR</div>
+                </div>
                 <SliderWrapper>
                     <TextField value={minValue} onChange={this.handleUpdateMinText} />
                     <Slider
@@ -53,8 +59,9 @@ class CustomSlider extends Component {
 }
 
 CustomSlider.defaultProps = {
-    min: 0,
-    max: 1
+    tolerance: 2,
+    minValue: "",
+    maxValue: ""
 };
 
 export default CustomSlider;

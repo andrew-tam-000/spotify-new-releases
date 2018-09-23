@@ -12,7 +12,8 @@ export default {
     analyzer: {
         advancedSearch: {
             tracks: [],
-            active: null
+            attributes: {},
+            activeTab: 0
         }
     }
 };

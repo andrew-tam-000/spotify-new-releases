@@ -336,20 +336,17 @@ export function advancedSearchAddTrack(trackDetails) {
     };
 }
 
-export function advancedSearchUpdateTrack(index, trackDetails) {
-    return {
-        type: "advanced-search|UPDATE_TRACK",
-        payload: {
-            index,
-            trackDetails
-        }
-    };
-}
-
 export function advancedSearchRemoveTrack(index) {
     return {
         type: "advanced-search|REMOVE_TRACK",
         payload: index
+    };
+}
+
+export function advancedSearchUpdateAttributes(trackDetails) {
+    return {
+        type: "advanced-search|UPDATE_ATTRIBUTES",
+        payload: trackDetails
     };
 }
 
@@ -371,6 +368,13 @@ export function advancedSearchGetResultsError(errMsg) {
     return {
         type: "advanced-search|GET_RESULTS_ERROR",
         payload: errMsg
+    };
+}
+
+export function advancedSearchChangeTab(index) {
+    return {
+        type: "advanced-search|CHANGE_TAB",
+        payload: index
     };
 }
 ////////////////////////////////////////////////////

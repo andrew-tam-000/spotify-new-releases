@@ -123,8 +123,17 @@ export const advancedSearchTracksSelector = createSelector(advancedSearchSelecto
     _.get(advancedSearch, "tracks")
 );
 
-export const advancedSearchActiveSelector = createSelector(
+export const advancedSearchAttributesSelector = createSelector(
     advancedSearchSelector,
-    advancedSearch => advancedSearchSelector,
-    advancedSearch => _.get(advancedSearch, "active")
+    advancedSearch => _.get(advancedSearch, "attributes")
+);
+
+export const advancedSearchResultsSelector = createSelector(
+    advancedSearchSelector,
+    advancedSearch => _.get(advancedSearch, "results")
+);
+
+export const advancedSearchActiveTabSelector = createSelector(
+    advancedSearchSelector,
+    advancedSearch => _.get(advancedSearch, "activeTab")
 );

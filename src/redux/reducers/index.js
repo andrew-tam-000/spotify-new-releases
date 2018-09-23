@@ -1,5 +1,5 @@
 import initialState from "../state";
-import _ from "lodash";
+import { slice } from "lodash";
 
 export default (state = initialState, { type, payload }) => {
     switch (type) {
@@ -84,25 +84,21 @@ export default (state = initialState, { type, payload }) => {
                     ...state.analyzer,
                     advancedSearch: {
                         ...state.analyzer.advancedSearch,
-                        tracks: _.slice([payload, ...state.analyzer.advancedSearch.tracks], 0, 5)
+                        tracks: slice([payload, ...state.analyzer.advancedSearch.tracks], 0, 5)
                     }
                 }
             };
-        case "advanced-search|UPDATE_TRACK":
+        case "advanced-search|UPDATE_ATTRIBUTES":
             return {
                 ...state,
                 analyzer: {
                     ...state.analyzer,
                     advancedSearch: {
                         ...state.analyzer.advancedSearch,
-                        tracks: [
-                            ..._.slice(state.analyzer.advancedSearch.tracks, 0, payload.index),
-                            {
-                                ...state.analyzer.advancedSearch.tracks[payload.index],
-                                ...payload.trackDetails
-                            },
-                            ..._.slice(state.analyzer.advancedSearch.tracks, payload.index + 1)
-                        ]
+                        attributes: {
+                            ...state.analyzer.advancedSearch.attributes,
+                            ...payload
+                        }
                     }
                 }
             };
@@ -114,8 +110,8 @@ export default (state = initialState, { type, payload }) => {
                     advancedSearch: {
                         ...state.analyzer.advancedSearch,
                         tracks: [
-                            ..._.slice(state.analyzer.advancedSearch.tracks, 0, payload.index),
-                            ..._.slice(state.analyzer.advancedSearch.tracks, payload.index + 1)
+                            ...slice(state.analyzer.advancedSearch.tracks, 0, payload),
+                            ...slice(state.analyzer.advancedSearch.tracks, payload + 1)
                         ]
                     }
                 }
@@ -128,6 +124,17 @@ export default (state = initialState, { type, payload }) => {
                     advancedSearch: {
                         ...state.analyzer.advancedSearch,
                         results: payload
+                    }
+                }
+            };
+        case "advanced-search|CHANGE_TAB":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    advancedSearch: {
+                        ...state.analyzer.advancedSearch,
+                        activeTab: payload
                     }
                 }
             };

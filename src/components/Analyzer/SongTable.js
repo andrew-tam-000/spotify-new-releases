@@ -44,6 +44,7 @@ export const tableConfig = [
         dataKey: "popularity",
         getter: () => "songDetails.track.popularity",
         tunable: true,
+        tolerance: 0,
         min: 0,
         max: 100
     },
@@ -69,6 +70,7 @@ export const tableConfig = [
         dataKey: "loudness",
         getter: () => "songAnalysis.loudness",
         tunable: true,
+        tolerance: 0,
         min: -60,
         max: 0
     },
