@@ -70,6 +70,11 @@ export const songDataSelector = createSelector(
     songData => songData
 );
 
+export const analyzerSearchTermSelector = createSelector(
+    state => _.get(state, "app.analyzer.searchTerm"),
+    searchTerm => searchTerm
+);
+
 export const artistIdsSelector = createSelector(songsSelector, songs => {
     return _.uniq(
         _.map(_.flatten(_.map(songs, song => _.get(song, "track.artists"))), artist =>

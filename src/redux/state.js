@@ -10,6 +10,8 @@ export default {
     },
     user: {},
     analyzer: {
+        searchTerm: "",
+        sort: [],
         advancedSearch: {
             tracks: [],
             attributes: {},

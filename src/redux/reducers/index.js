@@ -138,6 +138,14 @@ export default (state = initialState, { type, payload }) => {
                     }
                 }
             };
+        case "analyzer|UPDATE_SEARCH_TERM":
+            return {
+                ...state,
+                analyzer: {
+                    ...state.analyzer,
+                    searchTerm: payload
+                }
+            };
         default:
             return state;
     }

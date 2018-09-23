@@ -326,6 +326,17 @@ export function getArtistDataSuccess(songData) {
 
 ///////////////////////////////////////////////
 //
+// analzyer
+//
+///////////////////////////////////////////////
+export function analyzerUpdateSearchTerm(term) {
+    return {
+        type: "analyzer|UPDATE_SEARCH_TERM",
+        payload: term
+    };
+}
+///////////////////////////////////////////////
+//
 // advanced-search
 //
 ///////////////////////////////////////////////
@@ -377,6 +388,7 @@ export function advancedSearchChangeTab(index) {
         payload: index
     };
 }
+
 ////////////////////////////////////////////////////
 export function updateFirebaseUser(firebaseUser) {
     return {

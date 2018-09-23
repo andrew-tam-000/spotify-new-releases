@@ -5,11 +5,13 @@ import "react-virtualized/styles.css";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { Column, Table, SortIndicator } from "react-virtualized";
-import { songsWithDataByIdSelector } from "../../selectors";
+import { songsWithDataByIdSelector, analyzerSearchTermSelector } from "../../selectors";
+import { analyzerUpdateSearchTerm } from "../../redux/actions";
 import createMultiSort from "./createMultiSort";
-import _ from "lodash";
+import { reduce, values, map, orderBy, toLower, filter, get } from "lodash";
 import PlayButton from "./PlayButton";
 import SearchButton from "./SearchButton";
+import TextField from "@material-ui/core/TextField";
 
 export const tableConfig = [
     {
@@ -117,11 +119,11 @@ export const tableConfig = [
 class SongTable extends Component {
     sortState = createMultiSort(
         ({ sortBy, sortDirection }) => {
-            console.log(sortBy, _.map(sortBy, sort => sortDirection[sort]));
-            const sortedList = _.orderBy(
+            console.log(sortBy, map(sortBy, sort => sortDirection[sort]));
+            const sortedList = orderBy(
                 this.props.songsAsList,
                 sortBy,
-                _.map(sortBy, sort => _.toLower(sortDirection[sort]))
+                map(sortBy, sort => toLower(sortDirection[sort]))
             );
             this.setState({ sortedList });
         },
@@ -151,45 +153,55 @@ class SongTable extends Component {
     };
 
     render() {
+        const { analyzerSearchTerm, analyzerUpdateSearchTerm } = this.props;
         return (
-            <Table
-                sortBy={undefined}
-                sortDirection={undefined}
-                sort={this.sortState.sort}
-                width={2000}
-                height={300}
-                headerHeight={20}
-                rowHeight={30}
-                rowCount={this.state.sortedList.length}
-                rowGetter={({ index }) => this.state.sortedList[index]}
-            >
-                {_.map(_.filter(tableConfig, config => !_.get(config, "hidden")), config => (
-                    <Column
-                        headerRenderer={this.headerRenderer}
-                        key={config.dataKey}
-                        width={300}
-                        {...config}
-                    />
-                ))}
-            </Table>
+            <React.Fragment>
+                <TextField value={analyzerSearchTerm} onChange={analyzerUpdateSearchTerm} />
+                <Table
+                    sortBy={undefined}
+                    sortDirection={undefined}
+                    sort={this.sortState.sort}
+                    width={2000}
+                    height={300}
+                    headerHeight={20}
+                    rowHeight={30}
+                    rowCount={this.state.sortedList.length}
+                    rowGetter={({ index }) => this.state.sortedList[index]}
+                >
+                    {map(filter(tableConfig, config => !get(config, "hidden")), config => (
+                        <Column
+                            headerRenderer={this.headerRenderer}
+                            key={config.dataKey}
+                            width={300}
+                            {...config}
+                        />
+                    ))}
+                </Table>
+            </React.Fragment>
         );
     }
 }
 
 const mapStateToProps = createStructuredSelector({
-    songsWithDataById: songsWithDataByIdSelector
+    songsWithDataById: songsWithDataByIdSelector,
+    analyzerSearchTerm: analyzerSearchTermSelector
 });
 
 export default compose(
-    connect(mapStateToProps),
+    connect(
+        mapStateToProps,
+        dispatch => ({
+            analyzerUpdateSearchTerm: e => dispatch(analyzerUpdateSearchTerm(e.target.value))
+        })
+    ),
     withPropsOnChange(["songsWithDataById"], ({ songsWithDataById }) => ({
-        songsAsList: _.map(_.values(songsWithDataById), song =>
-            _.reduce(
+        songsAsList: map(values(songsWithDataById), song =>
+            reduce(
                 tableConfig,
                 (agg, { getter, dataKey, ...props }) => ({
                     ...agg,
                     ...props,
-                    [dataKey]: _.get(song, getter())
+                    [dataKey]: get(song, getter())
                 }),
                 {}
             )
