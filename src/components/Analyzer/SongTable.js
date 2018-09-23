@@ -59,23 +59,23 @@ class SongTable extends Component {
                     rowCount={songList.length}
                     rowGetter={({ index }) => songList[index]}
                 >
+                    <Column
+                        headerRenderer={this.headerRenderer}
+                        width={300}
+                        cellRenderer={({ cellData, rowData: { uri, id } }) => (
+                            <React.Fragment>
+                                <PlayButton uri={uri} />
+                                <SearchButton id={id} />
+                                {cellData}
+                            </React.Fragment>
+                        )}
+                    />
                     {map(filter(tableConfig, config => !get(config, "hidden")), config => (
                         <Column
                             headerRenderer={this.headerRenderer}
                             key={config.dataKey}
                             width={300}
                             {...config}
-                            cellRenderer={
-                                config.dataKey === "title"
-                                    ? ({ cellData, rowData: { uri, id } }) => (
-                                          <React.Fragment>
-                                              <PlayButton uri={uri} />
-                                              <SearchButton id={id} />
-                                              {cellData}
-                                          </React.Fragment>
-                                      )
-                                    : undefined
-                            }
                         />
                     ))}
                 </Table>
