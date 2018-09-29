@@ -1,29 +1,25 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux';
-import { createEpicMiddleware} from 'redux-observable';
-import thunk from 'redux-thunk';
-import rootReducer from './reducers';
-import { createLogger } from 'redux-logger';
-import rootEpic from '../epics';
-import history from '../history';
-import {
-    routerReducer,
-    routerMiddleware,
-} from "react-router-redux";
-import firebaseApp from '../firebase';
-import spotifyApi from '../spotifyApi';
+import { createStore, applyMiddleware } from "redux";
+import { createEpicMiddleware } from "redux-observable";
+import thunk from "redux-thunk";
+import rootReducer from "./reducers";
+import { createLogger } from "redux-logger";
+import rootEpic from "../epics";
+import history from "../history";
+import { routerMiddleware } from "react-router-redux";
+import firebaseApp from "../firebase";
+import spotifyApi from "../spotifyApi";
+import initialState from "./state";
 
 const epicMiddleware = createEpicMiddleware({
     dependencies: {
         firebaseApp,
-        spotifyApi,
+        spotifyApi
     }
 });
 
 const store = createStore(
-    combineReducers({
-        app: rootReducer,
-        router: routerReducer,
-    }),
+    rootReducer,
+    initialState,
     applyMiddleware(
         thunk,
         epicMiddleware,
