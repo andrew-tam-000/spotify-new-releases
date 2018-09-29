@@ -105,6 +105,11 @@ export const analyzerSortSelector = createSelector(
     sort => sort
 );
 
+export const analyzerOpenSearchPanelSelector = createSelector(
+    state => get(state, "app.analyzer.openSearchPanel"),
+    openSearchPanel => openSearchPanel
+);
+
 export const artistDataByIdSelector = createSelector(artistDataSelector, artistData =>
     keyBy(artistData, "id")
 );
@@ -191,4 +196,9 @@ export const advancedSearchActiveTabSelector = createSelector(
 
 export const advancedSearchGenresSelector = createSelector(advancedSearchSelector, advancedSearch =>
     get(advancedSearch, "genres")
+);
+
+export const advancedSearchArtistsSelector = createSelector(
+    advancedSearchSelector,
+    advancedSearch => get(advancedSearch, "artists")
 );

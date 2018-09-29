@@ -13,13 +13,23 @@ import { reduce, values, map, filter, get, mapKeys } from "lodash";
 import tableConfig from "../../tableConfig";
 import PlayButton from "./PlayButton";
 import SearchButton from "./SearchButton";
-import SearchField from "./SearchField";
+import TextField from "@material-ui/core/TextField";
+import { analyzerSearchTermSelector } from "../../selectors";
+import { analyzerUpdateSearchTerm } from "../../redux/actions";
 
 const Table = styled(_Table)`
     .ReactVirtualized__Table__rowColumn:first-child {
         overflow: initial !important;
     }
 `;
+
+const ButtonCellRenderer = ({ cellData, rowData: { uri, id } }) => (
+    <React.Fragment>
+        <PlayButton uri={uri} />
+        <SearchButton id={id} />
+        {cellData}
+    </React.Fragment>
+);
 
 class SongTable extends Component {
     sortState = createMultiSort(
@@ -47,10 +57,10 @@ class SongTable extends Component {
     };
 
     render() {
-        const { songList } = this.props;
+        const { songList, analyzerSearchTerm, analyzerUpdateSearchTerm } = this.props;
         return (
             <React.Fragment>
-                <SearchField />
+                <TextField value={analyzerSearchTerm} onChange={analyzerUpdateSearchTerm} />
                 <Table
                     sortBy={undefined}
                     sortDirection={undefined}
@@ -65,13 +75,7 @@ class SongTable extends Component {
                     <Column
                         headerRenderer={this.headerRenderer}
                         width={200}
-                        cellRenderer={({ cellData, rowData: { uri, id } }) => (
-                            <React.Fragment>
-                                <PlayButton uri={uri} />
-                                <SearchButton id={id} />
-                                {cellData}
-                            </React.Fragment>
-                        )}
+                        cellRenderer={ButtonCellRenderer}
                     />
                     {map(filter(tableConfig, config => !get(config, "hidden")), config => (
                         <Column
@@ -90,14 +94,16 @@ class SongTable extends Component {
 const mapStateToProps = createStructuredSelector({
     songsWithDataById: songsWithDataByIdSelector,
     analyzerSort: analyzerSortSelector,
-    songList: songListSelector
+    songList: songListSelector,
+    analyzerSearchTerm: analyzerSearchTermSelector
 });
 
 export default compose(
     connect(
         mapStateToProps,
         dispatch => ({
-            analyzerUpdateSort: sortParams => dispatch(analyzerUpdateSort(sortParams))
+            analyzerUpdateSort: sortParams => dispatch(analyzerUpdateSort(sortParams)),
+            analyzerUpdateSearchTerm: e => dispatch(analyzerUpdateSearchTerm(e.target.value))
         })
     ),
     withPropsOnChange(["songsWithDataById"], ({ songsWithDataById }) => ({

@@ -11,6 +11,7 @@ export default {
         },
         user: {},
         analyzer: {
+            openSearchPanel: false,
             searchTerm: "",
             sort: {
                 sortBy: ["artist", "popularity"],
@@ -22,9 +23,13 @@ export default {
             advancedSearch: {
                 genres: [],
                 tracks: [],
+                artists: [],
                 attributes: {},
                 activeTab: 0
-            }
+            },
+            artistData: [],
+            songData: [],
+            songs: []
         }
     }
 };

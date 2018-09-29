@@ -14,6 +14,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
 import MenuItem from "@material-ui/core/MenuItem";
+import ArtistSelect from "./ArtistSelect";
 
 const genres = [
     "acoustic",
@@ -187,6 +188,8 @@ const RelatedSearchForm = ({
                 ))}
             </Select>
         </GenreFormControl>
+
+        <ArtistSelect />
 
         <Button onClick={clearAttributes}>Clear Filters</Button>
         <form {...props}>

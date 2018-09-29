@@ -1,11 +1,20 @@
 import React, { Component } from "react";
+import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import { initializeOnAnalyzerStart } from "../redux/actions";
-import { songsWithDataByIdSelector } from "../selectors";
+import { initializeOnAnalyzerStart, analyzerCloseSearchPanel } from "../redux/actions";
+import { songsWithDataByIdSelector, analyzerOpenSearchPanelSelector } from "../selectors";
 import SongTable from "./Analyzer/SongTable";
 import RelatedSearch from "./Analyzer/RelatedSearch";
-import Drawer from "@material-ui/core/Drawer";
+import _Drawer from "@material-ui/core/Drawer";
+import OpenSearchButton from "./Analyzer/OpenSearchButton";
+
+const Drawer = withStyles({
+    root: {},
+    paper: {
+        width: "480px"
+    }
+})(_Drawer);
 
 class Analyzer extends Component {
     componentDidMount() {
@@ -13,10 +22,21 @@ class Analyzer extends Component {
     }
 
     render() {
+        const { analyzerOpenSearchPanel, analyzerCloseSearchPanel } = this.props;
         return (
             <React.Fragment>
                 <SongTable />
-                <Drawer>
+                <OpenSearchButton />
+                <Drawer
+                    paperProps={{
+                        style: {
+                            width: "450px !important"
+                        }
+                    }}
+                    onClose={analyzerCloseSearchPanel}
+                    anchor="right"
+                    open={analyzerOpenSearchPanel}
+                >
                     <RelatedSearch />
                 </Drawer>
             </React.Fragment>
@@ -25,10 +45,11 @@ class Analyzer extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-    songsWithDataById: songsWithDataByIdSelector
+    songsWithDataById: songsWithDataByIdSelector,
+    analyzerOpenSearchPanel: analyzerOpenSearchPanelSelector
 });
 
-const mapDispatchToProps = { initializeOnAnalyzerStart };
+const mapDispatchToProps = { initializeOnAnalyzerStart, analyzerCloseSearchPanel };
 
 export default connect(
     mapStateToProps,

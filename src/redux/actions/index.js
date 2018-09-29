@@ -342,6 +342,18 @@ export function analyzerUpdateSort(term) {
         payload: term
     };
 }
+
+export function analyzerOpenSearchPanel() {
+    return {
+        type: "analyzer|OPEN_SEARCH_PANEL"
+    };
+}
+
+export function analyzerCloseSearchPanel() {
+    return {
+        type: "analyzer|CLOSE_SEARCH_PANEL"
+    };
+}
 ///////////////////////////////////////////////
 //
 // advanced-search
@@ -400,6 +412,13 @@ export function advancedSearchSetGenres(genres) {
     return {
         type: "advanced-search|SET_GENRES",
         payload: genres
+    };
+}
+
+export function advancedSearchSetArtists(artists) {
+    return {
+        type: "advanced-search|SET_ARTISTS",
+        payload: artists
     };
 }
 

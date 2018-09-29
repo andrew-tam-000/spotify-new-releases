@@ -28,14 +28,11 @@ export default (state = {}, { type, payload }) => {
         case "advanced-search|UPDATE_ATTRIBUTES":
             return {
                 ...state,
-                analyzer: {
-                    ...state.analyzer,
-                    advancedSearch: {
-                        ...state.analyzer.advancedSearch,
-                        attributes: {
-                            ...state.analyzer.advancedSearch.attributes,
-                            ...payload
-                        }
+                advancedSearch: {
+                    ...state.advancedSearch,
+                    attributes: {
+                        ...state.advancedSearch.attributes,
+                        ...payload
                     }
                 }
             };
@@ -74,6 +71,14 @@ export default (state = {}, { type, payload }) => {
                     genres: payload
                 }
             };
+        case "advanced-search|SET_ARTISTS":
+            return {
+                ...state,
+                advancedSearch: {
+                    ...state.advancedSearch,
+                    artists: payload
+                }
+            };
         case "analyzer|UPDATE_SEARCH_TERM":
             return {
                 ...state,
@@ -83,6 +88,16 @@ export default (state = {}, { type, payload }) => {
             return {
                 ...state,
                 sort: payload
+            };
+        case "analyzer|OPEN_SEARCH_PANEL":
+            return {
+                ...state,
+                openSearchPanel: true
+            };
+        case "analyzer|CLOSE_SEARCH_PANEL":
+            return {
+                ...state,
+                openSearchPanel: false
             };
         default:
             return state;
