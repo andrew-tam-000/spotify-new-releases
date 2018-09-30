@@ -3,11 +3,11 @@ import { map, get, omitBy, isUndefined, size } from "lodash";
 import { timer, from, of } from "rxjs";
 import { mergeMap, debounce, catchError } from "rxjs/operators";
 import {
-    advancedSearchSelector,
     songsWithDataByIdSelector,
     advancedSearchTracksSelector,
     advancedSearchAttributesSelector,
-    advancedSearchGenresSelector
+    advancedSearchGenresSelector,
+    advancedSearchArtistsSelector
 } from "../selectors";
 import {
     advancedSearchGetResultsStart,
@@ -26,9 +26,11 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
             const songsWithDataById = songsWithDataByIdSelector(state$.value);
             const seedGenres = advancedSearchGenresSelector(state$.value);
             const seedTracks = tracks;
-            const seedArtists = map(tracks, track =>
-                get(songsWithDataById, `${track}.songDetails.track.artists.0.id`)
-            );
+            const seedArtists = advancedSearchArtistsSelector(state$.value).length
+                ? advancedSearchArtistsSelector(state$.value)
+                : map(tracks, track =>
+                      get(songsWithDataById, `${track}.songDetails.track.artists.0.id`)
+                  );
             return from(
                 spotifyApi.getRecommendations(
                     omitBy(

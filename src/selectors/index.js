@@ -10,7 +10,8 @@ import {
     reduce,
     filter,
     includes,
-    toLower
+    toLower,
+    sortBy
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
@@ -97,7 +98,7 @@ export const artistIdsSelector = createSelector(songsSelector, songs => {
 
 export const artistDataSelector = createSelector(
     state => get(state, "app.analyzer.artistData") || [],
-    artistData => artistData
+    artistData => sortBy(artistData, "name")
 );
 
 export const analyzerSortSelector = createSelector(
@@ -162,7 +163,8 @@ export const songListSelector = createSelector(
                 rowData =>
                     analyzerSearchTerm
                         ? includes(toLower(rowData.title), toLower(analyzerSearchTerm)) ||
-                          includes(toLower(rowData.artist), toLower(analyzerSearchTerm))
+                          includes(toLower(rowData.artist), toLower(analyzerSearchTerm)) ||
+                          includes(toLower(rowData.genre), toLower(analyzerSearchTerm))
                         : true
             ),
             sortBy,
