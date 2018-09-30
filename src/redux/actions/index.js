@@ -244,9 +244,10 @@ export function addTracksToPlaylistStart(uris) {
         payload: uris
     };
 }
-export function addTracksToPlaylistSuccess() {
+export function addTracksToPlaylistSuccess(uris) {
     return {
-        type: "ADD_TRACKS_TO_PLAYLIST_SUCCESS"
+        type: "ADD_TRACKS_TO_PLAYLIST_SUCCESS",
+        payload: uris
     };
 }
 
@@ -290,12 +291,12 @@ export function initializeOnAnalyzerSuccess() {
 ///////////////////////////////////////////////
 export function getSongsStart() {
     return {
-        type: "GET_SONGS_START"
+        type: "spotify|GET_SONGS_START"
     };
 }
 export function getSongsSuccess(songs) {
     return {
-        type: "GET_SONGS_SUCCESS",
+        type: "spotify|GET_SONGS_SUCCESS",
         payload: songs
     };
 }
@@ -307,13 +308,13 @@ export function getSongsSuccess(songs) {
 ///////////////////////////////////////////////
 export function getSongDataStart() {
     return {
-        type: "GET_SONG_DATA_START"
+        type: "spotify|GET_SONG_DATA_START"
     };
 }
 
 export function getSongDataSuccess(songData) {
     return {
-        type: "GET_SONG_DATA_SUCCESS",
+        type: "spotify|GET_SONG_DATA_SUCCESS",
         payload: songData
     };
 }
@@ -325,13 +326,13 @@ export function getSongDataSuccess(songData) {
 ///////////////////////////////////////////////
 export function getArtistDataStart() {
     return {
-        type: "GET_ARTIST_DATA_START"
+        type: "spotify|GET_ARTIST_DATA_START"
     };
 }
 
 export function getArtistDataSuccess(songData) {
     return {
-        type: "GET_ARTIST_DATA_SUCCESS",
+        type: "spotify|GET_ARTIST_DATA_SUCCESS",
         payload: songData
     };
 }

@@ -1,6 +1,12 @@
 import analyzer from "./analyzer";
 import { combineReducers } from "redux";
-import { getCurrentlyPlayingTrackSuccess } from "../actions/";
+import {
+    getCurrentlyPlayingTrackSuccess,
+    addTracksToPlaylistSuccess,
+    getSongsSuccess,
+    getSongDataSuccess,
+    getArtistDataSuccess
+} from "../actions/";
 
 const appReducer = combineReducers({
     analyzer,
@@ -64,12 +70,29 @@ const appReducer = combineReducers({
                     ...state,
                     nowPlaying: payload
                 };
+            case getSongsSuccess().type:
+                return {
+                    ...state,
+                    songs: payload
+                };
+            case getSongDataSuccess().type:
+                return {
+                    ...state,
+                    songData: payload
+                };
+            case getArtistDataSuccess().type:
+                return {
+                    ...state,
+                    artistData: payload
+                };
             default:
                 return state;
         }
     },
     playlist: (state = {}, { type, payload }) => {
         switch (type) {
+            case addTracksToPlaylistSuccess().type:
+                return [...state, ...payload];
             case "REFRESH_PLAYLIST_SUCCESS":
             case "CREATE_PLAYLIST_SUCCESS":
                 return {

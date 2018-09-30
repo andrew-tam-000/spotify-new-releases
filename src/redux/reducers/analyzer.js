@@ -2,21 +2,6 @@ import { slice } from "lodash";
 
 export default (state = {}, { type, payload }) => {
     switch (type) {
-        case "GET_SONGS_SUCCESS":
-            return {
-                ...state,
-                songs: payload
-            };
-        case "GET_SONG_DATA_SUCCESS":
-            return {
-                ...state,
-                songData: payload
-            };
-        case "GET_ARTIST_DATA_SUCCESS":
-            return {
-                ...state,
-                artistData: payload
-            };
         case "advanced-search|ADD_TRACK":
             return {
                 ...state,

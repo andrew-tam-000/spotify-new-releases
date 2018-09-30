@@ -6,7 +6,7 @@ import _ from "lodash";
 import { withStyles } from "@material-ui/core/styles";
 import { createStructuredSelector } from "reselect";
 
-import { playlistTracksSelector, playStatusSelector } from "../selectors";
+import { playlistSelector, playStatusSelector } from "../selectors";
 
 import { playSongStart, initializeOnPlaylist } from "../redux/actions";
 
@@ -65,7 +65,7 @@ class Spotify extends Component {
                     <Search />
                 </Drawer>
                 <List>
-                    {_.map(this.props.playlistTracks, (track, idx) => (
+                    {_.map(this.props.playlist, (track, idx) => (
                         <ListItem
                             button
                             onClick={() => this.props.playSongStart(_.get(track, "track.uri"))}
@@ -105,7 +105,7 @@ export default compose(
     withStyles(styles),
     connect(
         createStructuredSelector({
-            playlistTracks: playlistTracksSelector,
+            playlist: playlistSelector,
             playStatus: playStatusSelector
         }),
         { playSongStart, initializeOnPlaylist }

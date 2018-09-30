@@ -51,8 +51,8 @@ export const playlistIdSelector = createSelector(
     playlistId => playlistId
 );
 
-export const playlistTracksSelector = createSelector(
-    state => get(state, "app.playlist.tracks.items") || [],
+export const playlistSelector = createSelector(
+    state => get(state, "app.playlist") || [],
     tracks => tracks
 );
 
@@ -62,7 +62,7 @@ export const playlistUriSelector = createSelector(
 );
 
 export const spotifyUserIdSelector = createSelector(
-    state => get(state, "app.spotifyUser.id") || "",
+    state => get(state, "app.spotify.user.id") || "",
     spotifyUserId => spotifyUserId
 );
 
@@ -77,7 +77,7 @@ export const songAddedSelector = createSelector(
 );
 
 export const songsSelector = createSelector(
-    state => get(state, "app.analyzer.songs") || [],
+    state => get(state, "app.spotify.songs") || [],
     songs => songs
 );
 
@@ -86,7 +86,7 @@ export const songIdsSelector = createSelector(songsSelector, songs =>
 );
 
 export const songDataSelector = createSelector(
-    state => get(state, "app.analyzer.songData") || [],
+    state => get(state, "app.spotify.songData") || [],
     songData => songData
 );
 
@@ -102,7 +102,7 @@ export const artistIdsSelector = createSelector(songsSelector, songs => {
 });
 
 export const artistDataSelector = createSelector(
-    state => get(state, "app.analyzer.artistData") || [],
+    state => get(state, "app.spotify.artistData") || [],
     artistData => sortBy(artistData, "name")
 );
 
