@@ -4,6 +4,7 @@ export default {
     app: {
         playlist: {},
         search: {
+            isOpen: false,
             artists: [],
             tracks: [],
             albums: [],

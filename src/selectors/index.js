@@ -36,6 +36,11 @@ export const searchTracksSelector = createSelector(
     tracks => tracks
 );
 
+export const searchPanelSelector = createSelector(
+    state => get(state, "app.search.isOpen"),
+    isOpen => isOpen
+);
+
 export const searchTextSelector = createSelector(
     state => get(state, "app.search.text") || "",
     text => text

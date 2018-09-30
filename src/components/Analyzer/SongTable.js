@@ -12,7 +12,7 @@ import createMultiSort from "./createMultiSort";
 import { reduce, values, map, filter, get, mapKeys } from "lodash";
 import tableConfig from "../../tableConfig";
 import PlayButton from "./PlayButton";
-import SearchButton from "./SearchButton";
+import AddToAdvancedSearchButton from "./AddToAdvancedSearchButton";
 import TextField from "@material-ui/core/TextField";
 import { analyzerSearchTermSelector } from "../../selectors";
 import { analyzerUpdateSearchTerm } from "../../redux/actions";
@@ -26,7 +26,7 @@ const Table = styled(_Table)`
 const ButtonCellRenderer = ({ cellData, rowData: { uri, id } }) => (
     <React.Fragment>
         <PlayButton uri={uri} />
-        <SearchButton id={id} />
+        <AddToAdvancedSearchButton id={id} />
         {cellData}
     </React.Fragment>
 );

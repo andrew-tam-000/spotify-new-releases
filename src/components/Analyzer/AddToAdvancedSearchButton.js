@@ -2,12 +2,12 @@ import React from "react";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { compose, mapProps } from "recompose";
-import Search from "@material-ui/icons/Search";
 import Button from "@material-ui/core/Button";
 import { songsWithDataByIdSelector } from "../../selectors";
 import { advancedSearchAddTrack } from "../../redux/actions";
+import PlaylistAdd from "@material-ui/icons/PlaylistAdd";
 
-const SearchButton = ({ advancedSearchAddTrack, trackDetails }) => (
+const AddToAdvancedSearchButton = ({ advancedSearchAddTrack, trackDetails }) => (
     <Button
         onClick={() => advancedSearchAddTrack(trackDetails)}
         mini
@@ -15,7 +15,7 @@ const SearchButton = ({ advancedSearchAddTrack, trackDetails }) => (
         color="primary"
         aria-label="Add"
     >
-        <Search />
+        <PlaylistAdd />
     </Button>
 );
 
@@ -34,4 +34,4 @@ export default compose(
         trackDetails: id,
         ...props
     }))
-)(SearchButton);
+)(AddToAdvancedSearchButton);

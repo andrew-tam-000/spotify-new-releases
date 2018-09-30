@@ -423,20 +423,11 @@ export function advancedSearchSetArtists(artists) {
 }
 
 ////////////////////////////////////////////////////
-export function updateFirebaseUser(firebaseUser) {
-    return {
-        type: "UPDATE_FIREBASE_USER",
-        payload: firebaseUser
-    };
-}
-
-export function setUserUrl(url) {
-    return {
-        type: "SET_USER_URL",
-        payload: url
-    };
-}
-
+//
+//
+// SEARCH
+//
+////////////////////////////////////////////////////
 export function setSearchResults(searchResults) {
     return {
         type: "SET_SEARCH_RESULTS",
@@ -448,5 +439,32 @@ export function setSearchText(text) {
     return {
         type: "SET_SEARCH_TEXT",
         payload: text
+    };
+}
+
+export function searchOpenPanel() {
+    return {
+        type: "search|OPEN_PANEL"
+    };
+}
+
+export function searchClosePanel() {
+    return {
+        type: "search|CLOSE_PANEL"
+    };
+}
+
+////////////////////////////////////////////////////
+export function updateFirebaseUser(firebaseUser) {
+    return {
+        type: "UPDATE_FIREBASE_USER",
+        payload: firebaseUser
+    };
+}
+
+export function setUserUrl(url) {
+    return {
+        type: "SET_USER_URL",
+        payload: url
     };
 }
