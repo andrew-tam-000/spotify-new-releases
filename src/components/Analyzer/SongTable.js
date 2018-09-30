@@ -76,6 +76,7 @@ class SongTable extends Component {
                         headerRenderer={this.headerRenderer}
                         width={200}
                         cellRenderer={ButtonCellRenderer}
+                        dataKey="noop"
                     />
                     {map(filter(tableConfig, config => !get(config, "hidden")), config => (
                         <Column

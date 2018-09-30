@@ -19,6 +19,7 @@ import getSongs from "./getSongs";
 import getSongData from "./getSongData";
 import getArtistData from "./getArtistData";
 import getAdvancedSearchResults from "./getAdvancedSearchResults";
+import getNowPlaying from "./getNowPlaying";
 
 export default (...args) =>
     merge(
@@ -41,5 +42,6 @@ export default (...args) =>
         getSongs(...args),
         getSongData(...args),
         getArtistData(...args),
-        getAdvancedSearchResults(...args)
+        getAdvancedSearchResults(...args),
+        getNowPlaying(...args)
     );

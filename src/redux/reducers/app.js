@@ -1,5 +1,6 @@
 import analyzer from "./analyzer";
 import { combineReducers } from "redux";
+import { getCurrentlyPlayingTrackSuccess } from "../actions/";
 
 const appReducer = combineReducers({
     analyzer,
@@ -51,12 +52,17 @@ const appReducer = combineReducers({
                 return state;
         }
     },
-    spotifyUser: (state = {}, { type, payload }) => {
+    spotify: (state = {}, { type, payload }) => {
         switch (type) {
             case "GET_SPOTIFY_USER_SUCCESS":
                 return {
                     ...state,
-                    payload
+                    user: payload
+                };
+            case getCurrentlyPlayingTrackSuccess().type:
+                return {
+                    ...state,
+                    nowPlaying: payload
                 };
             default:
                 return state;

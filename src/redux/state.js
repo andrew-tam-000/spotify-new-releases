@@ -2,7 +2,13 @@ import spotifyApi from "../spotifyApi";
 
 export default {
     app: {
-        playlist: {},
+        spotify: {
+            nowPlaying: {}
+        },
+        // Let's sync this with firebase
+        // but this will contian ID's for all
+        // songs we'd like
+        playlist: [],
         search: {
             isOpen: false,
             artists: [],

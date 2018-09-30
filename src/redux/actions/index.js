@@ -1,4 +1,3 @@
-import spotifyApi from "../../spotifyApi";
 import _ from "lodash";
 
 import { searchTextSelector, playlistIdSelector, playlistUriSelector } from "../../selectors";
@@ -195,6 +194,19 @@ export function getSpotifyUserSuccess(spotifyUser) {
     return {
         type: "GET_SPOTIFY_USER_SUCCESS",
         payload: spotifyUser
+    };
+}
+
+export function getCurrentlyPlayingTrackStart() {
+    return {
+        type: "spotify|GET_CURRENTLY_PLAYING_TRACK_START"
+    };
+}
+
+export function getCurrentlyPlayingTrackSuccess(currentlyPlayingTrack) {
+    return {
+        type: "spotify|GET_CURRENTLY_PLAYING_TRACK_SUCCESS",
+        payload: currentlyPlayingTrack
     };
 }
 

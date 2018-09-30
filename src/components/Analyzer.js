@@ -10,7 +10,6 @@ import _Drawer from "@material-ui/core/Drawer";
 import OpenSearchButton from "./Analyzer/OpenSearchButton";
 
 const Drawer = withStyles({
-    root: {},
     paper: {
         width: "480px"
     }

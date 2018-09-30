@@ -33,7 +33,6 @@ const Scrollable = styled.div`
 `;
 
 const Drawer = withStyles({
-    root: {},
     paper: {
         width: "480px"
     }
