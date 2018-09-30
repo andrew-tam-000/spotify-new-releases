@@ -1,5 +1,5 @@
 import { ofType } from "redux-observable";
-import { map, get, omitBy, isUndefined, size } from "lodash";
+import { map, get, omitBy, isUndefined, size, compact } from "lodash";
 import { timer, from, of } from "rxjs";
 import { mergeMap, debounce, catchError } from "rxjs/operators";
 import {
@@ -28,8 +28,10 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
             const seedTracks = tracks;
             const seedArtists = advancedSearchArtistsSelector(state$.value).length
                 ? advancedSearchArtistsSelector(state$.value)
-                : map(tracks, track =>
-                      get(songsWithDataById, `${track}.songDetails.track.artists.0.id`)
+                : compact(
+                      map(tracks, track =>
+                          get(songsWithDataById, `${track}.songDetails.track.artists.0.id`)
+                      )
                   );
             return from(
                 spotifyApi.getRecommendations(

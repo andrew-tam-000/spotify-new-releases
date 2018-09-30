@@ -5,7 +5,7 @@ import { compose, mapProps } from "recompose";
 import Button from "@material-ui/core/Button";
 import { songsWithDataByIdSelector } from "../../selectors";
 import { advancedSearchAddTrack } from "../../redux/actions";
-import PlaylistAdd from "@material-ui/icons/PlaylistAdd";
+import NoteAdd from "@material-ui/icons/NoteAdd";
 
 const AddToAdvancedSearchButton = ({ advancedSearchAddTrack, trackDetails }) => (
     <Button
@@ -15,7 +15,7 @@ const AddToAdvancedSearchButton = ({ advancedSearchAddTrack, trackDetails }) => 
         color="primary"
         aria-label="Add"
     >
-        <PlaylistAdd />
+        <NoteAdd />
     </Button>
 );
 
