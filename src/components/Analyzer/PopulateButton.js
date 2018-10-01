@@ -1,11 +1,9 @@
 import React from "react";
 import { reduce, set, get, filter } from "lodash";
-import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { compose, mapProps } from "recompose";
 import PlaylistAdd from "@material-ui/icons/PlaylistAdd";
 import Button from "@material-ui/core/Button";
-import { songsWithDataByIdSelector } from "../../selectors";
 import { advancedSearchUpdateAttributes } from "../../redux/actions";
 import tableConfig from "../../tableConfig";
 
@@ -20,10 +18,6 @@ const PopulateButton = ({ advancedSearchUpdateAttributes, trackDetails }) => (
         <PlaylistAdd />
     </Button>
 );
-
-const mapStateToProps = createStructuredSelector({
-    songsWithDataById: songsWithDataByIdSelector
-});
 
 const mapDispatchToProps = (dispatch, { songData }) => ({
     advancedSearchUpdateAttributes: () =>
@@ -42,10 +36,10 @@ const mapDispatchToProps = (dispatch, { songData }) => ({
 
 export default compose(
     connect(
-        mapStateToProps,
+        null,
         mapDispatchToProps
     ),
-    mapProps(({ songsWithDataById, id, ...props }) => ({
+    mapProps(({ id, ...props }) => ({
         trackDetails: id,
         ...props
     }))

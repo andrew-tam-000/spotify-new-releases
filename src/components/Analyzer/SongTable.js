@@ -1,15 +1,14 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { compose, withPropsOnChange } from "recompose";
 import "react-virtualized/styles.css";
 
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { Column, Table as _Table, SortIndicator } from "react-virtualized";
-import { songsWithDataByIdSelector, analyzerSortSelector, songListSelector } from "../../selectors";
+import { analyzerSortSelector, librarySongListSelector } from "../../selectors";
 import { analyzerUpdateSort } from "../../redux/actions";
 import createMultiSort from "./createMultiSort";
-import { reduce, values, map, filter, get, mapKeys } from "lodash";
+import { map, filter, get, mapKeys } from "lodash";
 import tableConfig from "../../tableConfig";
 import PlayButton from "./PlayButton";
 import AddToPlaylistButton from "../AddToPlaylistButton";
@@ -42,10 +41,6 @@ class SongTable extends Component {
         )
     );
 
-    state = {
-        sortedList: this.props.songsAsList
-    };
-
     headerRenderer = ({ dataKey, label }) => {
         const showSortIndicator = this.sortState.sortBy.includes(dataKey);
         return (
@@ -59,7 +54,7 @@ class SongTable extends Component {
     };
 
     render() {
-        const { songList, analyzerSearchTerm, analyzerUpdateSearchTerm } = this.props;
+        const { librarySongList, analyzerSearchTerm, analyzerUpdateSearchTerm } = this.props;
         return (
             <React.Fragment>
                 <TextField value={analyzerSearchTerm} onChange={analyzerUpdateSearchTerm} />
@@ -71,8 +66,8 @@ class SongTable extends Component {
                     height={300}
                     headerHeight={20}
                     rowHeight={60}
-                    rowCount={songList.length}
-                    rowGetter={({ index }) => songList[index]}
+                    rowCount={librarySongList.length}
+                    rowGetter={({ index }) => librarySongList[index]}
                 >
                     <Column
                         headerRenderer={this.headerRenderer}
@@ -95,31 +90,15 @@ class SongTable extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-    songsWithDataById: songsWithDataByIdSelector,
     analyzerSort: analyzerSortSelector,
-    songList: songListSelector,
+    librarySongList: librarySongListSelector,
     analyzerSearchTerm: analyzerSearchTermSelector
 });
 
-export default compose(
-    connect(
-        mapStateToProps,
-        dispatch => ({
-            analyzerUpdateSort: sortParams => dispatch(analyzerUpdateSort(sortParams)),
-            analyzerUpdateSearchTerm: e => dispatch(analyzerUpdateSearchTerm(e.target.value))
-        })
-    ),
-    withPropsOnChange(["songsWithDataById"], ({ songsWithDataById }) => ({
-        songsAsList: map(values(songsWithDataById), song =>
-            reduce(
-                tableConfig,
-                (agg, { getter, dataKey, ...props }) => ({
-                    ...agg,
-                    ...props,
-                    [dataKey]: get(song, getter())
-                }),
-                {}
-            )
-        )
-    }))
+export default connect(
+    mapStateToProps,
+    dispatch => ({
+        analyzerUpdateSort: sortParams => dispatch(analyzerUpdateSort(sortParams)),
+        analyzerUpdateSearchTerm: e => dispatch(analyzerUpdateSearchTerm(e.target.value))
+    })
 )(SongTable);

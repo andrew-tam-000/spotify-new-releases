@@ -119,7 +119,7 @@ export const analyzerOpenSearchPanelSelector = createSelector(
 export const artistDataByIdSelector = createSelector(artistDataSelector, artistData =>
     keyBy(artistData, "id")
 );
-export const songsWithDataByIdSelector = createSelector(
+export const librarySongsWithDataSelector = createSelector(
     songDataSelector,
     songsSelector,
     artistDataByIdSelector,
@@ -147,14 +147,14 @@ export const songsWithDataByIdSelector = createSelector(
     }
 );
 
-export const songListSelector = createSelector(
-    songsWithDataByIdSelector,
+export const librarySongListSelector = createSelector(
+    librarySongsWithDataSelector,
     analyzerSearchTermSelector,
     analyzerSortSelector,
-    (songsWithDataById, analyzerSearchTerm, { sortBy, sortDirection }) =>
+    (librarySongsWithData, analyzerSearchTerm, { sortBy, sortDirection }) =>
         orderBy(
             filter(
-                map(values(songsWithDataById), song =>
+                map(values(librarySongsWithData), song =>
                     reduce(
                         tableConfig,
                         (agg, { getter, dataKey, ...props }) => ({

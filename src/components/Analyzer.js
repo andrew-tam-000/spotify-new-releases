@@ -3,7 +3,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { initializeOnAnalyzerStart, analyzerCloseSearchPanel } from "../redux/actions";
-import { songsWithDataByIdSelector, analyzerOpenSearchPanelSelector } from "../selectors";
+import { analyzerOpenSearchPanelSelector } from "../selectors";
 import SongTable from "./Analyzer/SongTable";
 import RelatedSearch from "./Analyzer/RelatedSearch";
 import _Drawer from "@material-ui/core/Drawer";
@@ -44,7 +44,6 @@ class Analyzer extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-    songsWithDataById: songsWithDataByIdSelector,
     analyzerOpenSearchPanel: analyzerOpenSearchPanelSelector
 });
 

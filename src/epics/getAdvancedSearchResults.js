@@ -3,7 +3,7 @@ import { map, get, omitBy, isUndefined, size, compact } from "lodash";
 import { timer, from, of } from "rxjs";
 import { mergeMap, debounce, catchError } from "rxjs/operators";
 import {
-    songsWithDataByIdSelector,
+    librarySongsWithDataSelector,
     advancedSearchTracksSelector,
     advancedSearchAttributesSelector,
     advancedSearchGenresSelector,
@@ -23,14 +23,14 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
         mergeMap(() => {
             const advancedSearchAttributes = advancedSearchAttributesSelector(state$.value);
             const tracks = advancedSearchTracksSelector(state$.value);
-            const songsWithDataById = songsWithDataByIdSelector(state$.value);
+            const librarySongsWithData = librarySongsWithDataSelector(state$.value);
             const seedGenres = advancedSearchGenresSelector(state$.value);
             const seedTracks = tracks;
             const seedArtists = advancedSearchArtistsSelector(state$.value).length
                 ? advancedSearchArtistsSelector(state$.value)
                 : compact(
                       map(tracks, track =>
-                          get(songsWithDataById, `${track}.songDetails.track.artists.0.id`)
+                          get(librarySongsWithData, `${track}.songDetails.track.artists.0.id`)
                       )
                   );
             return from(

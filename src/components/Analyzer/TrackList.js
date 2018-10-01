@@ -6,7 +6,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import styled from "styled-components";
-import { advancedSearchTracksSelector, songsWithDataByIdSelector } from "../../selectors";
+import { advancedSearchTracksSelector, librarySongsWithDataSelector } from "../../selectors";
 import _DeleteButton from "./DeleteButton";
 import PopulateButton from "./PopulateButton";
 const DeleteButton = styled(_DeleteButton)`
@@ -17,15 +17,15 @@ const SmallListItemText = styled(ListItemText)`
     flex: none !important;
 `;
 
-const TrackList = ({ advancedSearchTracks, songsWithDataById }) => (
+const TrackList = ({ advancedSearchTracks, librarySongsWithData }) => (
     <List>
         {map(advancedSearchTracks, (id, index) => (
             <ListItem key={index}>
                 <DeleteButton index={index} />
-                <PopulateButton songData={songsWithDataById[id]} />
+                <PopulateButton songData={librarySongsWithData[id]} />
                 <SmallListItemText
-                    primary={get(songsWithDataById[id], "songDetails.track.name")}
-                    secondary={get(songsWithDataById[id], "songDetails.track.artists.0.name")}
+                    primary={get(librarySongsWithData[id], "songDetails.track.name")}
+                    secondary={get(librarySongsWithData[id], "songDetails.track.artists.0.name")}
                 />
             </ListItem>
         ))}
@@ -34,7 +34,7 @@ const TrackList = ({ advancedSearchTracks, songsWithDataById }) => (
 
 export default connect(
     createStructuredSelector({
-        songsWithDataById: songsWithDataByIdSelector,
+        librarySongsWithData: librarySongsWithDataSelector,
         advancedSearchTracks: advancedSearchTracksSelector
     })
 )(TrackList);

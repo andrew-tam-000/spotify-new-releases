@@ -3,7 +3,10 @@ import spotifyApi from "../spotifyApi";
 export default {
     app: {
         spotify: {
-            nowPlaying: {}
+            nowPlaying: {},
+            artistData: [],
+            songData: [],
+            songs: []
         },
         // Let's sync this with firebase
         // but this will contian ID's for all
@@ -34,8 +37,9 @@ export default {
                 attributes: {},
                 activeTab: 0
             },
+            // This will just be id's that are populated
+            // from the spotify core data
             artistData: [],
-            songData: [],
             songs: []
         }
     }

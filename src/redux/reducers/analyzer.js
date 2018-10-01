@@ -1,7 +1,21 @@
-import { slice } from "lodash";
+import { getSongsSuccess, getSongDataSuccess, getArtistDataSuccess } from "../actions/";
+import { slice, map, get } from "lodash";
 
 export default (state = {}, { type, payload }) => {
     switch (type) {
+        case getSongsSuccess().type:
+            return {
+                ...state,
+                songs: map(payload, ({ added_at, track }) => ({
+                    added_at,
+                    track: get(track, "id")
+                }))
+            };
+        case getArtistDataSuccess().type:
+            return {
+                ...state,
+                artistData: map(payload, ({ id }) => id)
+            };
         case "advanced-search|ADD_TRACK":
             return {
                 ...state,

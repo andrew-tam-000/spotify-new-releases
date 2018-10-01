@@ -1,4 +1,5 @@
 import analyzer from "./analyzer";
+import spotify from "./spotify";
 import { combineReducers } from "redux";
 import {
     getCurrentlyPlayingTrackSuccess,
@@ -58,37 +59,7 @@ const appReducer = combineReducers({
                 return state;
         }
     },
-    spotify: (state = {}, { type, payload }) => {
-        switch (type) {
-            case "GET_SPOTIFY_USER_SUCCESS":
-                return {
-                    ...state,
-                    user: payload
-                };
-            case getCurrentlyPlayingTrackSuccess().type:
-                return {
-                    ...state,
-                    nowPlaying: payload
-                };
-            case getSongsSuccess().type:
-                return {
-                    ...state,
-                    songs: payload
-                };
-            case getSongDataSuccess().type:
-                return {
-                    ...state,
-                    songData: payload
-                };
-            case getArtistDataSuccess().type:
-                return {
-                    ...state,
-                    artistData: payload
-                };
-            default:
-                return state;
-        }
-    },
+    spotify,
     playlist: (state = {}, { type, payload }) => {
         switch (type) {
             case addTracksToPlaylistSuccess().type:
