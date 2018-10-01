@@ -7,7 +7,6 @@ import { analyzerOpenSearchPanelSelector } from "../selectors";
 import SongTable from "./Analyzer/SongTable";
 import RelatedSearch from "./Analyzer/RelatedSearch";
 import _Drawer from "@material-ui/core/Drawer";
-import OpenSearchButton from "./Analyzer/OpenSearchButton";
 
 const Drawer = withStyles({
     paper: {
@@ -25,7 +24,6 @@ class Analyzer extends Component {
         return (
             <React.Fragment>
                 <SongTable />
-                <OpenSearchButton />
                 <Drawer
                     paperProps={{
                         style: {

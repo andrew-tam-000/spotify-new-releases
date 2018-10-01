@@ -14,12 +14,13 @@ import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import RestoreIcon from "@material-ui/icons/Restore";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import SearchIcon from "@material-ui/icons/Search";
 import QueueMusicIcon from "@material-ui/icons/QueueMusic";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import Search from "./Search";
 import _Drawer from "@material-ui/core/Drawer";
-import { searchOpenPanel, searchClosePanel } from "../redux/actions";
+import { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";
 import { createStructuredSelector } from "reselect";
 
@@ -52,6 +53,9 @@ class RouteProvider extends Component {
             history.push("/123");
         }
         if (val === 2) {
+            this.props.analyzerOpenSearchPanel();
+        }
+        if (val === 3) {
             this.props.searchOpenPanel();
         }
     };
@@ -79,6 +83,7 @@ class RouteProvider extends Component {
                     <BottomNavigation value="0" onChange={this.handleChange} showLabels>
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
                         <BottomNavigationAction label="Playlist" icon={<QueueMusicIcon />} />
+                        <BottomNavigationAction label="SimilarSongs" icon={<ImageSearchIcon />} />
                         <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
                 </AppWrapper>
@@ -91,5 +96,5 @@ export default connect(
     createStructuredSelector({
         searchPanel: searchPanelSelector
     }),
-    { searchOpenPanel, searchClosePanel }
+    { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel }
 )(RouteProvider);
