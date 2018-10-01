@@ -9,7 +9,7 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
                 of(getCurrentlyPlayingTrackStart()),
                 from(spotifyApi.getMyCurrentPlayingTrack()).pipe(
                     mergeMap(resp => of(getCurrentlyPlayingTrackSuccess(resp))),
-                    catchError(e => ({ type: "error", payload: e.message }))
+                    catchError(e => of({ type: "error", payload: e.message }))
                 )
             )
         )

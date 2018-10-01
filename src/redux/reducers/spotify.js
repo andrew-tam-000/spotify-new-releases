@@ -2,7 +2,8 @@ import {
     getCurrentlyPlayingTrackSuccess,
     getSongsSuccess,
     getSongDataSuccess,
-    getArtistDataSuccess
+    getArtistDataSuccess,
+    setSearchResults
 } from "../actions/";
 import { reduce, set, get } from "lodash";
 
@@ -12,6 +13,20 @@ export default (state = {}, { type, payload }) => {
             return {
                 ...state,
                 user: payload
+            };
+        case setSearchResults().type:
+            return {
+                ...state,
+                songs: reduce(
+                    get(payload, "tracks.items"),
+                    (acc, track) => (acc[track.id] ? acc : set(acc, track.id, track)),
+                    state.songs
+                ),
+                artistData: reduce(
+                    get(payload, "artists.items"),
+                    (acc, artist) => (acc[artist.id] ? acc : set(acc, artist.id, artist)),
+                    state.artistData
+                )
             };
         case getCurrentlyPlayingTrackSuccess().type:
             return {
