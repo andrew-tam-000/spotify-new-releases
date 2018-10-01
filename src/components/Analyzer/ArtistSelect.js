@@ -2,14 +2,14 @@ import { compose, withPropsOnChange, withProps } from "recompose";
 import { reduce, set, get } from "lodash";
 import { createStructuredSelector } from "reselect";
 import { advancedSearchSetArtists } from "../../redux/actions";
-import { artistDataSelector, advancedSearchArtistsSelector } from "../../selectors";
+import { artistDropdownSelector, advancedSearchArtistsSelector } from "../../selectors";
 import { connect } from "react-redux";
 import MultiSelect from "./MultiSelect";
 
 export default compose(
     connect(
         createStructuredSelector({
-            options: artistDataSelector,
+            options: artistDropdownSelector,
             value: advancedSearchArtistsSelector
         }),
         dispatch => ({

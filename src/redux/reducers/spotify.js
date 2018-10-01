@@ -43,7 +43,7 @@ export default (state = {}, { type, payload }) => {
                         song.added_at
                             ? set(acc, get(song, "track.id"), get(song, "track"))
                             : set(acc, get(song, "id"), song),
-                    {}
+                    state.songs
                 )
             };
         case getSongDataSuccess().type:
@@ -52,7 +52,7 @@ export default (state = {}, { type, payload }) => {
                 songData: reduce(
                     payload,
                     (acc, songData) => set(acc, get(songData, "id"), songData),
-                    {}
+                    state.songData
                 )
             };
         case getArtistDataSuccess().type:
@@ -61,7 +61,7 @@ export default (state = {}, { type, payload }) => {
                 artistData: reduce(
                     payload,
                     (acc, artist) => set(acc, get(artist, "id"), artist),
-                    {}
+                    state.artistData
                 )
             };
         default:

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import { HashRouter as Router, Route } from "react-router-dom";
+import { Router, Route } from "react-router-dom";
+import createHashHistory from "history/createHashHistory";
 import styled from "styled-components";
 import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
@@ -14,11 +15,15 @@ import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import RestoreIcon from "@material-ui/icons/Restore";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import SearchIcon from "@material-ui/icons/Search";
+import QueueMusicIcon from "@material-ui/icons/QueueMusic";
+import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import Search from "./Search";
 import _Drawer from "@material-ui/core/Drawer";
 import { searchOpenPanel, searchClosePanel } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";
 import { createStructuredSelector } from "reselect";
+
+const history = createHashHistory();
 
 const AppWrapper = styled.div`
     display: flex;
@@ -40,6 +45,12 @@ const Drawer = withStyles({
 
 class RouteProvider extends Component {
     handleChange = (e, val) => {
+        if (val === 0) {
+            history.push("/analyzer");
+        }
+        if (val === 1) {
+            history.push("/123");
+        }
         if (val === 2) {
             this.props.searchOpenPanel();
         }
@@ -48,7 +59,7 @@ class RouteProvider extends Component {
     render() {
         const { searchPanel, searchClosePanel } = this.props;
         return (
-            <Router>
+            <Router history={history}>
                 <AppWrapper>
                     <AppBar position="static" color="default">
                         <Toolbar>
@@ -65,9 +76,9 @@ class RouteProvider extends Component {
                     <Drawer anchor="right" open={searchPanel} onClose={searchClosePanel}>
                         <Search />
                     </Drawer>
-                    <BottomNavigation value="Recents" onChange={this.handleChange} showLabels>
-                        <BottomNavigationAction label="Recents" icon={<RestoreIcon />} />
-                        <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
+                    <BottomNavigation value="0" onChange={this.handleChange} showLabels>
+                        <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
+                        <BottomNavigationAction label="Playlist" icon={<QueueMusicIcon />} />
                         <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
                 </AppWrapper>

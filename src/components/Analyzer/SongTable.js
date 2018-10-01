@@ -71,7 +71,7 @@ class SongTable extends Component {
                 >
                     <Column
                         headerRenderer={this.headerRenderer}
-                        width={200}
+                        width={300}
                         cellRenderer={ButtonCellRenderer}
                         dataKey="noop"
                     />

@@ -103,7 +103,11 @@ export const artistIdsSelector = createSelector(songsSelector, songs => {
 
 export const artistDataSelector = createSelector(
     state => get(state, "app.spotify.artistData") || [],
-    artistData => sortBy(artistData, "name")
+    artistData => artistData
+);
+
+export const artistDropdownSelector = createSelector(artistDataSelector, artistData =>
+    sortBy(values(artistData), "name")
 );
 
 export const analyzerSortSelector = createSelector(
@@ -126,19 +130,18 @@ export const libraryArtistsSelector = createSelector(
     songs => songs
 );
 
-export const artistDataByIdSelector = createSelector(artistDataSelector, artistData =>
-    keyBy(artistData, "id")
-);
-
 export const songWithDataByIdSelector = createSelector(
     songDataSelector,
     songsSelector,
-    artistDataByIdSelector,
-    (songData, songs, artistData) => id => ({
-        songDetails: songs[id],
-        songAnalysis: songData[id],
-        artistDetails: artistData[get(songs, `${id}.artists.0.id`)]
-    })
+    artistDataSelector,
+    (songData, songs, artistData) => id => {
+        return {
+            songDetails: songs[id],
+            songAnalysis: songData[id]
+            // Removing this because artists come inplicit with details
+            //artistDetails: artistData[get(songs, `${id}.artists.0.id`)]
+        };
+    }
 );
 
 export const librarySongsWithDataSelector = createSelector(

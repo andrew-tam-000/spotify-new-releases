@@ -73,7 +73,8 @@ const appReducer = combineReducers({
             default:
                 return state;
         }
-    }
+    },
+    user: (state = {}) => state
 });
 
 export default appReducer;

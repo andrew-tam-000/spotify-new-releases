@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { compose } from "redux";
+import { mapProps } from "recompose";
 import Search from "./Search";
-import _ from "lodash";
+import { map, get, join, split, last } from "lodash";
 import { withStyles } from "@material-ui/core/styles";
 import { createStructuredSelector } from "reselect";
 
-import { playlistSelector, playStatusSelector } from "../selectors";
+import { playlistSelector, playStatusSelector, songWithDataByIdSelector } from "../selectors";
 
 import { playSongStart, initializeOnPlaylist } from "../redux/actions";
 
@@ -15,10 +16,10 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Drawer from "@material-ui/core/Drawer";
+import PlayButton from "./Analyzer/PlayButton";
 
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from "@material-ui/icons/Close";
-import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 
 const styles = theme => ({
@@ -52,6 +53,7 @@ class Spotify extends Component {
     }
 
     render() {
+        const { playlist, playStatus } = this.props;
         return (
             <div>
                 <Drawer
@@ -65,22 +67,18 @@ class Spotify extends Component {
                     <Search />
                 </Drawer>
                 <List>
-                    {_.map(this.props.playlist, (track, idx) => (
-                        <ListItem
-                            button
-                            onClick={() => this.props.playSongStart(_.get(track, "track.uri"))}
-                            key={idx}
-                        >
-                            {_.get(track, "track.uri") === this.props.playStatus ? (
+                    {map(playlist, (track, idx) => (
+                        <ListItem button key={idx}>
+                            {get(track, "uri") === playStatus ? (
                                 <PauseCircleOutlineIcon color="secondary" />
                             ) : (
-                                <PlayCircleOutlineIcon />
+                                <PlayButton uri={get(track, "songDetails.uri")} />
                             )}
                             <ListItemText
-                                primary={_.get(track, "track.name")}
-                                secondary={_.join(
-                                    _.map(_.get(track, "track.artists"), artist =>
-                                        _.get(artist, "name")
+                                primary={get(track, "songDetails.name")}
+                                secondary={join(
+                                    map(get(track, "songDetails.artists"), artist =>
+                                        get(artist, "name")
                                     ),
                                     ", "
                                 )}
@@ -105,9 +103,14 @@ export default compose(
     withStyles(styles),
     connect(
         createStructuredSelector({
+            songWithDataById: songWithDataByIdSelector,
             playlist: playlistSelector,
             playStatus: playStatusSelector
         }),
         { playSongStart, initializeOnPlaylist }
-    )
+    ),
+    mapProps(({ songWithDataById, playlist, ...props }) => ({
+        ...props,
+        playlist: map(playlist, uri => songWithDataById(last(split(uri, ":"))))
+    }))
 )(Spotify);
