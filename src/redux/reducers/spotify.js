@@ -4,6 +4,7 @@ import {
     getSongDataSuccess,
     getArtistDataSuccess
 } from "../actions/";
+import { reduce, set, get } from "lodash";
 
 export default (state = {}, { type, payload }) => {
     switch (type) {
@@ -20,17 +21,33 @@ export default (state = {}, { type, payload }) => {
         case getSongsSuccess().type:
             return {
                 ...state,
-                songs: payload
+                songs: reduce(
+                    payload,
+                    // Duck type response
+                    (acc, song) =>
+                        song.added_at
+                            ? set(acc, get(song, "track.id"), get(song, "track"))
+                            : set(acc, get(song, "id"), song),
+                    {}
+                )
             };
         case getSongDataSuccess().type:
             return {
                 ...state,
-                songData: payload
+                songData: reduce(
+                    payload,
+                    (acc, songData) => set(acc, get(songData, "id"), songData),
+                    {}
+                )
             };
         case getArtistDataSuccess().type:
             return {
                 ...state,
-                artistData: payload
+                artistData: reduce(
+                    payload,
+                    (acc, artist) => set(acc, get(artist, "id"), artist),
+                    {}
+                )
             };
         default:
             return state;

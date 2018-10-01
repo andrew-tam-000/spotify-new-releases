@@ -2,27 +2,27 @@ const tableConfig = [
     {
         label: "Title",
         dataKey: "title",
-        getter: () => "songDetails.track.name"
+        getter: () => "songDetails.name"
     },
     {
         dataKey: "uri",
-        getter: () => "songDetails.track.uri",
+        getter: () => "songDetails.uri",
         hidden: true
     },
     {
         dataKey: "id",
-        getter: () => "songDetails.track.id",
+        getter: () => "songDetails.id",
         hidden: true
     },
     {
         label: "Artist",
         dataKey: "artist",
-        getter: () => "songDetails.track.artists.0.name"
+        getter: () => "songDetails.artists.0.name"
     },
     {
         label: "Popularity",
         dataKey: "popularity",
-        getter: () => "songDetails.track.popularity",
+        getter: () => "songDetails.popularity",
         tunable: true,
         tolerance: 0,
         min: 0,

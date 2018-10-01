@@ -4,7 +4,7 @@ import {
     get,
     values,
     keyBy,
-    merge,
+    set,
     uniq,
     flatten,
     reduce,
@@ -116,35 +116,37 @@ export const analyzerOpenSearchPanelSelector = createSelector(
     openSearchPanel => openSearchPanel
 );
 
+export const librarySongsSelector = createSelector(
+    state => get(state, "app.analyzer.songs"),
+    songs => songs
+);
+
+export const libraryArtistsSelector = createSelector(
+    state => get(state, "app.analyzer.artistData"),
+    songs => songs
+);
+
 export const artistDataByIdSelector = createSelector(artistDataSelector, artistData =>
     keyBy(artistData, "id")
 );
-export const librarySongsWithDataSelector = createSelector(
+
+export const songWithDataByIdSelector = createSelector(
     songDataSelector,
     songsSelector,
     artistDataByIdSelector,
-    (songData, songs, artistData) => {
-        const songDetailsById = keyBy(
-            map(songs, songDetails => ({ songDetails })),
-            "songDetails.track.id"
-        );
-        const songsById = keyBy(
-            map(songData, songAnalysis => ({ songAnalysis })),
-            "songAnalysis.id"
-        );
+    (songData, songs, artistData) => id => ({
+        songDetails: songs[id],
+        songAnalysis: songData[id],
+        artistDetails: artistData[get(songs, `${id}.artists.0.id`)]
+    })
+);
 
-        const artistsBySongId = keyBy(
-            map(songs, song => ({
-                artistDetails: {
-                    ...get(artistData, get(song, "track.artists.0.id")),
-                    songId: get(song, "track.id")
-                }
-            })),
-            "artistDetails.songId"
-        );
-
-        return merge({}, songDetailsById, songsById, artistsBySongId);
-    }
+export const librarySongsWithDataSelector = createSelector(
+    librarySongsSelector,
+    libraryArtistsSelector,
+    songWithDataByIdSelector,
+    (librarySongs, libraryArtists, songWithDataById) =>
+        reduce(librarySongs, (acc, { track }) => set(acc, track, songWithDataById(track)), {})
 );
 
 export const librarySongListSelector = createSelector(
