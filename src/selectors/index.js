@@ -214,3 +214,10 @@ export const advancedSearchArtistsSelector = createSelector(
     advancedSearchSelector,
     advancedSearch => get(advancedSearch, "artists")
 );
+
+export const nowPlayingSongIdSelector = createSelector(
+    state =>
+        get(state, "app.spotify.nowPlaying.is_playing") &&
+        get(state, "app.spotify.nowPlaying.item.id"),
+    songId => songId
+);

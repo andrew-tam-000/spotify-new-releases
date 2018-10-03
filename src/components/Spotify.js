@@ -35,19 +35,6 @@ const styles = theme => ({
 });
 
 class Spotify extends Component {
-    state = {
-        searchPanelIsOpen: false
-    };
-
-    toggleDrawer = () =>
-        this.setState({
-            searchPanelIsOpen: !this.state.searchPanelIsOpen
-        });
-
-    closeDrawer = () =>
-        this.setState({
-            searchPanelIsOpen: false
-        });
     componentDidMount() {
         this.props.initializeOnPlaylist(this.props.match.params.id);
     }
@@ -55,46 +42,26 @@ class Spotify extends Component {
     render() {
         const { playlist, playStatus } = this.props;
         return (
-            <div>
-                <Drawer
-                    anchor="right"
-                    open={this.state.searchPanelIsOpen}
-                    onClose={this.closeDrawer}
-                    classes={{
-                        paper: this.props.classes.drawerPaper
-                    }}
-                >
-                    <Search />
-                </Drawer>
-                <List>
-                    {map(playlist, (track, idx) => (
-                        <ListItem button key={idx}>
-                            {get(track, "uri") === playStatus ? (
-                                <PauseCircleOutlineIcon color="secondary" />
-                            ) : (
-                                <PlayButton uri={get(track, "songDetails.uri")} />
+            <List>
+                {map(playlist, (track, idx) => (
+                    <ListItem button key={idx}>
+                        {get(track, "uri") === playStatus ? (
+                            <PauseCircleOutlineIcon color="secondary" />
+                        ) : (
+                            <PlayButton uri={get(track, "songDetails.uri")} />
+                        )}
+                        <ListItemText
+                            primary={get(track, "songDetails.name")}
+                            secondary={join(
+                                map(get(track, "songDetails.artists"), artist =>
+                                    get(artist, "name")
+                                ),
+                                ", "
                             )}
-                            <ListItemText
-                                primary={get(track, "songDetails.name")}
-                                secondary={join(
-                                    map(get(track, "songDetails.artists"), artist =>
-                                        get(artist, "name")
-                                    ),
-                                    ", "
-                                )}
-                            />
-                        </ListItem>
-                    ))}
-                </List>
-                <Button
-                    className={this.props.classes.searchButton}
-                    variant="fab"
-                    color="secondary"
-                    onClick={this.toggleDrawer}
-                >
-                    {this.state.searchPanelIsOpen ? <CloseIcon /> : <SearchIcon />}
-                </Button>
-            </div>
+                        />
+                    </ListItem>
+                ))}
+            </List>
         );
     }
 }
