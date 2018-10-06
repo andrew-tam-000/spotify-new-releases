@@ -330,10 +330,54 @@ export function getArtistDataStart() {
     };
 }
 
-export function getArtistDataSuccess(songData) {
+export function getArtistDataSuccess(artistData) {
     return {
         type: "spotify|GET_ARTIST_DATA_SUCCESS",
-        payload: songData
+        payload: artistData
+    };
+}
+
+///////////////////////////////////////////////
+//
+// GET_RELATED_ARTISTS
+//
+///////////////////////////////////////////////
+export function getRelatedArtistsStart(artistId) {
+    return {
+        type: "spotify|GET_RELATED_ARTISTS_START",
+        payload: artistId
+    };
+}
+
+export function getRelatedArtistsSuccess(artistId, relatedArtists) {
+    return {
+        type: "spotify|GET_RELATED_ARTISTS_SUCCESS",
+        payload: {
+            artistId,
+            relatedArtists
+        }
+    };
+}
+
+///////////////////////////////////////////////
+//
+// GET_ARTIST_TOP_TRACKS
+//
+///////////////////////////////////////////////
+export function getArtistTopTracksStart(artistId) {
+    return {
+        type: "spotify|GET_ARTIST_TOP_TRACKS_START",
+        payload: artistId
+    };
+}
+
+export function getArtistTopTracksSuccess(artistId, topTracks) {
+    return {
+        type: "spotify|GET_ARTIST_TOP_TRACKS_SUCCESS",
+        payload: {
+            artistId,
+            topTracks
+        }
     };
 }
 

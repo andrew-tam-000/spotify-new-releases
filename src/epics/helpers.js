@@ -1,7 +1,7 @@
 import lzString from "lz-string";
-import { last, mapTo, filter, expand, mergeMap, catchError } from "rxjs/operators";
-import { merge, EMPTY, from, of } from "rxjs";
-import { getSongsStart, getSongsSuccess } from "../redux/actions";
+import { castArray } from "lodash";
+import { filter, mergeMap, catchError } from "rxjs/operators";
+import { from, of } from "rxjs";
 
 export function getValueFromLocalStorage(keyName) {
     return hasLocalStorageKey(keyName).pipe(
@@ -14,4 +14,15 @@ export function getValueFromLocalStorage(keyName) {
 export function hasLocalStorageKey(keyName) {
     const hasValue = of(!!localStorage.getItem(keyName));
     return of(hasValue);
+}
+
+export function apiObservable(apiCall, apiArgs, onSuccess) {
+    try {
+        return from(apiCall.apply(null, castArray(apiArgs))).pipe(
+            mergeMap(onSuccess),
+            catchError(e => of({ type: "error", payload: e.message }))
+        );
+    } catch (e) {
+        console.error(e);
+    }
 }

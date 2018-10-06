@@ -15,6 +15,7 @@ import {
     advancedSearchGetResultsError,
     advancedSearchChangeTab
 } from "../redux/actions";
+import { apiObservable } from "./helpers";
 
 export default function getAdvancedSearchResults(action$, state$, { spotifyApi }) {
     return action$.pipe(
@@ -33,8 +34,9 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
                           get(librarySongsWithData, `${track}.songDetails.track.artists.0.id`)
                       )
                   );
-            return from(
-                spotifyApi.getRecommendations(
+            return apiObservable(
+                spotifyApi.getRecommendations,
+                [
                     omitBy(
                         {
                             ...advancedSearchAttributes,
@@ -45,13 +47,8 @@ export default function getAdvancedSearchResults(action$, state$, { spotifyApi }
                         },
                         isUndefined
                     )
-                )
-            ).pipe(
-                mergeMap(resp => [
-                    advancedSearchGetResultsSuccess(resp),
-                    advancedSearchChangeTab(2)
-                ]),
-                catchError(e => of(advancedSearchGetResultsError(e.message)))
+                ],
+                resp => [advancedSearchGetResultsSuccess(resp), advancedSearchChangeTab(2)]
             );
         })
     );

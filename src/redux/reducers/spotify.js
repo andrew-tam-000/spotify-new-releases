@@ -3,9 +3,11 @@ import {
     getSongsSuccess,
     getSongDataSuccess,
     getArtistDataSuccess,
+    getRelatedArtistsSuccess,
+    getArtistTopTracksSuccess,
     setSearchResults
 } from "../actions/";
-import { reduce, set, get } from "lodash";
+import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
 export default (state = {}, { type, payload }) => {
     switch (type) {
@@ -36,33 +38,72 @@ export default (state = {}, { type, payload }) => {
         case getSongsSuccess().type:
             return {
                 ...state,
-                songs: reduce(
-                    payload,
-                    // Duck type response
-                    (acc, song) =>
-                        song.added_at
-                            ? set(acc, get(song, "track.id"), get(song, "track"))
-                            : set(acc, get(song, "id"), song),
-                    state.songs
-                )
+                songs: {
+                    ...state.songs,
+                    ...keyBy(
+                        filter(
+                            // Duck type response
+                            // for checking library songs or not
+                            compact(
+                                get(first(payload), "added_at")
+                                    ? map(payload, song => get(song, "track"))
+                                    : payload
+                            ),
+                            ({ id }) => !state.songs[id]
+                        ),
+                        "id"
+                    )
+                }
             };
         case getSongDataSuccess().type:
             return {
                 ...state,
-                songData: reduce(
-                    payload,
-                    (acc, songData) => set(acc, get(songData, "id"), songData),
-                    state.songData
-                )
+                songData: {
+                    ...state.songData,
+                    ...keyBy(filter(compact(payload), ({ id }) => !state.songData[id]), "id")
+                }
             };
         case getArtistDataSuccess().type:
             return {
                 ...state,
-                artistData: reduce(
-                    payload,
-                    (acc, artist) => set(acc, get(artist, "id"), artist),
-                    state.artistData
-                )
+                artistData: {
+                    ...state.artistData,
+                    ...keyBy(filter(compact(payload), ({ id }) => !state.artistData[id]), "id")
+                }
+            };
+        case getRelatedArtistsSuccess().type:
+            return {
+                ...state,
+                artistData: {
+                    ...state.artistData,
+                    ...keyBy(
+                        filter(compact(payload.relatedArtists), ({ id }) => !state.artistData[id]),
+                        "id"
+                    )
+                },
+                relatedArtists: {
+                    ...state.relatedArtists,
+                    ...(state.relatedArtists[payload.artistId]
+                        ? {}
+                        : { [payload.artistId]: map(payload.relatedArtists, ({ id }) => id) })
+                }
+            };
+        case getArtistTopTracksSuccess().type:
+            return {
+                ...state,
+                songs: {
+                    ...state.songs,
+                    ...keyBy(
+                        filter(compact(payload.topTracks), ({ id }) => !state.songData[id]),
+                        "id"
+                    )
+                },
+                artistTopTracks: {
+                    ...state.artistTopTracks,
+                    ...(state.artistTopTracks[payload.artistId]
+                        ? {}
+                        : { [payload.artistId]: map(payload.topTracks, ({ id }) => id) })
+                }
             };
         default:
             return state;

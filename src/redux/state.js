@@ -5,6 +5,8 @@ export default {
         spotify: {
             nowPlaying: {},
             artistData: [],
+            artistTopTracks: {},
+            relatedArtists: {},
             songData: [],
             songs: []
         },

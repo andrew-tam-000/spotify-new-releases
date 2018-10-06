@@ -24,14 +24,14 @@ const tokenUrl = `https://accounts.spotify.com/authorize?client_id=27135c7bda1c4
     " "
 )}`;
 
-function getAccessTokenFromLocalStorageObs() {
+function $getAccessTokenFromLocalStorage() {
     return of(window.localStorage.getItem("accessToken")).pipe(
         filter(token => token),
         map(token => token)
     );
 }
 
-function getAccessTokenFromUrlObs() {
+function $getAccessTokenFromUrl() {
     return of(window.localStorage.getItem("accessToken")).pipe(
         filter(token => !token),
         mergeMap(token => {
@@ -61,7 +61,7 @@ export default function createAccessToken(action$, state$, { firebaseApp, spotif
     return action$.pipe(
         ofType("CREATE_ACCESS_TOKEN_START"),
         // Check 2 things -- check if the
-        mergeMap(action => merge(getAccessTokenFromUrlObs(), getAccessTokenFromLocalStorageObs())),
+        mergeMap(action => merge($getAccessTokenFromUrl(), $getAccessTokenFromLocalStorage())),
         mergeMap(token => [createAccessTokenSuccess(token), updateFirebaseUserStart({ token })])
     );
 }

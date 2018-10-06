@@ -20,6 +20,7 @@ import getSongData from "./getSongData";
 import getArtistData from "./getArtistData";
 import getAdvancedSearchResults from "./getAdvancedSearchResults";
 import getNowPlaying from "./getNowPlaying";
+import spotifyApiTriggers from "./spotifyApiTriggers";
 
 export default (...args) =>
     merge(
@@ -43,5 +44,6 @@ export default (...args) =>
         getSongData(...args),
         getArtistData(...args),
         getAdvancedSearchResults(...args),
-        getNowPlaying(...args)
+        getNowPlaying(...args),
+        spotifyApiTriggers(...args)
     );
