@@ -24,5 +24,6 @@ export function apiObservable(apiCall, apiArgs, onSuccess) {
         );
     } catch (e) {
         console.error(e);
+        return of({ type: "error", payload: e.message });
     }
 }
