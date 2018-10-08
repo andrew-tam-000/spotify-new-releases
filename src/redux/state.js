@@ -10,6 +10,10 @@ export default {
             songData: [],
             songs: []
         },
+        discover: {
+            tree: "spotify:artist:0A0FS04o6zMoto8OKPsDwY"
+        },
+        showSideBar: false,
         // Let's sync this with firebase
         // but this will contian ID's for all
         // songs we'd like

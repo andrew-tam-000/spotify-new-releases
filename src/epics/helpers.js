@@ -17,13 +17,8 @@ export function hasLocalStorageKey(keyName) {
 }
 
 export function apiObservable(apiCall, apiArgs, onSuccess) {
-    try {
-        return from(apiCall.apply(null, castArray(apiArgs))).pipe(
-            mergeMap(onSuccess),
-            catchError(e => of({ type: "error", payload: e.message }))
-        );
-    } catch (e) {
-        console.error(e);
-        return of({ type: "error", payload: e.message });
-    }
+    return from(apiCall.apply(null, castArray(apiArgs))).pipe(
+        mergeMap(onSuccess),
+        catchError(e => of({ type: "error", payload: e.message }))
+    );
 }

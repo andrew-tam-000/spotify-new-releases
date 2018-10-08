@@ -1,6 +1,7 @@
 import {
     orderBy,
     map,
+    mapValues,
     get,
     values,
     keyBy,
@@ -90,6 +91,11 @@ export const songDataSelector = createSelector(
     songData => songData
 );
 
+export const relatedArtistsSelector = createSelector(
+    state => get(state, "app.spotify.relatedArtists") || [],
+    relatedArtists => relatedArtists
+);
+
 export const analyzerSearchTermSelector = createSelector(
     state => get(state, "app.analyzer.searchTerm"),
     searchTerm => searchTerm
@@ -104,6 +110,20 @@ export const artistIdsSelector = createSelector(songsSelector, songs => {
 export const artistDataSelector = createSelector(
     state => get(state, "app.spotify.artistData") || [],
     artistData => artistData
+);
+
+export const artistTopTracksSelector = createSelector(
+    state => get(state, "app.spotify.artistTopTracks") || {},
+    artistTopTracks => artistTopTracks
+);
+
+export const hydratedRelatedArtistsSelector = createSelector(
+    relatedArtistsSelector,
+    artistDataSelector,
+    (relatedArtists, artistData) =>
+        mapValues(relatedArtists, relatedArtistIds =>
+            map(relatedArtistIds, relatedArtistId => artistData[relatedArtistId])
+        )
 );
 
 export const artistDropdownSelector = createSelector(artistDataSelector, artistData =>
@@ -220,4 +240,9 @@ export const nowPlayingSongIdSelector = createSelector(
         get(state, "app.spotify.nowPlaying.is_playing") &&
         get(state, "app.spotify.nowPlaying.item.id"),
     songId => songId
+);
+
+export const showSideBarSelector = createSelector(
+    state => get(state, "app.showSideBar"),
+    showSideBar => showSideBar
 );

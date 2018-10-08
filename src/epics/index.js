@@ -15,11 +15,10 @@ import deletePlaylist from "./deletePlaylist";
 import setSpotifyApiToken from "./setSpotifyApiToken";
 import firebaseListener from "./firebaseListener";
 import initializeOnAnalyzer from "./initializeOnAnalyzer";
+import initializeOnDiscover from "./initializeOnDiscover";
 import getSongs from "./getSongs";
 import getSongData from "./getSongData";
 import getArtistData from "./getArtistData";
-import getAdvancedSearchResults from "./getAdvancedSearchResults";
-import getNowPlaying from "./getNowPlaying";
 import spotifyApiTriggers from "./spotifyApiTriggers";
 
 export default (...args) =>
@@ -40,10 +39,9 @@ export default (...args) =>
         updateFirebaseUser(...args),
         firebaseListener(...args),
         initializeOnAnalyzer(...args),
+        initializeOnDiscover(...args),
         getSongs(...args),
         getSongData(...args),
         getArtistData(...args),
-        getAdvancedSearchResults(...args),
-        getNowPlaying(...args),
         spotifyApiTriggers(...args)
     );

@@ -286,6 +286,17 @@ export function initializeOnAnalyzerSuccess() {
 
 ///////////////////////////////////////////////
 //
+// INITIALIZE_ON_DISCOVER
+//
+///////////////////////////////////////////////
+export function initializeOnDiscoverStart() {
+    return {
+        type: "INITIALIZE_ON_DISCOVER_START"
+    };
+}
+
+///////////////////////////////////////////////
+//
 // GET_SONGS
 //
 ///////////////////////////////////////////////
@@ -508,6 +519,40 @@ export function searchOpenPanel() {
 export function searchClosePanel() {
     return {
         type: "search|CLOSE_PANEL"
+    };
+}
+
+////////////////////////////////////////////////////
+//
+//
+// SHOW_SIDE_BAR
+//
+//
+////////////////////////////////////////////////////
+export function showSideBar(uri) {
+    return {
+        type: "SHOW_SIDE_BAR",
+        payload: uri
+    };
+}
+
+export function hideSideBar() {
+    return {
+        type: "HIDE_SIDE_BAR"
+    };
+}
+
+////////////////////////////////////////////////////
+//
+//
+// SET_DISCOVER
+//
+//
+////////////////////////////////////////////////////
+export function setDiscover(uri) {
+    return {
+        type: "SET_DISCOVER",
+        payload: uri
     };
 }
 

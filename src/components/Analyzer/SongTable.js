@@ -13,6 +13,7 @@ import tableConfig from "../../tableConfig";
 import PlayButton from "./PlayButton";
 import AddToPlaylistButton from "../AddToPlaylistButton";
 import AddToAdvancedSearchButton from "./AddToAdvancedSearchButton";
+import StartTreeButton from "../Discover/StartTreeButton";
 import TextField from "@material-ui/core/TextField";
 import { analyzerSearchTermSelector } from "../../selectors";
 import { analyzerUpdateSearchTerm } from "../../redux/actions";
@@ -28,6 +29,7 @@ const ButtonCellRenderer = ({ cellData, rowData: { uri, id } }) => (
         <PlayButton uri={uri} />
         <AddToAdvancedSearchButton id={id} />
         <AddToPlaylistButton uri={uri} />
+        <StartTreeButton uri={uri} />
         {cellData}
     </React.Fragment>
 );

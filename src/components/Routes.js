@@ -10,10 +10,14 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Spotify from "./Spotify";
 import Analyzer from "./Analyzer";
 import App from "./App";
+import SongDetails from "./SongDetails";
+import Discover from "./Discover";
+import Sidebar from "./Sidebar";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import RestoreIcon from "@material-ui/icons/Restore";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import NewReleasesIcon from "@material-ui/icons/NewReleases";
 import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import SearchIcon from "@material-ui/icons/Search";
 import QueueMusicIcon from "@material-ui/icons/QueueMusic";
@@ -44,6 +48,11 @@ const Drawer = withStyles({
     }
 })(_Drawer);
 
+const MainContent = styled.div`
+    display: flex;
+    flex: 1;
+`;
+
 class RouteProvider extends Component {
     handleChange = (e, val) => {
         if (val === 0) {
@@ -53,9 +62,12 @@ class RouteProvider extends Component {
             history.push("/123");
         }
         if (val === 2) {
-            this.props.analyzerOpenSearchPanel();
+            history.push("/discover");
         }
         if (val === 3) {
+            this.props.analyzerOpenSearchPanel();
+        }
+        if (val === 4) {
             this.props.searchOpenPanel();
         }
     };
@@ -72,17 +84,24 @@ class RouteProvider extends Component {
                             </Typography>
                         </Toolbar>
                     </AppBar>
-                    <Scrollable>
-                        <Route exact path="/analyzer" component={Analyzer} />
-                        <Route exact path="/:id([\d-]*)" component={Spotify} />
-                        <Route exact path="/" component={App} />
-                    </Scrollable>
-                    <Drawer anchor="right" open={searchPanel} onClose={searchClosePanel}>
-                        <Search />
-                    </Drawer>
+                    <MainContent>
+                        <Scrollable>
+                            <Route exact path="/discover" component={Discover} />
+                            <Route exact path="/analyzer" component={Analyzer} />
+                            <Route exact path="/:id([\d-]*)" component={Spotify} />
+                            <Route exact path="/" component={App} />
+                        </Scrollable>
+                        <Drawer anchor="right" open={searchPanel} onClose={searchClosePanel}>
+                            <Search />
+                        </Drawer>
+                        <Sidebar>
+                            <SongDetails />
+                        </Sidebar>
+                    </MainContent>
                     <BottomNavigation value="0" onChange={this.handleChange} showLabels>
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
                         <BottomNavigationAction label="Playlist" icon={<QueueMusicIcon />} />
+                        <BottomNavigationAction label="Discover" icon={<NewReleasesIcon />} />
                         <BottomNavigationAction label="SimilarSongs" icon={<ImageSearchIcon />} />
                         <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
