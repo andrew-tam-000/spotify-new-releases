@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import styled from "styled-components";
 import { createStructuredSelector } from "reselect";
 import TextField from "@material-ui/core/TextField";
@@ -7,14 +7,23 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import PlaylistAdd from "@material-ui/icons/PlaylistAdd";
 import ListItemText from "@material-ui/core/ListItemText";
-import _ from "lodash";
+import { map } from "lodash";
+import Typography from "@material-ui/core/Typography";
+import StartTreeButton from "./Discover/StartTreeButton";
 
 import { connect } from "react-redux";
 import { setSearchText, addTracksToPlaylistStart } from "../redux/actions";
-import { searchTracksSelector, searchTextSelector } from "../selectors";
+import {
+    searchTracksSelector,
+    searchAlbumsSelector,
+    searchArtistsSelector,
+    searchTextSelector
+} from "../selectors";
 import { withStyles } from "@material-ui/core/styles";
 import PlayButton from "./Analyzer/PlayButton";
 import AddToAdvancedSearchButton from "./Analyzer/AddToAdvancedSearchButton";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 
 const StyledSearch = styled.div`
     display: flex;
@@ -36,44 +45,74 @@ const SearchResultsList = withStyles({
     }
 })(List);
 
-const Search = ({
-    searchTracks,
-    searchText,
-    setSearchText,
-    addTracksToPlaylistStart,
-    ...props
-}) => {
-    return (
-        <StyledSearch {...props}>
-            <SearchTextField value={searchText} onChange={e => setSearchText(e.target.value)} />
-            <SearchResultsList>
-                {_.map(searchTracks, track => (
-                    <ListItem key={track.id} button>
-                        <PlayButton uri={track.uri} />
-                        <AddToAdvancedSearchButton id={track.id} />
-                        <Button
-                            onClick={() => addTracksToPlaylistStart([track.uri])}
-                            mini
-                            variant="fab"
-                            color="primary"
-                            aria-label="Add"
-                        >
-                            <PlaylistAdd />
-                        </Button>
-                        <ListItemText
-                            primary={track.name}
-                            secondary={track.artists.map(artist => artist.name).join(", ")}
-                        />
-                    </ListItem>
-                ))}
-            </SearchResultsList>
-        </StyledSearch>
-    );
-};
+class Search extends Component {
+    state = {
+        active: 0
+    };
+
+    handleChange = (e, val) => this.setState({ active: val });
+
+    render() {
+        const {
+            searchTracks,
+            searchArtists,
+            searchAlbums,
+            searchText,
+            setSearchText,
+            addTracksToPlaylistStart,
+            ...props
+        } = this.props;
+
+        return (
+            <StyledSearch {...props}>
+                <SearchTextField value={searchText} onChange={e => setSearchText(e.target.value)} />
+                <Tabs value={this.state.active} onChange={this.handleChange}>
+                    <Tab label="Tracks" />
+                    <Tab label="Artists" />
+                    <Tab label="Albums" />
+                </Tabs>
+                <SearchResultsList>
+                    {this.state.active === 0 &&
+                        map(searchTracks, track => (
+                            <ListItem key={track.id} button>
+                                <PlayButton uri={track.uri} />
+                                <StartTreeButton uri={track.uri} />
+                                <AddToAdvancedSearchButton id={track.id} />
+                                <ListItemText
+                                    primary={track.name}
+                                    secondary={track.artists.map(artist => artist.name).join(", ")}
+                                />
+                            </ListItem>
+                        ))}
+                    {this.state.active === 1 &&
+                        map(searchArtists, artist => (
+                            <ListItem key={artist.id} button>
+                                <PlayButton context_uri={artist.uri} />
+                                <StartTreeButton uri={artist.uri} />
+                                <ListItemText primary={artist.name} />
+                            </ListItem>
+                        ))}
+                    {this.state.active === 2 &&
+                        map(searchAlbums, track => (
+                            <ListItem key={track.id} button>
+                                <PlayButton context_uri={track.uri} />
+                                <ListItemText
+                                    primary={track.name}
+                                    secondary={track.artists.map(artist => artist.name).join(", ")}
+                                />
+                            </ListItem>
+                        ))}
+                </SearchResultsList>
+            </StyledSearch>
+        );
+    }
+}
 
 export default connect(
     createStructuredSelector({
         searchTracks: searchTracksSelector,
+        searchAlbums: searchAlbumsSelector,
+        searchArtists: searchArtistsSelector,
         searchText: searchTextSelector
     }),
     { setSearchText, addTracksToPlaylistStart }

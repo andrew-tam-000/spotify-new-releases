@@ -1,12 +1,10 @@
 import { merge } from "rxjs/observable/merge";
 import createAccessToken from "./createAccessToken";
 import createFirebaseUser from "./createFirebaseUser";
-import populateSearch from "./populateSearch";
 import getSpotifyUserData from "./getSpotifyUserData";
 import createSharedPlayilst from "./createSharedPlaylist";
 import addTracksToPlaylist from "./addTracksToPlaylist";
 import refreshPlaylist from "./refreshPlaylist";
-import playSong from "./playSong";
 import initializeApp from "./initializeApp";
 import initializeOnPlaylist from "./initializeOnPlaylist";
 import getFirebaseUser from "./getFirebaseUser";
@@ -20,6 +18,7 @@ import getSongs from "./getSongs";
 import getSongData from "./getSongData";
 import getArtistData from "./getArtistData";
 import spotifyApiTriggers from "./spotifyApiTriggers";
+import discoverTriggers from "./discoverTriggers";
 
 export default (...args) =>
     merge(
@@ -27,10 +26,8 @@ export default (...args) =>
         createAccessToken(...args),
         getSpotifyUserData(...args),
         createSharedPlayilst(...args),
-        populateSearch(...args),
         addTracksToPlaylist(...args),
         refreshPlaylist(...args),
-        playSong(...args),
         initializeApp(...args),
         initializeOnPlaylist(...args),
         getFirebaseUser(...args),
@@ -43,5 +40,6 @@ export default (...args) =>
         getSongs(...args),
         getSongData(...args),
         getArtistData(...args),
-        spotifyApiTriggers(...args)
+        spotifyApiTriggers(...args),
+        discoverTriggers(...args)
     );

@@ -1,33 +1,21 @@
 import React, { Component } from "react";
 import uuidv1 from "uuid/v1";
-import {
-    filter,
-    forEach,
-    size,
-    flatten,
-    last,
-    keyBy,
-    join,
-    reduce,
-    keys,
-    split,
-    map,
-    get,
-    pickBy,
-    first,
-    values,
-    set,
-    merge
-} from "lodash";
+import { filter, forEach, last, keys, split, map, pickBy, values, set, merge } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import { showSideBarSelector, hydratedRelatedArtistsSelector } from "../selectors";
+import {
+    showSideBarSelector,
+    hydratedRelatedArtistsSelector,
+    discoverNodesSelector,
+    discoverRootNodeSelector
+} from "../selectors";
 import styled from "styled-components";
 import {
     showSideBar,
     initializeOnDiscoverStart,
     getRelatedArtistsStart,
-    getArtistTopTracksStart
+    getArtistTopTracksStart,
+    toggleNode
 } from "../redux/actions";
 import * as d3 from "d3";
 import store from "../redux/";
@@ -97,38 +85,22 @@ function zoomed() {
 }
 
 class Discover extends Component {
-    state = {
-        nodesToPopulate: {},
-        nodes: {
-            root: {
-                data: {
-                    id: "root",
-                    uri: "spotify:artist:0A0FS04o6zMoto8OKPsDwY",
-                    open: false,
-                    name: "wow",
-                    populated: false
-                },
-                children: []
-            }
-        }
-    };
-
     buildTreeData() {
-        const rawTree = addChildren(this.state.nodes);
+        const rawTree = addChildren(
+            this.props.discoverNodes,
+            this.props.discoverNodes[this.props.discoverRootNode] || {}
+        );
 
         const d3Tree = d3.hierarchy(rawTree);
         d3Tree.x0 = 100 / 2;
         d3Tree.y0 = 0;
         d3Tree.eachAfter(d => {
-            // TODO: Set the ids
-            //console.log(d);
             return set(d, "id", d.data.id);
         });
 
         return d3Tree;
 
-        function addChildren(nodes, node) {
-            const { data, children } = !node ? nodes["root"] : node;
+        function addChildren(nodes, { data = {}, children }) {
             const updatedNode = {
                 ...data,
                 children: data.open
@@ -175,26 +147,7 @@ class Discover extends Component {
             .attr("stroke-opacity", 0)
             .on("click", d => {
                 const [, type, id] = split(d.data.uri, ":");
-
-                this.props.getRelatedArtistsStart(id);
-                this.props.getArtistTopTracksStart(id);
-                this.props.showSideBar(d.data.uri);
-
-                const newNode = merge({}, this.state.nodes[d.id], {
-                    data: {
-                        open: !this.state.nodes[d.id].data.open
-                    }
-                });
-
-                this.setState(
-                    {
-                        nodes: merge({}, this.state.nodes, { [d.id]: newNode }),
-                        nodesToPopulate: { ...this.state.nodesToPopulate, [d.id]: true }
-                    },
-                    () => {
-                        this.updateTree(d);
-                    }
-                );
+                this.props.toggleNode(d.data.id);
             });
 
         nodeEnter
@@ -278,47 +231,17 @@ class Discover extends Component {
     }
 }
 
-Discover.getDerivedStateFromProps = function({ hydratedRelatedArtists }, state) {
-    const nodesToPopulate = map(
-        keys(pickBy(state.nodesToPopulate, node => node)),
-        nodeId => state.nodes[nodeId]
-    );
-
-    console.log({ nodesToPopulate });
-    forEach(filter(values(nodesToPopulate), node => !node.data.populated), node => {
-        console.log(node);
-        const nodeId = node.data.id;
-        const id = last(split(node.data.uri, ":"));
-
-        const relatedArtistsForNode = hydratedRelatedArtists[id];
-
-        const childNodes = map(relatedArtistsForNode, relatedArtist => {
-            console.log(state.nodes, nodeId);
-            const newNodeId = uuidv1();
-            // Add the child node to the array
-            state.nodes[nodeId].children.push(newNodeId);
-
-            // Add the new node to state
-            set(state, ["nodes", newNodeId], {
-                children: [],
-                data: {
-                    id: newNodeId,
-                    uri: relatedArtist.uri,
-                    name: relatedArtist.name
-                }
-            });
-        });
-
-        // Don't repopulate node now;
-        relatedArtistsForNode && set(state, ["nodes", nodeId, "data", "populated"], true);
-    });
-
-    return state;
-};
-
 export default connect(
     createStructuredSelector({
-        hydratedRelatedArtists: hydratedRelatedArtistsSelector
+        hydratedRelatedArtists: hydratedRelatedArtistsSelector,
+        discoverNodes: discoverNodesSelector,
+        discoverRootNode: discoverRootNodeSelector
     }),
-    { initializeOnDiscoverStart, getRelatedArtistsStart, getArtistTopTracksStart, showSideBar }
+    {
+        toggleNode,
+        initializeOnDiscoverStart,
+        getRelatedArtistsStart,
+        getArtistTopTracksStart,
+        showSideBar
+    }
 )(Discover);

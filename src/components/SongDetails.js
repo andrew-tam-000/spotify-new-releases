@@ -10,10 +10,17 @@ import {
 } from "../selectors";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
+import _ListItemText from "@material-ui/core/ListItemText";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 import { compose, mapProps } from "recompose";
 import Typography from "@material-ui/core/Typography";
 import PlayButton from "./Analyzer/PlayButton";
+import PlayAll from "./PlayAll";
+import styled from "styled-components";
+
+const ListItemText = styled(_ListItemText)`
+    flex: 1 !important;
+`;
 
 const ArtistPanel = compose(
     connect(
@@ -37,10 +44,13 @@ const ArtistPanel = compose(
             <Typography variant="display2" gutterBottom>
                 {artistData.name}
             </Typography>
+            <PlayAll uris={map(topTracks, track => track.uri)} />
             <List>
                 {map(topTracks, track => (
                     <ListItem key={track.id}>
-                        <PlayButton uri={track.uri} />
+                        <ListItemIcon>
+                            <PlayButton uri={track.uri} />
+                        </ListItemIcon>
                         <ListItemText
                             primary={track.name}
                             secondary={join(map(track.artists, artist => artist.name), ", ")}

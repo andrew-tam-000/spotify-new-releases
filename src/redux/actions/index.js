@@ -38,10 +38,10 @@ export function getFirebaseUserSuccess(userData) {
 // PLAY_SONG
 //
 ///////////////////////////////////////////////
-export function playSongStart(trackUri) {
+export function playSongStart(params) {
     return {
         type: "PLAY_SONG_START",
-        payload: trackUri
+        payload: params
     };
 }
 export function playSongSuccess() {
@@ -53,6 +53,22 @@ export function playSongError(message) {
     return {
         type: "PLAY_SONG_ERROR",
         payload: message
+    };
+}
+
+///////////////////////////////////////////////
+//
+// PAUSE_SONG
+//
+///////////////////////////////////////////////
+export function pauseSongStart() {
+    return {
+        type: "PAUSE_SONG_START"
+    };
+}
+export function pauseSongSuccess() {
+    return {
+        type: "PAUSE_SONG_SUCCESS"
     };
 }
 
@@ -545,14 +561,36 @@ export function hideSideBar() {
 ////////////////////////////////////////////////////
 //
 //
-// SET_DISCOVER
+// DISCOVER
 //
 //
 ////////////////////////////////////////////////////
-export function setDiscover(uri) {
+export function setDiscover(uri, name) {
     return {
-        type: "SET_DISCOVER",
-        payload: uri
+        type: "discover|SET_DISCOVER",
+        payload: { uri, name }
+    };
+}
+
+// TODO: Support a type
+export function toggleNode(nodeId) {
+    return {
+        type: "discover|TOGGLE_NODE",
+        payload: nodeId
+    };
+}
+
+export function nodeFetched(nodeId) {
+    return {
+        type: "discover|NODE_FETCHED",
+        payload: nodeId
+    };
+}
+
+export function createNodes(parentId, nodes) {
+    return {
+        type: "discover|CREATE_NODES",
+        payload: { parentId, nodes }
     };
 }
 

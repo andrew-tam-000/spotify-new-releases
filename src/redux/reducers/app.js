@@ -1,5 +1,6 @@
 import analyzer from "./analyzer";
 import spotify from "./spotify";
+import discover from "./discover";
 import { combineReducers } from "redux";
 import { addTracksToPlaylistSuccess, showSideBar, hideSideBar, setDiscover } from "../actions/";
 
@@ -79,14 +80,7 @@ const appReducer = combineReducers({
                 return state;
         }
     },
-    discover: (state = {}, { type, payload }) => {
-        switch (type) {
-            case setDiscover().type:
-                return payload;
-            default:
-                return state;
-        }
-    }
+    discover
 });
 
 export default appReducer;

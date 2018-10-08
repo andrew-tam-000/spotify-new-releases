@@ -37,6 +37,16 @@ export const searchTracksSelector = createSelector(
     tracks => tracks
 );
 
+export const searchAlbumsSelector = createSelector(
+    state => get(state, "app.search.albums.items") || [],
+    albums => albums
+);
+
+export const searchArtistsSelector = createSelector(
+    state => get(state, "app.search.artists.items") || [],
+    artists => artists
+);
+
 export const searchPanelSelector = createSelector(
     state => get(state, "app.search.isOpen"),
     isOpen => isOpen
@@ -245,4 +255,32 @@ export const nowPlayingSongIdSelector = createSelector(
 export const showSideBarSelector = createSelector(
     state => get(state, "app.showSideBar"),
     showSideBar => showSideBar
+);
+
+export const discoverRootNodeSelector = createSelector(
+    state => get(state, "app.discover.root"),
+    discoverRootNode => discoverRootNode
+);
+
+export const discoverNodesSelector = createSelector(
+    state => get(state, "app.discover.nodes"),
+    discoverNodes => discoverNodes
+);
+
+export const hydratedDiscoverNodesSelector = createSelector(
+    discoverNodesSelector,
+    relatedArtistsSelector,
+    (discoverNodes, relatedArtists) =>
+        map(discoverNodes, node => {
+            const open = node.data.open;
+
+            if (!open) {
+                return node;
+            }
+
+            return {
+                ...node,
+                children: []
+            };
+        })
 );

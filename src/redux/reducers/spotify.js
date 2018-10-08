@@ -5,6 +5,7 @@ import {
     getArtistDataSuccess,
     getRelatedArtistsSuccess,
     getArtistTopTracksSuccess,
+    pauseSongSuccess,
     setSearchResults
 } from "../actions/";
 import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";

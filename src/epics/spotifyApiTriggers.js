@@ -1,8 +1,8 @@
 import { ofType } from "redux-observable";
-import { mergeMap, debounce, catchError } from "rxjs/operators";
 import { map, get, omitBy, isUndefined, size, compact } from "lodash";
 import { merge } from "rxjs/observable/merge";
-import { timer, of, interval, concat } from "rxjs";
+import { from, timer, of, interval } from "rxjs";
+import { mergeMap, debounce, catchError, switchMap } from "rxjs/operators";
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
     librarySongsWithDataSelector,
@@ -18,19 +18,61 @@ import {
     getRelatedArtistsSuccess,
     advancedSearchGetResultsStart,
     advancedSearchGetResultsSuccess,
-    advancedSearchChangeTab
+    advancedSearchChangeTab,
+    playSongStart,
+    playSongSuccess,
+    updateFirebaseUserStart,
+    setSearchResults,
+    pauseSongStart,
+    pauseSongSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
+const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
+    interval(5000).pipe(mergeMap(() => of(getCurrentlyPlayingTrackStart())));
+
 const getNowPlaying = (action$, state$, { spotifyApi }) =>
-    interval(5000).pipe(
-        mergeMap(() =>
-            concat(
-                of(getCurrentlyPlayingTrackStart()),
-                apiObservable(spotifyApi.getMyCurrentPlayingTrack, [], resp =>
-                    of(getCurrentlyPlayingTrackSuccess(resp))
-                )
+    action$.pipe(
+        ofType(getCurrentlyPlayingTrackStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.getMyCurrentPlayingTrack, [], resp =>
+                of(getCurrentlyPlayingTrackSuccess(resp))
             )
+        )
+    );
+
+const getSearchResults = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType("SET_SEARCH_TEXT"),
+        debounce(() => timer(400)),
+        switchMap(({ payload: searchText }) =>
+            from(spotifyApi.search(searchText, ["artist", "track", "album"])).pipe(
+                mergeMap(resp => of(setSearchResults(resp))),
+                catchError(e => of({ type: "error", payload: e }))
+            )
+        )
+    );
+
+const pauseSong = (action$, state$, { firebaseApp, spotifyApi }) =>
+    action$.pipe(
+        ofType(pauseSongStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.pause, null, resp => [
+                pauseSongSuccess(),
+                getCurrentlyPlayingTrackStart()
+            ])
+        )
+    );
+
+const playSong = (action$, state$, { firebaseApp, spotifyApi }) =>
+    action$.pipe(
+        ofType(playSongStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.play, action.payload, resp => [
+                playSongSuccess(),
+                getCurrentlyPlayingTrackStart(),
+                updateFirebaseUserStart({ playStatus: action.payload })
+            ])
         )
     );
 
@@ -95,5 +137,9 @@ export default (...args) =>
         getArtistTopTracks(...args),
         getRelatedArtists(...args),
         getNowPlaying(...args),
-        getAdvancedSearchResults(...args)
+        getNowPlayingPing(...args),
+        getAdvancedSearchResults(...args),
+        playSong(...args),
+        getSearchResults(...args),
+        pauseSong(...args)
     ).pipe(catchError(e => console.error(e)));
