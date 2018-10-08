@@ -266,21 +266,3 @@ export const discoverNodesSelector = createSelector(
     state => get(state, "app.discover.nodes"),
     discoverNodes => discoverNodes
 );
-
-export const hydratedDiscoverNodesSelector = createSelector(
-    discoverNodesSelector,
-    relatedArtistsSelector,
-    (discoverNodes, relatedArtists) =>
-        map(discoverNodes, node => {
-            const open = node.data.open;
-
-            if (!open) {
-                return node;
-            }
-
-            return {
-                ...node,
-                children: []
-            };
-        })
-);

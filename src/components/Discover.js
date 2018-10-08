@@ -91,6 +91,8 @@ class Discover extends Component {
             this.props.discoverNodes[this.props.discoverRootNode] || {}
         );
 
+        console.log(rawTree, this.props.discoverNodes);
+
         const d3Tree = d3.hierarchy(rawTree);
         d3Tree.x0 = 100 / 2;
         d3Tree.y0 = 0;
@@ -117,8 +119,6 @@ class Discover extends Component {
         const duration = d3.event && d3.event.altKey ? 2500 : 250;
         const nodes = root.descendants().reverse();
         const links = root.links();
-
-        console.log(root);
 
         // Compute the new tree layout.
         tree(root);

@@ -1,12 +1,13 @@
 import React from "react";
-import { join, split, map, last } from "lodash";
+import { join, get, split, map, last } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import {
     songsSelector,
     showSideBarSelector,
     artistTopTracksSelector,
-    artistDataSelector
+    artistDataSelector,
+    discoverNodesSelector
 } from "../selectors";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -17,28 +18,29 @@ import Typography from "@material-ui/core/Typography";
 import PlayButton from "./Analyzer/PlayButton";
 import PlayAll from "./PlayAll";
 import styled from "styled-components";
+import UpdateNodeUriButton from "./UpdateNodeUriButton";
 
 const ListItemText = styled(_ListItemText)`
     flex: 1 !important;
 `;
 
+// Potentially supports nodes and alos regular tables
 const ArtistPanel = compose(
     connect(
         createStructuredSelector({
             artistTopTracks: artistTopTracksSelector,
-            showSideBar: showSideBarSelector,
             songs: songsSelector,
             artistData: artistDataSelector
         })
     ),
-    mapProps(({ artistData, artistTopTracks, showSideBar, songs }) => {
-        const [, type, id] = split(showSideBar, ":");
+    mapProps(({ artistData, artistTopTracks, songs, nodeId, spotifyId }) => {
         return {
-            topTracks: map(artistTopTracks[id], trackId => songs[trackId]),
-            artistData: artistData[id] || {}
+            nodeId,
+            topTracks: map(artistTopTracks[spotifyId], trackId => songs[trackId]),
+            artistData: artistData[spotifyId]
         };
     })
-)(function _ArtistPanel({ topTracks, artistData }) {
+)(function _ArtistPanel({ topTracks, artistData, nodeId }) {
     return (
         <React.Fragment>
             <Typography variant="display2" gutterBottom>
@@ -48,9 +50,10 @@ const ArtistPanel = compose(
             <List>
                 {map(topTracks, track => (
                     <ListItem key={track.id}>
-                        <ListItemIcon>
+                        <div>
                             <PlayButton uri={track.uri} />
-                        </ListItemIcon>
+                            <UpdateNodeUriButton uri={track.uri} nodeId={nodeId} />
+                        </div>
                         <ListItemText
                             primary={track.name}
                             secondary={join(map(track.artists, artist => artist.name), ", ")}
@@ -62,11 +65,58 @@ const ArtistPanel = compose(
     );
 });
 
-const SongDetails = ({ showSideBar }) =>
-    split(showSideBar, ":")[1] === "artist" ? <ArtistPanel /> : null;
+// Potentially supports nodes and alos regular tables
+const TrackPanel = compose(
+    connect(
+        createStructuredSelector({
+            songs: songsSelector
+        })
+    ),
+    mapProps(({ nodeId, songs, spotifyId }) => {
+        return {
+            nodeId,
+            songData: songs[spotifyId]
+        };
+    })
+)(function _TrackPanel({ songData, nodeId }) {
+    return (
+        <React.Fragment>
+            <Typography variant="display2" gutterBottom>
+                {songData.name}
+            </Typography>
+            <PlayButton uri={songData.uri} />
+            <UpdateNodeUriButton uri={songData.uri} nodeId={nodeId} />
+            <List>
+                {map(songData.artists, artist => (
+                    <ListItem key={artist.id}>
+                        <div>
+                            <UpdateNodeUriButton uri={artist.uri} nodeId={nodeId} />
+                        </div>
+                        <ListItemText primary={artist.name} />
+                    </ListItem>
+                ))}
+            </List>
+        </React.Fragment>
+    );
+});
+
+const SongDetails = ({ showSideBar, discoverNodes }) => {
+    const { data } = showSideBar;
+    const node = discoverNodes[data];
+    const nodeId = get(node, "data.id");
+    const uri = get(node, "data.uri");
+    const [, type, spotifyId] = split(uri, ":");
+    const props = {
+        nodeId,
+        uri,
+        spotifyId
+    };
+    return type === "artist" ? <ArtistPanel {...props} /> : <TrackPanel {...props} />;
+};
 
 export default connect(
     createStructuredSelector({
-        showSideBar: showSideBarSelector
+        showSideBar: showSideBarSelector,
+        discoverNodes: discoverNodesSelector
     })
 )(SongDetails);

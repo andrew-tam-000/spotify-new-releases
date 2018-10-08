@@ -73,7 +73,10 @@ const appReducer = combineReducers({
     showSideBar: (state = {}, { type, payload }) => {
         switch (type) {
             case showSideBar().type:
-                return payload;
+                return {
+                    type: payload.type,
+                    data: payload.data
+                };
             case hideSideBar().type:
                 return false;
             default:

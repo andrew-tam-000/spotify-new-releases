@@ -24,7 +24,9 @@ import {
     updateFirebaseUserStart,
     setSearchResults,
     pauseSongStart,
-    pauseSongSuccess
+    pauseSongSuccess,
+    getRecommendationsStart,
+    getRecommendationsSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
@@ -90,9 +92,19 @@ const getArtistTopTracks = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getArtistTopTracksStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getArtistTopTracks, [action.payload, "US"], resp => {
-                return of(getArtistTopTracksSuccess(action.payload, resp.tracks));
-            })
+            apiObservable(spotifyApi.getArtistTopTracks, [action.payload, "US"], resp =>
+                of(getArtistTopTracksSuccess(action.payload, resp.tracks))
+            )
+        )
+    );
+
+const getRecommendations = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getRecommendationsStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.getRecommendations, action.payload, resp =>
+                of(getRecommendationsSuccess(resp))
+            )
         )
     );
 
@@ -141,5 +153,6 @@ export default (...args) =>
         getAdvancedSearchResults(...args),
         playSong(...args),
         getSearchResults(...args),
-        pauseSong(...args)
+        pauseSong(...args),
+        getRecommendations(...args)
     ).pipe(catchError(e => console.error(e)));

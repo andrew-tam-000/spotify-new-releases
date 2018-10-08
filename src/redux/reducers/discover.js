@@ -1,4 +1,4 @@
-import { setDiscover, toggleNode, nodeFetched, createNodes } from "../actions/";
+import { updateNodeUri, setDiscover, toggleNode, nodeFetched, createNodes } from "../actions/";
 import { merge, set, get, map } from "lodash";
 
 export default (state = {}, { type, payload }) => {
@@ -39,6 +39,22 @@ export default (state = {}, { type, payload }) => {
                     [payload]: merge({}, state.nodes[payload], set({}, ["data", "fetched"], true))
                 }
             };
+
+        case updateNodeUri().type: {
+            return {
+                ...state,
+                nodes: {
+                    ...state.nodes,
+                    [payload.nodeId]: merge(
+                        {},
+                        state.nodes[payload.nodeId],
+                        set({}, ["data", "fetched"], false),
+                        set({}, ["data", "uri"], payload.uri),
+                        set({}, ["data", "name"], payload.name)
+                    )
+                }
+            };
+        }
 
         case createNodes().type:
             return {

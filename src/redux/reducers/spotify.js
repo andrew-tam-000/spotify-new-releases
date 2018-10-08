@@ -5,6 +5,7 @@ import {
     getArtistDataSuccess,
     getRelatedArtistsSuccess,
     getArtistTopTracksSuccess,
+    getRecommendationsSuccess,
     pauseSongSuccess,
     setSearchResults
 } from "../actions/";
@@ -104,6 +105,15 @@ export default (state = {}, { type, payload }) => {
                     ...(state.artistTopTracks[payload.artistId]
                         ? {}
                         : { [payload.artistId]: map(payload.topTracks, ({ id }) => id) })
+                }
+            };
+
+        case getRecommendationsSuccess().type:
+            return {
+                ...state,
+                songs: {
+                    ...state.songs,
+                    ...keyBy(filter(payload.tracks, ({ id }) => !state.songs[id]), "id")
                 }
             };
         default:

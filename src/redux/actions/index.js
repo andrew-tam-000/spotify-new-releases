@@ -506,6 +506,20 @@ export function advancedSearchSetArtists(artists) {
     };
 }
 
+export function getRecommendationsStart(params) {
+    return {
+        type: "advanced-search|GET_RECOMMENDATIONS_START",
+        payload: params
+    };
+}
+
+export function getRecommendationsSuccess(resp) {
+    return {
+        type: "advanced-search|GET_RECOMMENDATIONS_SUCCESS",
+        payload: resp
+    };
+}
+
 ////////////////////////////////////////////////////
 //
 //
@@ -545,10 +559,10 @@ export function searchClosePanel() {
 //
 //
 ////////////////////////////////////////////////////
-export function showSideBar(uri) {
+export function showSideBar(type, data) {
     return {
         type: "SHOW_SIDE_BAR",
-        payload: uri
+        payload: { type, data }
     };
 }
 
@@ -572,7 +586,6 @@ export function setDiscover(uri, name) {
     };
 }
 
-// TODO: Support a type
 export function toggleNode(nodeId) {
     return {
         type: "discover|TOGGLE_NODE",
@@ -584,6 +597,13 @@ export function nodeFetched(nodeId) {
     return {
         type: "discover|NODE_FETCHED",
         payload: nodeId
+    };
+}
+
+export function updateNodeUri(nodeId, uri, name) {
+    return {
+        type: "discover|UPDATE_NODE_URI",
+        payload: { nodeId, uri, name }
     };
 }
 
