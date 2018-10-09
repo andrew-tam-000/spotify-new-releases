@@ -3,50 +3,24 @@ import uuidv1 from "uuid/v1";
 import { filter, forEach, last, keys, split, map, pickBy, values, set, merge } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import {
-    showSideBarSelector,
-    hydratedRelatedArtistsSelector,
-    discoverNodesSelector,
-    discoverRootNodeSelector
-} from "../selectors";
+import { showSideBarSelector, discoverNodesSelector, discoverRootNodeSelector } from "../selectors";
 import styled from "styled-components";
 import {
-    showSideBar,
     initializeOnDiscoverStart,
     getRelatedArtistsStart,
     getArtistTopTracksStart,
-    toggleNode
+    toggleNode,
+    showSideBar
 } from "../redux/actions";
 import * as d3 from "d3";
 import store from "../redux/";
+
+window.d3 = d3;
 
 const View = styled.div`
     display: flex;
     flex: 1;
     height: 100%;
-
-    .node circle {
-        fill: #999;
-    }
-
-    .node text {
-        font: 10px sans-serif;
-    }
-
-    .node--internal circle {
-        fill: #555;
-    }
-
-    .node--internal text {
-        text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
-    }
-
-    .link {
-        fill: none;
-        stroke: #555;
-        stroke-opacity: 0.4;
-        stroke-width: 1.5px;
-    }
 `;
 
 const diagonal = d3
@@ -54,18 +28,15 @@ const diagonal = d3
     .x(d => d.y)
     .y(d => d.x);
 
+const zoom = d3.zoom().on("zoom", zoomed);
+
 const svg = d3
     .create("svg")
     .attr("width", "100%")
     .attr("height", "100%")
-    .style("font", "10px sans-serif")
+    .style("font", "14px sans-serif")
     .style("user-select", "none")
-    .call(
-        d3
-            .zoom()
-            .scaleExtent([1 / 2, 4])
-            .on("zoom", zoomed)
-    )
+    .call(zoom)
     .on("dblclick.zoom", null);
 
 const gLink = svg
@@ -77,13 +48,26 @@ const gLink = svg
 
 const gNode = svg.append("g").attr("cursor", "pointer");
 
-const tree = d3.tree().nodeSize([50, 100]);
+// Size between nodes
+const tree = d3.tree().nodeSize([25, 200]);
 
 function zoomed() {
+    const dimensions = svg.node().getBoundingClientRect();
+    const newCoordinates = d3.event.transform.translate(
+        dimensions.width / 2,
+        dimensions.height / 2
+    );
     gLink.attr("transform", d3.event.transform);
     gNode.attr("transform", d3.event.transform);
 }
 
+function center() {
+    const dimensions = svg.node().getBoundingClientRect();
+    svg.call(
+        zoom.transform,
+        d3.zoomIdentity.translate(dimensions.width / 2, dimensions.height / 2)
+    );
+}
 class Discover extends Component {
     buildTreeData() {
         const rawTree = addChildren(
@@ -150,13 +134,17 @@ class Discover extends Component {
 
         nodeEnter
             .append("circle")
-            .attr("r", 2.5)
-            .attr("fill", d => (d._children ? "#555" : "#999"));
+            .attr("r", 5)
+            .attr("fill", d => (d._children ? "#555" : "#999"))
+            .on("click", d => {
+                d3.event.stopPropagation();
+                this.props.showSideBar("node", d.data.id);
+            });
 
         nodeEnter
             .append("text")
             .attr("dy", "0.31em")
-            .attr("x", d => (d._children ? -6 : 6))
+            .attr("x", d => 10)
             .attr("text-anchor", d => (d._children ? "end" : "start"))
             .text(d => d.data.name)
             .clone(true)
@@ -222,6 +210,13 @@ class Discover extends Component {
         this.createTree();
     }
 
+    componentDidUpdate(prevProps) {
+        // If the root changed, lets recenter
+        if (this.props.discoverRootNode !== prevProps.discoverRootNode) {
+            center();
+        }
+    }
+
     render() {
         this.props.discoverRootNode && this.updateTree(this.buildTreeData());
         return <View innerRef={tree => (this.tree = tree)} />;
@@ -230,7 +225,6 @@ class Discover extends Component {
 
 export default connect(
     createStructuredSelector({
-        hydratedRelatedArtists: hydratedRelatedArtistsSelector,
         discoverNodes: discoverNodesSelector,
         discoverRootNode: discoverRootNodeSelector
     }),

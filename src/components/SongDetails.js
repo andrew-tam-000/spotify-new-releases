@@ -43,7 +43,7 @@ const ArtistPanel = compose(
 )(function _ArtistPanel({ topTracks, artistData, nodeId }) {
     return (
         <React.Fragment>
-            <Typography variant="display2" gutterBottom>
+            <Typography variant="display1" gutterBottom>
                 {artistData.name}
             </Typography>
             <PlayAll uris={map(topTracks, track => track.uri)} />
@@ -81,7 +81,7 @@ const TrackPanel = compose(
 )(function _TrackPanel({ songData, nodeId }) {
     return (
         <React.Fragment>
-            <Typography variant="display2" gutterBottom>
+            <Typography variant="display1" gutterBottom>
                 {songData.name}
             </Typography>
             <PlayButton uri={songData.uri} />

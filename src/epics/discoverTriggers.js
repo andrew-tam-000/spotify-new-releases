@@ -48,8 +48,6 @@ const streamForAddingTracks = (action$, state$, node, trackId) => {
     );
 };
 
-// NOTE: On get related atracks, we need to grab all related artists as we!!!!
-
 const streamForAddingArtists = (action$, state$, node, artistId) => {
     const nodeId = node.data.id;
     return concat(
@@ -80,6 +78,8 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
     );
 };
 
+// TODO: this should clean up the node tree
+// TODO: This should also add a new node to the tree
 const onUpdateNodeUri = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(updateNodeUri().type),
