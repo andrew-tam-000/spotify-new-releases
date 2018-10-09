@@ -3,6 +3,7 @@ import {
     getSongsSuccess,
     getSongDataSuccess,
     getArtistDataSuccess,
+    getArtistsSuccess,
     getRelatedArtistsSuccess,
     getArtistTopTracksSuccess,
     getRecommendationsSuccess,
@@ -65,6 +66,7 @@ export default (state = {}, { type, payload }) => {
                     ...keyBy(filter(compact(payload), ({ id }) => !state.songData[id]), "id")
                 }
             };
+        case getArtistsSuccess().type:
         case getArtistDataSuccess().type:
             return {
                 ...state,

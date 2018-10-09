@@ -11,18 +11,7 @@ export default {
             songs: []
         },
         discover: {
-            nodes: {
-                "spotify:artist:0A0FS04o6zMoto8OKPsDwY": {
-                    data: {
-                        id: "spotify:artist:0A0FS04o6zMoto8OKPsDwY",
-                        uri: "spotify:artist:0A0FS04o6zMoto8OKPsDwY",
-                        open: false,
-                        name: "root",
-                        fetched: false
-                    },
-                    children: []
-                }
-            }
+            nodes: {}
         },
         showSideBar: false,
         // Let's sync this with firebase

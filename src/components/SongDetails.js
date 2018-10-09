@@ -37,7 +37,7 @@ const ArtistPanel = compose(
         return {
             nodeId,
             topTracks: map(artistTopTracks[spotifyId], trackId => songs[trackId]),
-            artistData: artistData[spotifyId]
+            artistData: artistData[spotifyId] || {}
         };
     })
 )(function _ArtistPanel({ topTracks, artistData, nodeId }) {
@@ -75,7 +75,7 @@ const TrackPanel = compose(
     mapProps(({ nodeId, songs, spotifyId }) => {
         return {
             nodeId,
-            songData: songs[spotifyId]
+            songData: songs[spotifyId] || {}
         };
     })
 )(function _TrackPanel({ songData, nodeId }) {

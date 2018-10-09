@@ -1,7 +1,7 @@
 import { ofType } from "redux-observable";
-import { map, get, omitBy, isUndefined, size, compact } from "lodash";
+import { flatten, map, get, omitBy, isUndefined, size, compact } from "lodash";
 import { merge } from "rxjs/observable/merge";
-import { from, timer, of, interval } from "rxjs";
+import { concat, from, timer, of, interval } from "rxjs";
 import { mergeMap, debounce, catchError, switchMap } from "rxjs/operators";
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
@@ -12,6 +12,8 @@ import {
     advancedSearchArtistsSelector
 } from "../selectors";
 import {
+    getArtistsStart,
+    getArtistsSuccess,
     getArtistTopTracksStart,
     getArtistTopTracksSuccess,
     getRelatedArtistsStart,
@@ -26,7 +28,9 @@ import {
     pauseSongStart,
     pauseSongSuccess,
     getRecommendationsStart,
-    getRecommendationsSuccess
+    getRecommendationsSuccess,
+    getTracksStart,
+    getTracksSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
@@ -39,6 +43,26 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
         mergeMap(action =>
             apiObservable(spotifyApi.getMyCurrentPlayingTrack, [], resp =>
                 of(getCurrentlyPlayingTrackSuccess(resp))
+            )
+        )
+    );
+
+// TODO: Test this and make sure it works
+const getTracks = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getTracksStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.getTracks, action.payload, resp => of(getTracksSuccess(resp)))
+        )
+    );
+
+// TODO: Make this support more than 50 artist id
+const getArtists = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getArtistsStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.getArtists, [action.payload], resp =>
+                of(getArtistsSuccess(resp.artists))
             )
         )
     );
@@ -103,7 +127,17 @@ const getRecommendations = (action$, state$, { spotifyApi }) =>
         ofType(getRecommendationsStart().type),
         mergeMap(action =>
             apiObservable(spotifyApi.getRecommendations, action.payload, resp =>
-                of(getRecommendationsSuccess(resp))
+                concat(
+                    of(
+                        getArtistsStart(
+                            map(
+                                flatten(map(resp.tracks, track => track.artists)),
+                                artist => artist.id
+                            )
+                        )
+                    ),
+                    of(getRecommendationsSuccess(resp))
+                )
             )
         )
     );
@@ -154,5 +188,7 @@ export default (...args) =>
         playSong(...args),
         getSearchResults(...args),
         pauseSong(...args),
-        getRecommendations(...args)
+        getRecommendations(...args),
+        getTracks(...args),
+        getArtists(...args)
     ).pipe(catchError(e => console.error(e)));

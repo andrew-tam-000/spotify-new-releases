@@ -48,6 +48,8 @@ const streamForAddingTracks = (action$, state$, node, trackId) => {
     );
 };
 
+// NOTE: On get related atracks, we need to grab all related artists as we!!!!
+
 const streamForAddingArtists = (action$, state$, node, artistId) => {
     const nodeId = node.data.id;
     return concat(

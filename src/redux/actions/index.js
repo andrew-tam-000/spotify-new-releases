@@ -572,6 +572,34 @@ export function hideSideBar() {
     };
 }
 
+export function getTracksStart(ids) {
+    return {
+        type: "GET_TRACKS_START",
+        payload: ids
+    };
+}
+
+export function getTracksSuccess(tracks) {
+    return {
+        type: "GET_TRACKS_START",
+        payload: tracks
+    };
+}
+
+export function getArtistsStart(ids) {
+    return {
+        type: "GET_ARTISTS_START",
+        payload: ids
+    };
+}
+
+export function getArtistsSuccess(artists) {
+    return {
+        type: "GET_ARTISTS_SUCCESS",
+        payload: artists
+    };
+}
+
 ////////////////////////////////////////////////////
 //
 //

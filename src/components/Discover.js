@@ -91,8 +91,6 @@ class Discover extends Component {
             this.props.discoverNodes[this.props.discoverRootNode] || {}
         );
 
-        console.log(rawTree, this.props.discoverNodes);
-
         const d3Tree = d3.hierarchy(rawTree);
         d3Tree.x0 = 100 / 2;
         d3Tree.y0 = 0;
@@ -217,7 +215,6 @@ class Discover extends Component {
 
     createTree() {
         this.tree.appendChild(svg.node());
-        this.updateTree(this.buildTreeData());
     }
 
     componentDidMount() {
@@ -226,7 +223,7 @@ class Discover extends Component {
     }
 
     render() {
-        this.updateTree(this.buildTreeData());
+        this.props.discoverRootNode && this.updateTree(this.buildTreeData());
         return <View innerRef={tree => (this.tree = tree)} />;
     }
 }
