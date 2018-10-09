@@ -35,7 +35,8 @@ const streamForAddingTracks = (action$, state$, node, trackId) => {
                                 data: {
                                     id: uuidv1(),
                                     uri: track.uri,
-                                    name: track.name
+                                    name: track.name,
+                                    renderKey: uuidv1()
                                 }
                             })),
                             "data.id"
@@ -64,7 +65,8 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
                                 data: {
                                     id: uuidv1(),
                                     uri: relatedArtist.uri,
-                                    name: relatedArtist.name
+                                    name: relatedArtist.name,
+                                    renderKey: uuidv1()
                                 }
                             })),
                             "data.id"
@@ -78,7 +80,6 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
     );
 };
 
-// TODO: this should clean up the node tree
 // TODO: This should also add a new node to the tree
 const onUpdateNodeUri = (action$, state$, { spotifyApi }) =>
     action$.pipe(

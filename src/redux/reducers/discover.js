@@ -13,6 +13,7 @@ export default (state = {}, { type, payload }) => {
                             id: payload.uri,
                             uri: payload.uri,
                             open: false,
+                            renderKey: payload.uri,
                             name: payload.name
                         },
                         children: []
@@ -50,7 +51,8 @@ export default (state = {}, { type, payload }) => {
                         state.nodes[payload.nodeId],
                         set({}, ["data", "fetched"], false),
                         set({}, ["data", "uri"], payload.uri),
-                        set({}, ["data", "name"], payload.name)
+                        set({}, ["data", "name"], payload.name),
+                        set({}, ["data", "renderKey"], payload.renderKey)
                     )
                 }
             };

@@ -78,9 +78,7 @@ class Discover extends Component {
         const d3Tree = d3.hierarchy(rawTree);
         d3Tree.x0 = 100 / 2;
         d3Tree.y0 = 0;
-        d3Tree.eachAfter(d => {
-            return set(d, "id", d.data.id);
-        });
+        d3Tree.eachAfter(d => set(d, "id", d.data.renderKey));
 
         return d3Tree;
 
