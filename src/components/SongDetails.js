@@ -1,5 +1,5 @@
 import React from "react";
-import { join, get, split, map, last } from "lodash";
+import { compact, join, get, split, map, last } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import {
@@ -12,7 +12,6 @@ import {
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import _ListItemText from "@material-ui/core/ListItemText";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 import { compose, mapProps } from "recompose";
 import Typography from "@material-ui/core/Typography";
 import PlayButton from "./Analyzer/PlayButton";
@@ -69,16 +68,23 @@ const ArtistPanel = compose(
 const TrackPanel = compose(
     connect(
         createStructuredSelector({
-            songs: songsSelector
+            songs: songsSelector,
+            discoverNodes: discoverNodesSelector
         })
     ),
-    mapProps(({ nodeId, songs, spotifyId }) => {
+    mapProps(({ nodeId, songs, spotifyId, discoverNodes }) => {
         return {
             nodeId,
-            songData: songs[spotifyId] || {}
+            songData: songs[spotifyId] || {},
+            relatedTracks: compact(
+                map(
+                    get(discoverNodes, `${nodeId}.children`),
+                    nodeId => songs[last(split(get(discoverNodes, `${nodeId}.data.uri`), ":"))]
+                )
+            )
         };
     })
-)(function _TrackPanel({ songData, nodeId }) {
+)(function _TrackPanel({ songData, nodeId, relatedTracks }) {
     return (
         <React.Fragment>
             <Typography variant="display1" gutterBottom>
@@ -93,6 +99,21 @@ const TrackPanel = compose(
                             <UpdateNodeUriButton uri={artist.uri} nodeId={nodeId} />
                         </div>
                         <ListItemText primary={artist.name} />
+                    </ListItem>
+                ))}
+            </List>
+            <PlayAll uris={map(relatedTracks, track => track.uri)} />
+            <List>
+                {map(relatedTracks, track => (
+                    <ListItem key={track.id}>
+                        <div>
+                            <PlayButton uri={track.uri} />
+                            <UpdateNodeUriButton uri={track.uri} nodeId={nodeId} />
+                        </div>
+                        <ListItemText
+                            primary={track.name}
+                            secondary={join(map(track.artists, artist => artist.name), ", ")}
+                        />
                     </ListItem>
                 ))}
             </List>

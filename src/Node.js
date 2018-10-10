@@ -5,6 +5,7 @@ const Node = function(data, children = []) {
             uri: null,
             open: false,
             renderKey: null,
+            image: null,
             name: null,
             ...data
         },

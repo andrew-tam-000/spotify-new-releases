@@ -67,6 +67,7 @@ const getArtists = (action$, state$, { spotifyApi }) =>
         )
     );
 
+// Let's also expand artists here
 const getSearchResults = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType("SET_SEARCH_TEXT"),
