@@ -7,6 +7,7 @@ import { setDiscover } from "../../redux/actions";
 import { songsSelector, artistDataSelector } from "../../selectors";
 import { createStructuredSelector } from "reselect";
 import { split } from "lodash";
+import Node from "../../Node";
 
 const StartTreeButton = ({ setDiscover }) => (
     <Button onClick={setDiscover} mini variant="fab" color="primary" aria-label="Add">
@@ -26,7 +27,16 @@ export default compose(
         const [, type, id] = split(uri, ":");
         const name = type === "track" ? songs[id].name : artistData[id].name;
         return {
-            setDiscover: () => setDiscover(uri, name)
+            setDiscover: () =>
+                setDiscover(
+                    new Node({
+                        id: uri,
+                        uri,
+                        open: false,
+                        renderKey: uri,
+                        name
+                    })
+                )
         };
     })
 )(StartTreeButton);

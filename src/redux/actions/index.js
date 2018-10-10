@@ -607,10 +607,10 @@ export function getArtistsSuccess(artists) {
 //
 //
 ////////////////////////////////////////////////////
-export function setDiscover(uri, name) {
+export function setDiscover(newNode) {
     return {
         type: "discover|SET_DISCOVER",
-        payload: { uri, name }
+        payload: newNode
     };
 }
 
@@ -628,7 +628,7 @@ export function nodeFetched(nodeId) {
     };
 }
 
-export function updateNodeUri({ nodeId, uri, name, renderKey} = {}) {
+export function updateNodeUri({ nodeId, uri, name, renderKey } = {}) {
     return {
         type: "discover|UPDATE_NODE_URI",
         payload: { nodeId, uri, name, renderKey }

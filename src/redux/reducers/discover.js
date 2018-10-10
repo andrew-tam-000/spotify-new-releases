@@ -6,18 +6,9 @@ export default (state = {}, { type, payload }) => {
         case setDiscover().type:
             return {
                 ...state,
-                root: payload.uri,
+                root: payload.data.id,
                 nodes: {
-                    [payload.uri]: {
-                        data: {
-                            id: payload.uri,
-                            uri: payload.uri,
-                            open: false,
-                            renderKey: payload.uri,
-                            name: payload.name
-                        },
-                        children: []
-                    }
+                    [payload.data.id]: payload
                 }
             };
         case toggleNode().type:
