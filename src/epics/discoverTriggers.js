@@ -18,6 +18,7 @@ import {
     getRecommendationsStart,
     getRecommendationsSuccess
 } from "../redux/actions";
+import Node from "../Node";
 
 const streamForAddingTracks = (action$, state$, node, trackId) => {
     const nodeId = node.data.id;
@@ -31,14 +32,16 @@ const streamForAddingTracks = (action$, state$, node, trackId) => {
                     createNodes(
                         nodeId,
                         keyBy(
-                            map(action.payload.tracks, track => ({
-                                data: {
-                                    id: uuidv1(),
-                                    uri: track.uri,
-                                    name: track.name,
-                                    renderKey: uuidv1()
-                                }
-                            })),
+                            map(
+                                action.payload.tracks,
+                                track =>
+                                    new Node({
+                                        id: uuidv1(),
+                                        uri: track.uri,
+                                        name: track.name,
+                                        renderKey: uuidv1()
+                                    })
+                            ),
                             "data.id"
                         )
                     )
@@ -61,14 +64,16 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
                     createNodes(
                         nodeId,
                         keyBy(
-                            map(action.payload.relatedArtists, relatedArtist => ({
-                                data: {
-                                    id: uuidv1(),
-                                    uri: relatedArtist.uri,
-                                    name: relatedArtist.name,
-                                    renderKey: uuidv1()
-                                }
-                            })),
+                            map(
+                                action.payload.relatedArtists,
+                                relatedArtist =>
+                                    new Node({
+                                        id: uuidv1(),
+                                        uri: relatedArtist.uri,
+                                        name: relatedArtist.name,
+                                        renderKey: uuidv1()
+                                    })
+                            ),
                             "data.id"
                         )
                     )
