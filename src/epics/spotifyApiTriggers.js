@@ -138,14 +138,22 @@ const getArtistTopTracks = (action$, state$, { spotifyApi }) =>
 const skipToNext = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(skipToNextStart().type),
-        mergeMap(action => apiObservable(spotifyApi.skipToNext, resp => of(skipToNextSuccess())))
+        mergeMap(action =>
+            apiObservable(spotifyApi.skipToNext, null, resp => [
+                skipToNextSuccess(),
+                getCurrentlyPlayingTrackStart()
+            ])
+        )
     );
 
 const skipToPrevious = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(skipToPreviousStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.skipToPrevious, resp => of(skipToPreviousSuccess()))
+            apiObservable(spotifyApi.skipToPrevious, null, resp => [
+                skipToPreviousSuccess(),
+                getCurrentlyPlayingTrackStart()
+            ])
         )
     );
 
