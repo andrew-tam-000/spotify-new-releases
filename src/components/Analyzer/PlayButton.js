@@ -5,12 +5,12 @@ import { createStructuredSelector } from "reselect";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import Button from "@material-ui/core/Button";
-import { nowPlayingSongIdSelector } from "../../selectors";
+import { nowPlayingSongUriSelector } from "../../selectors";
 
 import { playSongStart, pauseSongStart } from "../../redux/actions";
 
-const PlayButton = ({ playSongStart, pauseSongStart, nowPlayingSongId, uri, ...props }) => {
-    const isPlaying = last(split(uri, ":")) === nowPlayingSongId;
+const PlayButton = ({ playSongStart, pauseSongStart, nowPlayingSongUri, uri, ...props }) => {
+    const isPlaying = uri === nowPlayingSongUri;
     return (
         <Button
             onClick={isPlaying ? pauseSongStart : playSongStart}
@@ -39,7 +39,7 @@ const mapDispatchToProps = (dispatch, { uris, uri, context_uri, offset }) => ({
 
 export default connect(
     createStructuredSelector({
-        nowPlayingSongId: nowPlayingSongIdSelector
+        nowPlayingSongUri: nowPlayingSongUriSelector
     }),
     mapDispatchToProps
 )(PlayButton);

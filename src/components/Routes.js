@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Router, Route } from "react-router-dom";
 import createHashHistory from "history/createHashHistory";
 import styled from "styled-components";
-import AppBar from "@material-ui/core/AppBar";
+import _AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
 import Spotify from "./Spotify";
@@ -22,6 +22,7 @@ import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import SearchIcon from "@material-ui/icons/Search";
 import QueueMusicIcon from "@material-ui/icons/QueueMusic";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
+import PlayDash from "./PlayDash";
 import Search from "./Search";
 import _Drawer from "@material-ui/core/Drawer";
 import { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel } from "../redux/actions";
@@ -51,6 +52,13 @@ const Drawer = withStyles({
 const MainContent = styled.div`
     display: flex;
     flex: 1;
+`;
+
+const AppBar = styled(_AppBar)`
+    display: flex;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 class RouteProvider extends Component {
@@ -83,6 +91,7 @@ class RouteProvider extends Component {
                                 Music
                             </Typography>
                         </Toolbar>
+                        <PlayDash />
                     </AppBar>
                     <MainContent>
                         <Scrollable>

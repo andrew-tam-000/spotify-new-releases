@@ -1,8 +1,8 @@
 import { ofType } from "redux-observable";
 import { flatten, map, get, omitBy, isUndefined, size, compact } from "lodash";
 import { merge } from "rxjs/observable/merge";
-import { concat, from, timer, of, interval } from "rxjs";
-import { mergeMap, debounce, catchError, switchMap } from "rxjs/operators";
+import { EMPTY, concat, from, timer, of, interval } from "rxjs";
+import { take, mergeMap, debounce, catchError, switchMap, mapTo } from "rxjs/operators";
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
     librarySongsWithDataSelector,
@@ -30,19 +30,31 @@ import {
     getRecommendationsStart,
     getRecommendationsSuccess,
     getTracksStart,
-    getTracksSuccess
+    getTracksSuccess,
+    skipToNextStart,
+    skipToNextSuccess,
+    skipToPreviousStart,
+    skipToPreviousSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
 const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
     interval(5000).pipe(mergeMap(() => of(getCurrentlyPlayingTrackStart())));
 
+// Need to also grab this track from the api
 const getNowPlaying = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getCurrentlyPlayingTrackStart().type),
         mergeMap(action =>
             apiObservable(spotifyApi.getMyCurrentPlayingTrack, [], resp =>
-                of(getCurrentlyPlayingTrackSuccess(resp))
+                concat(
+                    of(getTracksStart([[resp.item.id]])),
+                    action$.pipe(
+                        ofType(getTracksSuccess().type),
+                        take(1),
+                        mapTo(getCurrentlyPlayingTrackSuccess(resp))
+                    )
+                )
             )
         )
     );
@@ -123,6 +135,20 @@ const getArtistTopTracks = (action$, state$, { spotifyApi }) =>
         )
     );
 
+const skipToNext = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(skipToNextStart().type),
+        mergeMap(action => apiObservable(spotifyApi.skipToNext, resp => of(skipToNextSuccess())))
+    );
+
+const skipToPrevious = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(skipToPreviousStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.skipToPrevious, resp => of(skipToPreviousSuccess()))
+        )
+    );
+
 const getRecommendations = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getRecommendationsStart().type),
@@ -191,5 +217,7 @@ export default (...args) =>
         pauseSong(...args),
         getRecommendations(...args),
         getTracks(...args),
-        getArtists(...args)
+        getArtists(...args),
+        skipToNext(...args),
+        skipToPrevious(...args)
     ).pipe(catchError(e => console.error(e)));

@@ -7,8 +7,8 @@ import {
     getRelatedArtistsSuccess,
     getArtistTopTracksSuccess,
     getRecommendationsSuccess,
-    pauseSongSuccess,
-    setSearchResults
+    setSearchResults,
+    getTracksSuccess
 } from "../actions/";
 import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
@@ -38,6 +38,15 @@ export default (state = {}, { type, payload }) => {
                 ...state,
                 nowPlaying: payload
             };
+        case getTracksSuccess().type:
+            return {
+                ...state,
+                songs: {
+                    ...state.songs,
+                    ...keyBy(filter(payload.tracks, ({ id }) => !state.songs[id]), "id")
+                }
+            };
+
         case getSongsSuccess().type:
             return {
                 ...state,

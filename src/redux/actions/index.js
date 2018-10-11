@@ -581,7 +581,7 @@ export function getTracksStart(ids) {
 
 export function getTracksSuccess(tracks) {
     return {
-        type: "GET_TRACKS_START",
+        type: "GET_TRACKS_SUCCESS",
         payload: tracks
     };
 }
@@ -639,6 +639,30 @@ export function createNodes(parentId, nodes) {
     return {
         type: "discover|CREATE_NODES",
         payload: { parentId, nodes }
+    };
+}
+
+export function skipToNextStart() {
+    return {
+        type: "SKIP_TO_NEXT_START"
+    };
+}
+
+export function skipToNextSuccess() {
+    return {
+        type: "SKIP_TO_NEXT_SUCCESS"
+    };
+}
+
+export function skipToPreviousStart() {
+    return {
+        type: "SKIP_TO_PREVIOUS_START"
+    };
+}
+
+export function skipToPreviousSuccess() {
+    return {
+        type: "SKIP_TO_PREVIOUS_SUCCESS"
     };
 }
 

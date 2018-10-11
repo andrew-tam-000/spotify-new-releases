@@ -25,7 +25,7 @@ export default compose(
     ),
     mapProps(({ songs, artistData, uri, setDiscover }) => {
         const [, type, id] = split(uri, ":");
-        const name = type === "track" ? songs[id].name : artistData[id].name;
+        const name = ((type === "track" ? songs[id] : artistData[id]) || {}).name;
         return {
             setDiscover: () =>
                 setDiscover(
