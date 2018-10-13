@@ -168,7 +168,7 @@ class Discover extends Component {
             .attr("dy", "1.61em")
             .attr("x", d => 35)
             .attr("text-anchor", d => (d._children ? "end" : "start"))
-            .text(d => d.data.artist)
+            .text(d => d.data.artist || undefined)
             .clone(true)
             .lower()
             .attr("stroke-linejoin", "round")

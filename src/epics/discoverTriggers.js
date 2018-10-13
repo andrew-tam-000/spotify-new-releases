@@ -1,3 +1,5 @@
+// TODO: Don't need to store 'nodeFEtched' becasue we store this in the redux state
+
 import { ofType } from "redux-observable";
 import { mergeMap, catchError, take } from "rxjs/operators";
 import { get, last, keyBy, map, split } from "lodash";
@@ -97,20 +99,32 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
     );
 };
 
+const onShowSideBar = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(showSideBar().type),
+        mergeMap(action => {
+            if (action.payload.type === "node") {
+                const nodeId = action.payload.data;
+                const node = discoverNodesSelector(state$.value)[nodeId];
+                const uri = node.data.uri;
+                const [, type, id] = split(uri, ":");
+                const streamToRun =
+                    type === "artist" ? streamForAddingArtists : streamForAddingTracks;
+                return !node.data.fetched ? streamToRun(action$, state$, node, id) : EMPTY;
+            } else {
+                return EMPTY;
+            }
+        })
+    );
+
 const onUpdateNodeUri = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(updateNodeUri().type),
         mergeMap(action => {
             const {
-                data: { id: nodeId, uri }
+                data: { id: nodeId }
             } = action.payload;
-            const node = discoverNodesSelector(state$.value)[nodeId];
-            const [, type, id] = split(uri, ":");
-            const streamToRun = type === "artist" ? streamForAddingArtists : streamForAddingTracks;
-            return concat(
-                of(showSideBar("node", nodeId)),
-                !node.data.fetched ? streamToRun(action$, state$, node, id) : EMPTY
-            );
+            return of(showSideBar("node", nodeId));
         })
     );
 
@@ -119,15 +133,11 @@ const onToggleNode = (action$, state$, { spotifyApi }) =>
         ofType(toggleNode().type),
         mergeMap(action => {
             const nodeId = action.payload;
-            const node = discoverNodesSelector(state$.value)[nodeId];
-            const [, type, id] = split(node.data.uri, ":");
-            const streamToRun = type === "artist" ? streamForAddingArtists : streamForAddingTracks;
-            return concat(
-                of(showSideBar("node", nodeId)),
-                !node.data.fetched ? streamToRun(action$, state$, node, id) : EMPTY
-            );
+            return of(showSideBar("node", nodeId));
         })
     );
 
 export default (...args) =>
-    merge(onUpdateNodeUri(...args), onToggleNode(...args)).pipe(catchError(e => console.error(e)));
+    merge(onShowSideBar(...args), onUpdateNodeUri(...args), onToggleNode(...args)).pipe(
+        catchError(e => console.error(e))
+    );
