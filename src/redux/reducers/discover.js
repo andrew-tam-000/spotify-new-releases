@@ -37,14 +37,7 @@ export default (state = {}, { type, payload }) => {
                 ...state,
                 nodes: {
                     ...state.nodes,
-                    [payload.nodeId]: merge(
-                        {},
-                        state.nodes[payload.nodeId],
-                        set({}, ["data", "fetched"], false),
-                        set({}, ["data", "uri"], payload.uri),
-                        set({}, ["data", "name"], payload.name),
-                        set({}, ["data", "renderKey"], payload.renderKey)
-                    )
+                    [payload.data.id]: payload
                 }
             };
         }

@@ -628,10 +628,10 @@ export function nodeFetched(nodeId) {
     };
 }
 
-export function updateNodeUri({ nodeId, uri, name, renderKey } = {}) {
+export function updateNodeUri(newNode) {
     return {
         type: "discover|UPDATE_NODE_URI",
-        payload: { nodeId, uri, name, renderKey }
+        payload: newNode
     };
 }
 

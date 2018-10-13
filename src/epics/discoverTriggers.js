@@ -94,12 +94,13 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
     );
 };
 
-// TODO: This should also add a new node to the tree
 const onUpdateNodeUri = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(updateNodeUri().type),
         mergeMap(action => {
-            const { nodeId, uri } = action.payload;
+            const {
+                data: { id: nodeId, uri }
+            } = action.payload;
             const node = discoverNodesSelector(state$.value)[nodeId];
             const [, type, id] = split(uri, ":");
             const streamToRun = type === "artist" ? streamForAddingArtists : streamForAddingTracks;
