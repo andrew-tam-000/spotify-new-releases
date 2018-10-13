@@ -34,7 +34,9 @@ import {
     skipToNextStart,
     skipToNextSuccess,
     skipToPreviousStart,
-    skipToPreviousSuccess
+    skipToPreviousSuccess,
+    seekStart,
+    seekSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
@@ -157,6 +159,14 @@ const skipToPrevious = (action$, state$, { spotifyApi }) =>
         )
     );
 
+const seek = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(seekStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.seek, null, resp => of(skipToPreviousSuccess()))
+        )
+    );
+
 const getRecommendations = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getRecommendationsStart().type),
@@ -227,5 +237,6 @@ export default (...args) =>
         getTracks(...args),
         getArtists(...args),
         skipToNext(...args),
-        skipToPrevious(...args)
+        skipToPrevious(...args),
+        seek(...args)
     ).pipe(catchError(e => console.error(e)));

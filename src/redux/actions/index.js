@@ -666,6 +666,18 @@ export function skipToPreviousSuccess() {
     };
 }
 
+export function seekStart() {
+    return {
+        type: "SEEK_START"
+    };
+}
+
+export function seekSuccess() {
+    return {
+        type: "SEEK_SUCCESS"
+    };
+}
+
 ////////////////////////////////////////////////////
 export function updateFirebaseUser(firebaseUser) {
     return {

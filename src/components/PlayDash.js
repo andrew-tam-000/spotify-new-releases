@@ -9,6 +9,7 @@ import PlayButton from "./Analyzer/PlayButton";
 import { nowPlayingSongUriSelector, songsSelector } from "../selectors";
 import Typography from "@material-ui/core/Typography";
 import StartTreeButton from "./Discover/StartTreeButton";
+import Slider from "@material-ui/lab/Slider";
 import styled from "styled-components";
 
 const Title = styled(Typography)`
@@ -29,6 +30,7 @@ const PlayDash = ({ uri, track }) => (
             <SkipToPreviousButton />
             <PlayButton uri={uri} />
             <SkipToNextButton />
+            <Slider />
         </Buttons>
     </React.Fragment>
 );
