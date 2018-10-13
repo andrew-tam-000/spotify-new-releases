@@ -666,9 +666,10 @@ export function skipToPreviousSuccess() {
     };
 }
 
-export function seekStart() {
+export function seekStart(distance) {
     return {
-        type: "SEEK_START"
+        type: "SEEK_START",
+        payload: distance
     };
 }
 

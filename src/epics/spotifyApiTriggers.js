@@ -236,8 +236,11 @@ const skipToPrevious = (action$, state$, { spotifyApi }) =>
 const seek = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(seekStart().type),
+        debounce(() => timer(400)),
         mergeMap(action =>
-            apiObservable(spotifyApi.seek, null, resp => of(skipToPreviousSuccess()))
+            apiObservable(spotifyApi.seek, [action.payload, {}], resp =>
+                of(skipToPreviousSuccess())
+            )
         )
     );
 

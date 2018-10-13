@@ -245,6 +245,16 @@ export const advancedSearchArtistsSelector = createSelector(
     advancedSearch => get(advancedSearch, "artists")
 );
 
+export const nowPlayingSongDurationSelector = createSelector(
+    state => get(state, "app.spotify.nowPlaying.item.duration_ms"),
+    duration => duration
+);
+
+export const nowPlayingSongProgressSelector = createSelector(
+    state => get(state, "app.spotify.nowPlaying.progress_ms"),
+    progress => progress
+);
+
 export const nowPlayingSongUriSelector = createSelector(
     state =>
         get(state, "app.spotify.nowPlaying.is_playing") &&
