@@ -12,7 +12,7 @@ import {
 } from "../actions/";
 import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
-export default (state = {}, { type, payload }) => {
+export default (state = {}, { type, payload = {} }) => {
     switch (type) {
         case "GET_SPOTIFY_USER_SUCCESS":
             return {

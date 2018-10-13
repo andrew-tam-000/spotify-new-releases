@@ -1,10 +1,26 @@
 import { ofType } from "redux-observable";
-import { flatten, map, get, omitBy, isUndefined, size, compact } from "lodash";
+import {
+    flatMap,
+    uniq,
+    filter,
+    thru,
+    first,
+    isArray,
+    flatten,
+    map,
+    get,
+    omitBy,
+    isUndefined,
+    size,
+    compact
+} from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, concat, from, timer, of, interval } from "rxjs";
 import { take, mergeMap, debounce, catchError, switchMap, mapTo } from "rxjs/operators";
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
+    songsSelector,
+    artistDataSelector,
     librarySongsWithDataSelector,
     advancedSearchTracksSelector,
     advancedSearchAttributesSelector,
@@ -48,25 +64,57 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getCurrentlyPlayingTrackStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getMyCurrentPlayingTrack, [], resp =>
-                concat(
-                    of(getTracksStart([[resp.item.id]])),
-                    action$.pipe(
-                        ofType(getTracksSuccess().type),
-                        take(1),
-                        mapTo(getCurrentlyPlayingTrackSuccess(resp))
-                    )
-                )
+            apiObservable(
+                spotifyApi.getMyCurrentPlayingTrack,
+                [],
+                resp =>
+                    songsSelector(state$.value)[resp.item.id]
+                        ? from(Promise.resolve()).pipe(mapTo(getCurrentlyPlayingTrackSuccess(resp)))
+                        : concat(
+                              of(getTracksStart([resp.item.id])),
+                              action$.pipe(
+                                  ofType(getTracksSuccess().type),
+                                  take(1),
+                                  mapTo(getCurrentlyPlayingTrackSuccess(resp))
+                              )
+                          )
             )
         )
     );
 
-// TODO: Test this and make sure it works
 const getTracks = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getTracksStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getTracks, action.payload, resp => of(getTracksSuccess(resp)))
+            thru(
+                thru(songsSelector(state$.value), songs =>
+                    filter(
+                        isArray(action.payload) ? action.payload : [action.payload],
+                        trackId => !songs[trackId]
+                    )
+                ),
+                trackIds =>
+                    size(trackIds)
+                        ? apiObservable(spotifyApi.getTracks, [trackIds], resp =>
+                              concat(
+                                  of(
+                                      getArtistsStart(
+                                          uniq(
+                                              flatMap(resp.tracks, track =>
+                                                  map(track.artists, artist => artist.id)
+                                              )
+                                          )
+                                      )
+                                  ),
+                                  action$.pipe(
+                                      ofType(getArtistsSuccess().type),
+                                      take(1),
+                                      mapTo(getTracksSuccess(resp))
+                                  )
+                              )
+                          )
+                        : from(Promise.resolve()).pipe(mapTo(getTracksSuccess()))
+            )
         )
     );
 
@@ -75,8 +123,19 @@ const getArtists = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getArtistsStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getArtists, [action.payload], resp =>
-                of(getArtistsSuccess(resp.artists))
+            thru(
+                thru(artistDataSelector(state$.value), artists =>
+                    filter(
+                        isArray(action.payload) ? action.payload : [action.payload],
+                        artistId => !artists[artistId]
+                    )
+                ),
+                artistIds =>
+                    size(artistIds)
+                        ? apiObservable(spotifyApi.getArtists, [artistIds], resp =>
+                              of(getArtistsSuccess(resp.artists))
+                          )
+                        : from(Promise.resolve()).pipe(mapTo(getArtistsSuccess()))
             )
         )
     );

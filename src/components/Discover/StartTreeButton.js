@@ -4,9 +4,14 @@ import { compose, mapProps } from "recompose";
 import TerrainIcon from "@material-ui/icons/Terrain";
 import Button from "@material-ui/core/Button";
 import { setDiscover } from "../../redux/actions";
-import { songsSelector, artistDataSelector } from "../../selectors";
+import {
+    songsSelector,
+    artistDataSelector,
+    artistImageForTrackIdSelector,
+    artistImageForArtistIdSelector
+} from "../../selectors";
 import { createStructuredSelector } from "reselect";
-import { split } from "lodash";
+import { split, get, last } from "lodash";
 import Node from "../../Node";
 
 const StartTreeButton = ({ setDiscover }) => (
@@ -19,13 +24,16 @@ export default compose(
     connect(
         createStructuredSelector({
             songs: songsSelector,
-            artistData: artistDataSelector
+            artistData: artistDataSelector,
+            artistImageForTrackId: artistImageForTrackIdSelector
         }),
         { setDiscover }
     ),
-    mapProps(({ songs, artistData, uri, setDiscover }) => {
+    mapProps(({ songs, artistData, uri, setDiscover, artistImageForTrackId }) => {
         const [, type, id] = split(uri, ":");
         const name = ((type === "track" ? songs[id] : artistData[id]) || {}).name;
+        const image =
+            type === "track" ? artistImageForTrackId(id) : artistImageForArtistIdSelector(id);
         return {
             setDiscover: () =>
                 setDiscover(
@@ -34,6 +42,7 @@ export default compose(
                         uri,
                         open: false,
                         renderKey: uri,
+                        image,
                         name
                     })
                 )

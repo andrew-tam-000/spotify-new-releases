@@ -18,20 +18,23 @@ const Title = styled(Typography)`
     overflow: hidden;
 `;
 
-const Buttons = styled.div`
+const Controls = styled.div`
     display: flex;
+    flex-direction: column;
 `;
 
 const PlayDash = ({ uri, track }) => (
     <React.Fragment>
         <Title variant="headline">{track.name}</Title>
-        <Buttons>
-            <StartTreeButton uri={uri} />
-            <SkipToPreviousButton />
-            <PlayButton uri={uri} />
-            <SkipToNextButton />
+        <Controls>
+            <div>
+                <StartTreeButton uri={uri} />
+                <SkipToPreviousButton />
+                <PlayButton uri={uri} />
+                <SkipToNextButton />
+            </div>
             <Slider />
-        </Buttons>
+        </Controls>
     </React.Fragment>
 );
 

@@ -7,6 +7,7 @@ const Node = function(data, children = []) {
             renderKey: null,
             image: null,
             name: null,
+            secondary: "test",
             ...data
         },
         children

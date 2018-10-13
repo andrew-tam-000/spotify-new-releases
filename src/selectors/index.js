@@ -4,7 +4,7 @@ import {
     mapValues,
     get,
     values,
-    keyBy,
+    last,
     set,
     uniq,
     flatten,
@@ -265,4 +265,17 @@ export const discoverRootNodeSelector = createSelector(
 export const discoverNodesSelector = createSelector(
     state => get(state, "app.discover.nodes"),
     discoverNodes => discoverNodes
+);
+
+export const artistImageForArtistIdSelector = createSelector(
+    artistDataSelector,
+    artistData => artistId => get(last(get(artistData[artistId], "images")), "url")
+);
+
+export const artistImageForTrackIdSelector = createSelector(
+    artistDataSelector,
+    songsSelector,
+    artistImageForArtistIdSelector,
+    (artistData, songsSelector, artistImageForArtistId) => trackId =>
+        artistImageForArtistId(get(songsSelector[trackId], "artists.0.id"))
 );

@@ -1,9 +1,9 @@
 import { ofType } from "redux-observable";
 import { mergeMap, catchError, take } from "rxjs/operators";
-import { keyBy, map, split } from "lodash";
+import { get, last, keyBy, map, split } from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, of, concat } from "rxjs";
-import { discoverNodesSelector } from "../selectors";
+import { discoverNodesSelector, artistImageForTrackIdSelector } from "../selectors";
 import uuidv1 from "uuid/v1";
 import {
     toggleNode,
@@ -11,7 +11,6 @@ import {
     getRelatedArtistsStart,
     getRelatedArtistsSuccess,
     getArtistTopTracksStart,
-    getArtistTopTracksSuccess,
     createNodes,
     showSideBar,
     updateNodeUri,
@@ -39,6 +38,9 @@ const streamForAddingTracks = (action$, state$, node, trackId) => {
                                         id: uuidv1(),
                                         uri: track.uri,
                                         name: track.name,
+                                        image: artistImageForTrackIdSelector(state$.value)(
+                                            track.id
+                                        ),
                                         renderKey: uuidv1()
                                     })
                             ),
