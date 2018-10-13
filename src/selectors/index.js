@@ -267,15 +267,22 @@ export const discoverNodesSelector = createSelector(
     discoverNodes => discoverNodes
 );
 
+export const artistForTrackIdSelector = createSelector(
+    artistDataSelector,
+    songsSelector,
+    (artistData, songs) => trackId => artistData[get(songs[trackId], "artists.0.id")] || {}
+);
+
 export const artistImageForArtistIdSelector = createSelector(
     artistDataSelector,
     artistData => artistId => get(last(get(artistData[artistId], "images")), "url")
 );
 
 export const artistImageForTrackIdSelector = createSelector(
+    artistForTrackIdSelector,
     artistDataSelector,
     songsSelector,
     artistImageForArtistIdSelector,
-    (artistData, songsSelector, artistImageForArtistId) => trackId =>
-        artistImageForArtistId(get(songsSelector[trackId], "artists.0.id"))
+    (artistForTrackId, artistData, songsSelector, artistImageForArtistId) => trackId =>
+        artistImageForArtistId(get(artistForTrackId(trackId), "id"))
 );

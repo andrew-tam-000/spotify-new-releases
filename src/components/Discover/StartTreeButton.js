@@ -7,6 +7,7 @@ import { setDiscover } from "../../redux/actions";
 import {
     songsSelector,
     artistDataSelector,
+    artistForTrackIdSelector,
     artistImageForTrackIdSelector,
     artistImageForArtistIdSelector
 } from "../../selectors";
@@ -26,12 +27,14 @@ export default compose(
             songs: songsSelector,
             artistData: artistDataSelector,
             artistImageForTrackId: artistImageForTrackIdSelector,
-            artistImageForArtistId: artistImageForArtistIdSelector
+            artistImageForArtistId: artistImageForArtistIdSelector,
+            artistForTrackId: artistForTrackIdSelector
         }),
         { setDiscover }
     ),
     mapProps(
         ({
+            artistForTrackId,
             songs,
             artistData,
             uri,
@@ -42,6 +45,7 @@ export default compose(
             const [, type, id] = split(uri, ":");
             const name = ((type === "track" ? songs[id] : artistData[id]) || {}).name;
             const image = type === "track" ? artistImageForTrackId(id) : artistImageForArtistId(id);
+            const artist = type === "track" && artistForTrackId(id).name;
             return {
                 setDiscover: () =>
                     setDiscover(
@@ -51,7 +55,8 @@ export default compose(
                             open: false,
                             renderKey: uri,
                             image,
-                            name
+                            name,
+                            artist
                         })
                     )
             };

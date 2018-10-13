@@ -10,7 +10,8 @@ import {
     artistDataSelector,
     discoverNodesSelector,
     artistImageForTrackIdSelector,
-    artistImageForArtistIdSelector
+    artistImageForArtistIdSelector,
+    artistForTrackIdSelector
 } from "../selectors";
 import { compose, mapProps } from "recompose";
 import uuidv1 from "uuid/v1";
@@ -29,7 +30,8 @@ export default compose(
             songs: songsSelector,
             discoverNodes: discoverNodesSelector,
             artistImageForTrackId: artistImageForTrackIdSelector,
-            artistImageForArtistId: artistImageForArtistIdSelector
+            artistImageForArtistId: artistImageForArtistIdSelector,
+            artistForTrackId: artistForTrackIdSelector
         }),
         { updateNodeUri, searchClosePanel }
     ),
@@ -39,6 +41,7 @@ export default compose(
             artistImageForArtistId,
             discoverNodes,
             searchClosePanel,
+            artistForTrackId,
             updateNodeUri,
             nodeId,
             uri,
@@ -61,7 +64,8 @@ export default compose(
                                 image:
                                     type === "track"
                                         ? artistImageForTrackId(id)
-                                        : artistImageForArtistId(id)
+                                        : artistImageForArtistId(id),
+                                artist: type === "track" && artistForTrackId(id).name
                             })
                         )
                     ) && searchClosePanel()

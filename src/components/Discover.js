@@ -163,6 +163,18 @@ class Discover extends Component {
             .attr("stroke-width", 3)
             .attr("stroke", "white");
 
+        nodeEnter
+            .append("text")
+            .attr("dy", "1.61em")
+            .attr("x", d => 35)
+            .attr("text-anchor", d => (d._children ? "end" : "start"))
+            .text(d => d.data.artist)
+            .clone(true)
+            .lower()
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-width", 3)
+            .attr("stroke", "white");
+
         // Transition nodes to their new position.
         node.merge(nodeEnter)
             .transition(transition)

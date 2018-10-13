@@ -6,6 +6,7 @@ import { EMPTY, of, concat } from "rxjs";
 import {
     discoverNodesSelector,
     artistImageForTrackIdSelector,
+    artistForTrackIdSelector,
     artistImageForArtistIdSelector
 } from "../selectors";
 import uuidv1 from "uuid/v1";
@@ -45,6 +46,8 @@ const streamForAddingTracks = (action$, state$, node, trackId) => {
                                         image: artistImageForTrackIdSelector(state$.value)(
                                             track.id
                                         ),
+                                        artist: artistForTrackIdSelector(state$.value)(track.id)
+                                            .name,
                                         renderKey: uuidv1()
                                     })
                             ),
