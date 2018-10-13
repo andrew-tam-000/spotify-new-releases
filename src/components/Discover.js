@@ -49,7 +49,7 @@ const gLink = svg
 const gNode = svg.append("g").attr("cursor", "pointer");
 
 // Size between nodes
-const tree = d3.tree().nodeSize([25, 200]);
+const tree = d3.tree().nodeSize([80, 200]);
 
 function zoomed() {
     const dimensions = svg.node().getBoundingClientRect();
@@ -140,9 +140,21 @@ class Discover extends Component {
             });
 
         nodeEnter
+            .append("image")
+            .attr("xlink:href", d => d.data.image)
+            .attr("x", "-30px")
+            .attr("y", "-30px")
+            .attr("width", "60px")
+            .attr("height", "60px")
+            .on("click", d => {
+                d3.event.stopPropagation();
+                this.props.showSideBar("node", d.data.id);
+            });
+
+        nodeEnter
             .append("text")
             .attr("dy", "0.31em")
-            .attr("x", d => 10)
+            .attr("x", d => 35)
             .attr("text-anchor", d => (d._children ? "end" : "start"))
             .text(d => d.data.name)
             .clone(true)
@@ -150,20 +162,6 @@ class Discover extends Component {
             .attr("stroke-linejoin", "round")
             .attr("stroke-width", 3)
             .attr("stroke", "white");
-
-        /*
-        nodeEnter
-            .append("text")
-            .attr("dy", "0.31em")
-            .attr("x", d => 10)
-            .attr("text-anchor", d => (d._children ? "end" : "start"))
-            .text(d => d.data.secondary)
-            .clone(true)
-            .lower()
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-width", 3)
-            .attr("stroke", "white");
-            */
 
         // Transition nodes to their new position.
         node.merge(nodeEnter)

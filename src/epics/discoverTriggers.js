@@ -3,7 +3,11 @@ import { mergeMap, catchError, take } from "rxjs/operators";
 import { get, last, keyBy, map, split } from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, of, concat } from "rxjs";
-import { discoverNodesSelector, artistImageForTrackIdSelector } from "../selectors";
+import {
+    discoverNodesSelector,
+    artistImageForTrackIdSelector,
+    artistImageForArtistIdSelector
+} from "../selectors";
 import uuidv1 from "uuid/v1";
 import {
     toggleNode,
@@ -73,6 +77,9 @@ const streamForAddingArtists = (action$, state$, node, artistId) => {
                                         id: uuidv1(),
                                         uri: relatedArtist.uri,
                                         name: relatedArtist.name,
+                                        image: artistImageForArtistIdSelector(state$.value)(
+                                            relatedArtist.id
+                                        ),
                                         renderKey: uuidv1()
                                     })
                             ),

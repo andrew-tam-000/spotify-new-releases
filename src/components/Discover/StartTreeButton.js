@@ -25,27 +25,36 @@ export default compose(
         createStructuredSelector({
             songs: songsSelector,
             artistData: artistDataSelector,
-            artistImageForTrackId: artistImageForTrackIdSelector
+            artistImageForTrackId: artistImageForTrackIdSelector,
+            artistImageForArtistId: artistImageForArtistIdSelector
         }),
         { setDiscover }
     ),
-    mapProps(({ songs, artistData, uri, setDiscover, artistImageForTrackId }) => {
-        const [, type, id] = split(uri, ":");
-        const name = ((type === "track" ? songs[id] : artistData[id]) || {}).name;
-        const image =
-            type === "track" ? artistImageForTrackId(id) : artistImageForArtistIdSelector(id);
-        return {
-            setDiscover: () =>
-                setDiscover(
-                    new Node({
-                        id: uri,
-                        uri,
-                        open: false,
-                        renderKey: uri,
-                        image,
-                        name
-                    })
-                )
-        };
-    })
+    mapProps(
+        ({
+            songs,
+            artistData,
+            uri,
+            setDiscover,
+            artistImageForTrackId,
+            artistImageForArtistId
+        }) => {
+            const [, type, id] = split(uri, ":");
+            const name = ((type === "track" ? songs[id] : artistData[id]) || {}).name;
+            const image = type === "track" ? artistImageForTrackId(id) : artistImageForArtistId(id);
+            return {
+                setDiscover: () =>
+                    setDiscover(
+                        new Node({
+                            id: uri,
+                            uri,
+                            open: false,
+                            renderKey: uri,
+                            image,
+                            name
+                        })
+                    )
+            };
+        }
+    )
 )(StartTreeButton);

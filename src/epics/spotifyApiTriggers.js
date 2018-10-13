@@ -147,7 +147,22 @@ const getSearchResults = (action$, state$, { spotifyApi }) =>
         debounce(() => timer(400)),
         switchMap(({ payload: searchText }) =>
             from(spotifyApi.search(searchText, ["artist", "track", "album"])).pipe(
-                mergeMap(resp => of(setSearchResults(resp))),
+                mergeMap(resp =>
+                    concat(
+                        of(
+                            getArtistsStart(
+                                flatMap(resp.tracks.items, track =>
+                                    map(track.artists, artist => artist.id)
+                                )
+                            )
+                        ),
+                        action$.pipe(
+                            ofType(getArtistsSuccess().type),
+                            take(1),
+                            mapTo(setSearchResults(resp))
+                        )
+                    )
+                ),
                 catchError(e => of({ type: "error", payload: e }))
             )
         )
@@ -240,7 +255,11 @@ const getRecommendations = (action$, state$, { spotifyApi }) =>
                             )
                         )
                     ),
-                    of(getRecommendationsSuccess(resp))
+                    action$.pipe(
+                        ofType(getArtistsSuccess().type),
+                        take(1),
+                        mapTo(getRecommendationsSuccess(resp))
+                    )
                 )
             )
         )

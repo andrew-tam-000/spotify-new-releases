@@ -1,5 +1,5 @@
 import React from "react";
-import { last, split } from "lodash";
+import { first, last, split } from "lodash";
 import { compose, mapProps } from "recompose";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
@@ -17,6 +17,11 @@ const Title = styled(Typography)`
     text-overflow: ellipsis;
     overflow: hidden;
 `;
+const Artist = styled(Typography)`
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+`;
 
 const Controls = styled.div`
     display: flex;
@@ -25,7 +30,10 @@ const Controls = styled.div`
 
 const PlayDash = ({ uri, track }) => (
     <React.Fragment>
-        <Title variant="headline">{track.name}</Title>
+        <div>
+            <Title variant="headline">{track.name}</Title>
+            <Artist variant="title">{first(track.artists).name}</Artist>
+        </div>
         <Controls>
             <div>
                 <StartTreeButton uri={uri} />
@@ -47,6 +55,6 @@ export default compose(
     ),
     mapProps(({ uri, songs }) => ({
         uri,
-        track: songs[last(split(uri, ":"))] || {}
+        track: songs[last(split(uri, ":"))] || { artists: [{}] }
     }))
 )(PlayDash);
