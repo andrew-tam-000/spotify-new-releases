@@ -4,7 +4,6 @@ import {
     uniq,
     filter,
     thru,
-    first,
     isArray,
     flatten,
     map,
@@ -16,7 +15,16 @@ import {
 } from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, concat, from, timer, of, interval } from "rxjs";
-import { take, mergeMap, debounce, catchError, switchMap, mapTo } from "rxjs/operators";
+import {
+    last,
+    take,
+    expand,
+    mergeMap,
+    debounce,
+    catchError,
+    switchMap,
+    mapTo
+} from "rxjs/operators";
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
     songsSelector,
@@ -52,7 +60,9 @@ import {
     skipToPreviousStart,
     skipToPreviousSuccess,
     seekStart,
-    seekSuccess
+    seekSuccess,
+    getNewReleasesStart,
+    getNewReleasesSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
@@ -304,6 +314,33 @@ const getAdvancedSearchResults = (action$, state$, { spotifyApi }) =>
         })
     );
 
+const getNewReleases = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getNewReleasesStart().type),
+        mapTo({ limit: 50, offset: 0, albums: [] }),
+        expand(({ limit, offset, albums }) =>
+            from(spotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
+                mergeMap(
+                    resp =>
+                        offset + limit >= resp.albums.total
+                            ? EMPTY
+                            : of({
+                                  offset: offset + limit,
+                                  limit,
+                                  albums: [...albums, ...resp.albums.items]
+                              })
+                ),
+                catchError(e => EMPTY)
+            )
+        ),
+        last(),
+        mergeMap(albums => {
+            console.log("HERE");
+            return of(getNewReleasesSuccess(albums));
+        }),
+        catchError(e => console.error(e))
+    );
+
 export default (...args) =>
     merge(
         getArtistTopTracks(...args),
@@ -319,5 +356,6 @@ export default (...args) =>
         getArtists(...args),
         skipToNext(...args),
         skipToPrevious(...args),
-        seek(...args)
+        seek(...args),
+        getNewReleases(...args)
     ).pipe(catchError(e => console.error(e)));

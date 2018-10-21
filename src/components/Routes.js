@@ -15,8 +15,6 @@ import Discover from "./Discover";
 import Sidebar from "./Sidebar";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
-import RestoreIcon from "@material-ui/icons/Restore";
-import FavoriteIcon from "@material-ui/icons/Favorite";
 import NewReleasesIcon from "@material-ui/icons/NewReleases";
 import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import SearchIcon from "@material-ui/icons/Search";
@@ -24,6 +22,7 @@ import QueueMusicIcon from "@material-ui/icons/QueueMusic";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import PlayDash from "./PlayDash";
 import Search from "./Search";
+import NewReleases from "./NewReleases";
 import _Drawer from "@material-ui/core/Drawer";
 import { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";
@@ -95,6 +94,7 @@ class RouteProvider extends Component {
                     </AppBar>
                     <MainContent>
                         <Scrollable>
+                            <Route exact path="/new-releases" component={NewReleases} />
                             <Route exact path="/discover" component={Discover} />
                             <Route exact path="/analyzer" component={Analyzer} />
                             <Route exact path="/:id([\d-]*)" component={Spotify} />

@@ -1,5 +1,5 @@
 import React from "react";
-import { compact, join, get, split, map, last } from "lodash";
+import { orderBy, compact, join, get, split, map, last } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import {
@@ -18,10 +18,46 @@ import PlayButton from "./Analyzer/PlayButton";
 import PlayAll from "./PlayAll";
 import styled from "styled-components";
 import UpdateNodeUriButton from "./UpdateNodeUriButton";
+import StarsIcon from "@material-ui/icons/Stars";
 
 const ListItemText = styled(_ListItemText)`
     flex: 1 !important;
 `;
+
+const Header = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const Buttons = styled.div`
+    display: flex;
+    margin-right: 12px;
+`;
+
+const TextIcon = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const TrackRow = ({ track, nodeId }) => (
+    <ListItem>
+        <div>
+            <PlayButton uri={track.uri} />
+            <UpdateNodeUriButton uri={track.uri} nodeId={nodeId} />
+        </div>
+        <ListItemText
+            primary={track.name}
+            secondary={[
+                <span>{join(map(track.artists, artist => artist.name), ", ")}</span>,
+                <br />,
+                <TextIcon>
+                    <StarsIcon />
+                    <div>{track.popularity}</div>
+                </TextIcon>
+            ]}
+        />
+    </ListItem>
+);
 
 // Potentially supports nodes and alos regular tables
 const ArtistPanel = compose(
@@ -48,16 +84,7 @@ const ArtistPanel = compose(
             <PlayAll uris={map(topTracks, track => track.uri)} />
             <List>
                 {map(topTracks, track => (
-                    <ListItem key={track.id}>
-                        <div>
-                            <PlayButton uri={track.uri} />
-                            <UpdateNodeUriButton uri={track.uri} nodeId={nodeId} />
-                        </div>
-                        <ListItemText
-                            primary={track.name}
-                            secondary={join(map(track.artists, artist => artist.name), ", ")}
-                        />
-                    </ListItem>
+                    <TrackRow key={track.id} track={track} nodeId={nodeId} />
                 ))}
             </List>
         </React.Fragment>
@@ -76,22 +103,30 @@ const TrackPanel = compose(
         return {
             nodeId,
             songData: songs[spotifyId] || {},
-            relatedTracks: compact(
-                map(
-                    get(discoverNodes, `${nodeId}.children`),
-                    nodeId => songs[last(split(get(discoverNodes, `${nodeId}.data.uri`), ":"))]
-                )
+            relatedTracks: orderBy(
+                compact(
+                    map(
+                        get(discoverNodes, `${nodeId}.children`),
+                        nodeId => songs[last(split(get(discoverNodes, `${nodeId}.data.uri`), ":"))]
+                    )
+                ),
+                "popularity",
+                "desc"
             )
         };
     })
 )(function _TrackPanel({ songData, nodeId, relatedTracks }) {
     return (
         <React.Fragment>
-            <Typography variant="display1" gutterBottom>
-                {songData.name}
-            </Typography>
-            <PlayButton uri={songData.uri} />
-            <UpdateNodeUriButton uri={songData.uri} nodeId={nodeId} />
+            <Header>
+                <Buttons>
+                    <PlayButton uri={songData.uri} />
+                    <UpdateNodeUriButton uri={songData.uri} nodeId={nodeId} />
+                </Buttons>
+                <Typography variant="display1" gutterBottom>
+                    {songData.name}
+                </Typography>
+            </Header>
             <List>
                 {map(songData.artists, artist => (
                     <ListItem key={artist.id}>
@@ -105,16 +140,7 @@ const TrackPanel = compose(
             <PlayAll uris={map(relatedTracks, track => track.uri)} />
             <List>
                 {map(relatedTracks, track => (
-                    <ListItem key={track.id}>
-                        <div>
-                            <PlayButton uri={track.uri} />
-                            <UpdateNodeUriButton uri={track.uri} nodeId={nodeId} />
-                        </div>
-                        <ListItemText
-                            primary={track.name}
-                            secondary={join(map(track.artists, artist => artist.name), ", ")}
-                        />
-                    </ListItem>
+                    <TrackRow key={track.id} track={track} nodeId={nodeId} />
                 ))}
             </List>
         </React.Fragment>

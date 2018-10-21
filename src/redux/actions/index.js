@@ -668,14 +668,39 @@ export function skipToPreviousSuccess() {
 
 export function seekStart(distance) {
     return {
-        type: "SEEK_START",
+        type: "spotify|SEEK_START",
         payload: distance
     };
 }
 
 export function seekSuccess() {
     return {
-        type: "SEEK_SUCCESS"
+        type: "spotify|SEEK_SUCCESS"
+    };
+}
+
+export function getNewReleasesStart() {
+    return {
+        type: "spotify|GET_NEW_RELEASES_START"
+    };
+}
+
+export function getNewReleasesSuccess() {
+    return {
+        type: "spotify|GET_NEW_RELEASES_SUCCESS"
+    };
+}
+
+export function getAlbumsStart(albumIds) {
+    return {
+        type: "spotify|GET_ALBUMS_START",
+        payload: albumIds
+    };
+}
+export function getAlbumsSuccess(albums) {
+    return {
+        type: "spotify|GET_ALBUMS_SUCCESS",
+        payload: albums
     };
 }
 

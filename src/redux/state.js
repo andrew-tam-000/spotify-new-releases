@@ -3,6 +3,7 @@ import spotifyApi from "../spotifyApi";
 export default {
     app: {
         spotify: {
+            albums: {},
             nowPlaying: {},
             artistData: [],
             artistTopTracks: {},
