@@ -6,6 +6,7 @@ export default {
             albums: {},
             nowPlaying: {},
             artistData: [],
+            newReleases: [],
             artistTopTracks: {},
             relatedArtists: {},
             songData: [],
@@ -14,6 +15,7 @@ export default {
         discover: {
             nodes: {}
         },
+        // has 'type' and 'data' as keys
         showSideBar: false,
         // Let's sync this with firebase
         // but this will contian ID's for all
@@ -27,6 +29,15 @@ export default {
             text: ""
         },
         user: {},
+        newReleases: {
+            sort: {
+                sortBy: ["artist", "popularity"],
+                sortDirection: {
+                    popularity: "DESC",
+                    artist: "ASC"
+                }
+            }
+        },
         analyzer: {
             openSearchPanel: false,
             searchTerm: "",

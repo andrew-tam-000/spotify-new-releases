@@ -14,6 +14,7 @@ import setSpotifyApiToken from "./setSpotifyApiToken";
 import firebaseListener from "./firebaseListener";
 import initializeOnAnalyzer from "./initializeOnAnalyzer";
 import initializeOnDiscover from "./initializeOnDiscover";
+import initializeOnNewRelease from "./initializeOnNewRelease";
 import getSongs from "./getSongs";
 import getSongData from "./getSongData";
 import getArtistData from "./getArtistData";
@@ -37,6 +38,7 @@ export default (...args) =>
         firebaseListener(...args),
         initializeOnAnalyzer(...args),
         initializeOnDiscover(...args),
+        initializeOnNewRelease(...args),
         getSongs(...args),
         getSongData(...args),
         getArtistData(...args),

@@ -1,5 +1,5 @@
 import React from "react";
-import { orderBy, compact, join, get, split, map, last } from "lodash";
+import { compact, join, get, split, map, last } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import {
@@ -103,15 +103,11 @@ const TrackPanel = compose(
         return {
             nodeId,
             songData: songs[spotifyId] || {},
-            relatedTracks: orderBy(
-                compact(
-                    map(
-                        get(discoverNodes, `${nodeId}.children`),
-                        nodeId => songs[last(split(get(discoverNodes, `${nodeId}.data.uri`), ":"))]
-                    )
-                ),
-                "popularity",
-                "desc"
+            relatedTracks: compact(
+                map(
+                    get(discoverNodes, `${nodeId}.children`),
+                    nodeId => songs[last(split(get(discoverNodes, `${nodeId}.data.uri`), ":"))]
+                )
             )
         };
     })

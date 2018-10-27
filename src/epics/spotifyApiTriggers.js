@@ -1,22 +1,28 @@
 import { ofType } from "redux-observable";
 import {
+    chunk,
+    keys,
     flatMap,
+    flatten,
     uniq,
     filter,
     thru,
     isArray,
-    flatten,
     map,
     get,
     omitBy,
     isUndefined,
+    slice,
     size,
-    compact
+    compact,
+    orderBy
 } from "lodash";
 import { merge } from "rxjs/observable/merge";
-import { EMPTY, concat, from, timer, of, interval } from "rxjs";
+import { EMPTY, concat, from, timer, of, interval, forkJoin } from "rxjs";
 import {
+    scan,
     last,
+    takeWhile,
     take,
     expand,
     mergeMap,
@@ -28,6 +34,7 @@ import {
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
     songsSelector,
+    albumsSelector,
     artistDataSelector,
     librarySongsWithDataSelector,
     advancedSearchTracksSelector,
@@ -38,6 +45,8 @@ import {
 import {
     getArtistsStart,
     getArtistsSuccess,
+    getAlbumsStart,
+    getAlbumsSuccess,
     getArtistTopTracksStart,
     getArtistTopTracksSuccess,
     getRelatedArtistsStart,
@@ -128,26 +137,34 @@ const getTracks = (action$, state$, { spotifyApi }) =>
         )
     );
 
-// TODO: Make this support more than 50 artist id
 const getArtists = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getArtistsStart().type),
-        mergeMap(action =>
-            thru(
-                thru(artistDataSelector(state$.value), artists =>
-                    filter(
-                        isArray(action.payload) ? action.payload : [action.payload],
-                        artistId => !artists[artistId]
-                    )
-                ),
-                artistIds =>
-                    size(artistIds)
-                        ? apiObservable(spotifyApi.getArtists, [artistIds], resp =>
-                              of(getArtistsSuccess(resp.artists))
+        // Get relevant ids
+        mergeMap(action => {
+            const artists = artistDataSelector(state$.value);
+            const idsToFetch = uniq(
+                filter(
+                    isArray(action.payload) ? action.payload : [action.payload],
+                    artistId => !artists[artistId]
+                )
+            );
+            return size(idsToFetch)
+                ? forkJoin(
+                      ...map(chunk(idsToFetch, 20), idSet =>
+                          apiObservable(spotifyApi.getArtists, [idSet], resp => of(resp))
+                      )
+                  ).pipe(
+                      mergeMap(nestedArtistsArray =>
+                          of(
+                              getArtistsSuccess(
+                                  flatMap(nestedArtistsArray, ({ artists }) => artists)
+                              )
                           )
-                        : from(Promise.resolve()).pipe(mapTo(getArtistsSuccess()))
-            )
-        )
+                      )
+                  )
+                : of(getArtistsSuccess([]));
+        })
     );
 
 // Let's also expand artists here
@@ -155,26 +172,29 @@ const getSearchResults = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType("SET_SEARCH_TEXT"),
         debounce(() => timer(400)),
-        switchMap(({ payload: searchText }) =>
-            from(spotifyApi.search(searchText, ["artist", "track", "album"])).pipe(
-                mergeMap(resp =>
-                    concat(
-                        of(
-                            getArtistsStart(
-                                flatMap(resp.tracks.items, track =>
-                                    map(track.artists, artist => artist.id)
-                                )
-                            )
-                        ),
-                        action$.pipe(
-                            ofType(getArtistsSuccess().type),
-                            take(1),
-                            mapTo(setSearchResults(resp))
-                        )
-                    )
-                ),
-                catchError(e => of({ type: "error", payload: e }))
-            )
+        switchMap(
+            ({ payload: searchText }) =>
+                searchText
+                    ? from(spotifyApi.search(searchText, ["artist", "track", "album"])).pipe(
+                          mergeMap(resp =>
+                              concat(
+                                  of(
+                                      getArtistsStart(
+                                          flatMap(resp.tracks.items, track =>
+                                              map(track.artists, artist => artist.id)
+                                          )
+                                      )
+                                  ),
+                                  action$.pipe(
+                                      ofType(getArtistsSuccess().type),
+                                      take(1),
+                                      mapTo(setSearchResults(resp))
+                                  )
+                              )
+                          ),
+                          catchError(e => of({ type: "error", payload: e }))
+                      )
+                    : EMPTY
         )
     );
 
@@ -206,7 +226,12 @@ const getRelatedArtists = (action$, state$, { spotifyApi }) =>
         ofType(getRelatedArtistsStart().type),
         mergeMap(action =>
             apiObservable(spotifyApi.getArtistRelatedArtists, [action.payload], resp =>
-                of(getRelatedArtistsSuccess(action.payload, resp.artists))
+                of(
+                    getRelatedArtistsSuccess(
+                        action.payload,
+                        orderBy(resp.artists, "popularity", "desc")
+                    )
+                )
             )
         )
     );
@@ -262,16 +287,18 @@ const getRecommendations = (action$, state$, { spotifyApi }) =>
                 concat(
                     of(
                         getArtistsStart(
-                            map(
-                                flatten(map(resp.tracks, track => track.artists)),
-                                artist => artist.id
-                            )
+                            map(flatMap(resp.tracks, track => track.artists), artist => artist.id)
                         )
                     ),
                     action$.pipe(
                         ofType(getArtistsSuccess().type),
                         take(1),
-                        mapTo(getRecommendationsSuccess(resp))
+                        mapTo(
+                            getRecommendationsSuccess({
+                                ...resp,
+                                tracks: orderBy(resp.tracks, "popularity", "desc")
+                            })
+                        )
                     )
                 )
             )
@@ -317,28 +344,70 @@ const getAdvancedSearchResults = (action$, state$, { spotifyApi }) =>
 const getNewReleases = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
-        mapTo({ limit: 50, offset: 0, albums: [] }),
-        expand(({ limit, offset, albums }) =>
+        mapTo({ limit: 50, total: 1000, offset: 0, albums: [] }),
+        expand(({ limit, total, offset, albums }) =>
             from(spotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
-                mergeMap(
-                    resp =>
-                        offset + limit >= resp.albums.total
-                            ? EMPTY
-                            : of({
-                                  offset: offset + limit,
-                                  limit,
-                                  albums: [...albums, ...resp.albums.items]
-                              })
+                mergeMap(resp =>
+                    of({
+                        offset: offset + limit,
+                        limit,
+                        albums: [...albums, ...resp.albums.items],
+                        total: resp.albums.total
+                    })
                 ),
-                catchError(e => EMPTY)
+                catchError(e => console.error(e))
             )
         ),
+        takeWhile(({ offset, total, limit }) => offset < total + limit),
         last(),
-        mergeMap(albums => {
-            console.log("HERE");
-            return of(getNewReleasesSuccess(albums));
-        }),
+        mergeMap(({ albums }) =>
+            concat(
+                of(getAlbumsStart(map(albums, "id"))),
+                action$.pipe(
+                    ofType(getAlbumsSuccess().type),
+                    take(1),
+                    mapTo(getNewReleasesSuccess(albums))
+                )
+            )
+        ),
         catchError(e => console.error(e))
+    );
+
+const getAlbums = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getAlbumsStart().type),
+        mergeMap(action => {
+            const albums = albumsSelector(state$.value);
+            const idsToFetch = uniq(
+                filter(
+                    isArray(action.payload) ? action.payload : [action.payload],
+                    albumId => !albums[albumId]
+                )
+            );
+            return size(idsToFetch)
+                ? forkJoin(
+                      ...map(chunk(idsToFetch, 20), idSet =>
+                          apiObservable(spotifyApi.getAlbums, [idSet], resp => of(resp))
+                      )
+                  ).pipe(
+                      mergeMap(nestedAlbumsArray =>
+                          thru(flatMap(nestedAlbumsArray, ({ albums }) => albums), albums =>
+                              concat(
+                                  of(getArtistsStart(flatMap(flatMap(albums, "artists"), "id"))),
+
+                                  action$.pipe(
+                                      ofType(getArtistsSuccess().type),
+                                      take(1),
+                                      mapTo(
+                                          getAlbumsSuccess(albums, flatMap(albums, "tracks.items"))
+                                      )
+                                  )
+                              )
+                          )
+                      )
+                  )
+                : of(getAlbumsSuccess([]));
+        })
     );
 
 export default (...args) =>
@@ -357,5 +426,6 @@ export default (...args) =>
         skipToNext(...args),
         skipToPrevious(...args),
         seek(...args),
-        getNewReleases(...args)
+        getNewReleases(...args),
+        getAlbums(...args)
     ).pipe(catchError(e => console.error(e)));

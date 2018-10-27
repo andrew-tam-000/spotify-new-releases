@@ -1,4 +1,5 @@
 import {
+    thru,
     orderBy,
     map,
     mapValues,
@@ -16,6 +17,8 @@ import {
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
+import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
+import queryString from "query-string";
 
 export const accessTokenSelector = createSelector(
     state => get(state, "app.firebase.token"),
@@ -116,6 +119,11 @@ export const artistIdsSelector = createSelector(songsSelector, songs => {
         map(flatten(map(songs, song => get(song, "track.artists"))), artist => get(artist, "id"))
     );
 });
+
+export const albumsSelector = createSelector(
+    state => get(state, "app.spotify.albums") || {},
+    albums => albums
+);
 
 export const artistDataSelector = createSelector(
     state => get(state, "app.spotify.artistData") || [],
@@ -261,6 +269,12 @@ export const nowPlayingSongUriSelector = createSelector(
         get(state, "app.spotify.nowPlaying.item.uri"),
     songId => songId
 );
+export const nowPlayingContextUriSelector = createSelector(
+    state =>
+        get(state, "app.spotify.nowPlaying.is_playing") &&
+        get(state, "app.spotify.nowPlaying.context.uri"),
+    songId => songId
+);
 
 export const showSideBarSelector = createSelector(
     state => get(state, "app.showSideBar"),
@@ -295,4 +309,57 @@ export const artistImageForTrackIdSelector = createSelector(
     artistImageForArtistIdSelector,
     (artistForTrackId, artistData, songsSelector, artistImageForArtistId) => trackId =>
         artistImageForArtistId(get(artistForTrackId(trackId), "id"))
+);
+
+export const queryParamsSelector = createSelector(
+    state => get(state, "router.location.search"),
+    query => queryString.parse(query)
+);
+
+export const newReleasesSelector = createSelector(
+    state => get(state, "app.spotify.newReleases"),
+    newReleases => newReleases
+);
+
+export const newReleasesByAlbumTableDataSelector = createSelector(
+    newReleasesSelector,
+    artistDataSelector,
+    albumsSelector,
+    (newReleases, artistData, albums) => ({
+        rows: map(newReleases, newRelease =>
+            thru(
+                {
+                    album: albums[newRelease.id],
+                    artists: map(newRelease.artists, artist => artistData[artist.id]),
+                    newReleaseMeta: newRelease
+                },
+                row =>
+                    reduce(
+                        newReleasesByAlbumConfig,
+                        (acc, { dataKey, getter, formatter }) => ({
+                            ...acc,
+                            [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
+                        }),
+                        {}
+                    )
+            )
+        ),
+        config: newReleasesByAlbumConfig
+    })
+);
+
+export const tracksForAlbumForIdSelector = createSelector(
+    albumsSelector,
+    songDataSelector,
+    (albums, songData) => albumId => {
+        const album = albums[albumId];
+        console.log(album);
+        return {
+            album,
+            hydratedTracks: map(album.tracks.items, track => ({
+                track
+                //trackData: songData[track.id]
+            }))
+        };
+    }
 );

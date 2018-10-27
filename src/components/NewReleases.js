@@ -1,17 +1,18 @@
 import React, { Component } from "react";
-import { getNewReleasesStart } from "../redux/actions";
+import { initializeOnNewReleasesStart } from "../redux/actions";
 import { connect } from "react-redux";
+import Table from "./NewReleases/Table";
 
 class NewReleases extends Component {
     componentDidMount() {
-        this.props.getNewReleasesStart();
+        this.props.initializeOnNewReleasesStart();
     }
     render() {
-        return <div>hi</div>;
+        return <Table />;
     }
 }
 
 export default connect(
     null,
-    { getNewReleasesStart }
+    { initializeOnNewReleasesStart }
 )(NewReleases);

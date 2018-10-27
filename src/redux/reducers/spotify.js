@@ -8,9 +8,18 @@ import {
     getArtistTopTracksSuccess,
     getRecommendationsSuccess,
     setSearchResults,
-    getTracksSuccess
+    getTracksSuccess,
+    getNewReleasesSuccess,
+    getAlbumsSuccess
 } from "../actions/";
 import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
+
+function mergeNewItems(obj, arr, idGetter) {
+    return {
+        ...obj,
+        ...keyBy(filter(compact(arr), item => !obj[get(item, idGetter)]), idGetter)
+    };
+}
 
 export default (state = {}, { type, payload = {} }) => {
     switch (type) {
@@ -18,6 +27,12 @@ export default (state = {}, { type, payload = {} }) => {
             return {
                 ...state,
                 user: payload
+            };
+
+        case getNewReleasesSuccess().type:
+            return {
+                ...state,
+                newReleases: payload
             };
         case setSearchResults().type:
             return {
@@ -126,6 +141,13 @@ export default (state = {}, { type, payload = {} }) => {
                     ...state.songs,
                     ...keyBy(filter(payload.tracks, ({ id }) => !state.songs[id]), "id")
                 }
+            };
+
+        case getAlbumsSuccess().type:
+            return {
+                ...state,
+                albums: mergeNewItems(state.albums, payload.albums, "id"),
+                songs: mergeNewItems(state.songs, payload.tracks, "id")
             };
         default:
             return state;

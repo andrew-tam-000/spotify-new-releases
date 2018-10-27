@@ -311,6 +311,12 @@ export function initializeOnDiscoverStart() {
     };
 }
 
+export function initializeOnNewReleasesStart() {
+    return {
+        type: "INITIALIZE_ON_NEW_RELEASES_START"
+    };
+}
+
 ///////////////////////////////////////////////
 //
 // GET_SONGS
@@ -574,28 +580,28 @@ export function hideSideBar() {
 
 export function getTracksStart(ids) {
     return {
-        type: "GET_TRACKS_START",
+        type: "spotify|GET_TRACKS_START",
         payload: ids
     };
 }
 
 export function getTracksSuccess(tracks) {
     return {
-        type: "GET_TRACKS_SUCCESS",
+        type: "spotify|GET_TRACKS_SUCCESS",
         payload: tracks
     };
 }
 
 export function getArtistsStart(ids) {
     return {
-        type: "GET_ARTISTS_START",
+        type: "spotify|GET_ARTISTS_START",
         payload: ids
     };
 }
 
 export function getArtistsSuccess(artists) {
     return {
-        type: "GET_ARTISTS_SUCCESS",
+        type: "spotify|GET_ARTISTS_SUCCESS",
         payload: artists
     };
 }
@@ -685,9 +691,10 @@ export function getNewReleasesStart() {
     };
 }
 
-export function getNewReleasesSuccess() {
+export function getNewReleasesSuccess(newReleases) {
     return {
-        type: "spotify|GET_NEW_RELEASES_SUCCESS"
+        type: "spotify|GET_NEW_RELEASES_SUCCESS",
+        payload: newReleases
     };
 }
 
@@ -697,10 +704,10 @@ export function getAlbumsStart(albumIds) {
         payload: albumIds
     };
 }
-export function getAlbumsSuccess(albums) {
+export function getAlbumsSuccess(albums, tracks) {
     return {
         type: "spotify|GET_ALBUMS_SUCCESS",
-        payload: albums
+        payload: { albums, tracks }
     };
 }
 

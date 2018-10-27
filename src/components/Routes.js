@@ -13,6 +13,7 @@ import App from "./App";
 import SongDetails from "./SongDetails";
 import Discover from "./Discover";
 import Sidebar from "./Sidebar";
+import AlbumList from "./NewReleases/AlbumList";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import NewReleasesIcon from "@material-ui/icons/NewReleases";
@@ -72,15 +73,19 @@ class RouteProvider extends Component {
             history.push("/discover");
         }
         if (val === 3) {
-            this.props.analyzerOpenSearchPanel();
+            history.push("/new-releases");
         }
         if (val === 4) {
+            this.props.analyzerOpenSearchPanel();
+        }
+        if (val === 5) {
             this.props.searchOpenPanel();
         }
     };
 
     render() {
         const { searchPanel, searchClosePanel } = this.props;
+        //<SongDetails />
         return (
             <Router history={history}>
                 <AppWrapper>
@@ -104,13 +109,14 @@ class RouteProvider extends Component {
                             <Search />
                         </Drawer>
                         <Sidebar>
-                            <SongDetails />
+                            <AlbumList />
                         </Sidebar>
                     </MainContent>
                     <BottomNavigation value="0" onChange={this.handleChange} showLabels>
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
                         <BottomNavigationAction label="Playlist" icon={<QueueMusicIcon />} />
                         <BottomNavigationAction label="Discover" icon={<NewReleasesIcon />} />
+                        <BottomNavigationAction label="New Releases" icon={<NewReleasesIcon />} />
                         <BottomNavigationAction label="SimilarSongs" icon={<ImageSearchIcon />} />
                         <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
