@@ -16,12 +16,12 @@ const SmallListItemText = styled(ListItemText)`
 
 const AlbumList = ({ tracksForAlbum: { album, hydratedTracks } }) => (
     <List>
-        {map(hydratedTracks, ({ track, trackData }) => (
+        {map(hydratedTracks, (track = {}) => (
             <ListItem key={track.id}>
                 <PlayButton uri={track.uri} />
                 <SmallListItemText
                     primary={track.name}
-                    secondary={[get(track, "artists.0.name"), trackData.popularity]}
+                    secondary={[get(track, "artists.0.name"), track.popularity]}
                 />
             </ListItem>
         ))}

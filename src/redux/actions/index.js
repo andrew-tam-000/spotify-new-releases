@@ -705,10 +705,10 @@ export function getAlbumsStart(albumIds) {
         payload: albumIds
     };
 }
-export function getAlbumsSuccess(albums, tracks) {
+export function getAlbumsSuccess(albums) {
     return {
         type: "spotify|GET_ALBUMS_SUCCESS",
-        payload: { albums, tracks }
+        payload: albums
     };
 }
 

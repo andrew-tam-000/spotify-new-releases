@@ -20,6 +20,7 @@
     "query-string": "^6.1.0",
     "re-reselect": "^2.1.0",
     "react": "^16.4.2",
+    "react-circular-progressbar": "^1.0.0",
     "react-d3-tree": "^1.11.0",
     "react-dom": "^16.4.2",
     "react-redux": "^5.0.7",

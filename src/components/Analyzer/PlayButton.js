@@ -18,7 +18,8 @@ const PlayButton = ({
     uri,
     ...props
 }) => {
-    const isPlaying = uri === nowPlayingSongUri || context_uri === nowPlayingContextUri;
+    const isPlaying =
+        (uri && uri === nowPlayingSongUri) || (context_uri && context_uri === nowPlayingContextUri);
     return (
         <Button
             onClick={isPlaying ? pauseSongStart : playSongStart}

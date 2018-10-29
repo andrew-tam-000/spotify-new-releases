@@ -127,12 +127,9 @@ const getTracks = (action$, state$, { spotifyApi }) =>
                           )
                       )
                   ).pipe(
-                      mergeMap(nestedTracksArray => {
-                          console.log(nestedTracksArray);
-                          return of(
-                              getTracksSuccess(flatMap(nestedTracksArray, ({ tracks }) => tracks))
-                          );
-                      })
+                      mergeMap(nestedTracksArray =>
+                          of(getTracksSuccess(flatMap(nestedTracksArray, ({ tracks }) => tracks)))
+                      )
                   )
                 : of(getArtistsSuccess([]));
         })
@@ -437,11 +434,7 @@ const getAlbums = (action$, state$, { spotifyApi }) =>
                                           ofType(getTracksSuccess().type),
                                           take(1)
                                       )
-                                  ).pipe(
-                                      mapTo(
-                                          getAlbumsSuccess(albums, flatMap(albums, "tracks.items"))
-                                      )
-                                  )
+                                  ).pipe(mapTo(getAlbumsSuccess(albums)))
                               )
                           )
                       )

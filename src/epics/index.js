@@ -39,7 +39,7 @@ export default (...args) =>
         initializeOnAnalyzer(...args),
         initializeOnDiscover(...args),
         initializeOnNewRelease(...args),
-        getSongs(...args),
+        //getSongs(...args),
         //getSongData(...args),
         getArtistData(...args),
         spotifyApiTriggers(...args),

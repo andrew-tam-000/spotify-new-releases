@@ -13,7 +13,8 @@ import {
     filter,
     includes,
     toLower,
-    sortBy
+    sortBy,
+    flatMap
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
@@ -348,18 +349,43 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
     })
 );
 
+export const newReleasesByTrackTableDataSelector = createSelector(
+    newReleasesSelector,
+    artistDataSelector,
+    albumsSelector,
+    songsSelector,
+    (newReleases, artistData, albums, songs) => ({
+        rows: flatMap(newReleases, newRelease =>
+            thru(
+                thru(map(get(albums, [newRelease.id, "tracks", "items"]), "id"), trackId => ({
+                    album: albums[newRelease.id],
+                    artists: map(newRelease.artists, artist => artistData[artist.id]),
+                    newReleaseMeta: newRelease,
+                    track: songs[trackId]
+                })),
+                row =>
+                    reduce(
+                        newReleasesByAlbumConfig,
+                        (acc, { dataKey, getter, formatter }) => ({
+                            ...acc,
+                            [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
+                        }),
+                        {}
+                    )
+            )
+        ),
+        config: newReleasesByAlbumConfig
+    })
+);
+
 export const tracksForAlbumForIdSelector = createSelector(
     albumsSelector,
-    songDataSelector,
-    (albums, songData) => albumId => {
+    songsSelector,
+    (albums, songs) => albumId => {
         const album = albums[albumId];
-        console.log(album);
         return {
             album,
-            hydratedTracks: map(album.tracks.items, track => ({
-                track,
-                trackData: songData[track.id]
-            }))
+            hydratedTracks: map(album.tracks.items, track => songs[track.id])
         };
     }
 );

@@ -56,10 +56,7 @@ export default (state = {}, { type, payload = {} }) => {
         case getTracksSuccess().type:
             return {
                 ...state,
-                songs: {
-                    ...state.songs,
-                    ...keyBy(filter(payload.tracks, ({ id }) => !state.songs[id]), "id")
-                }
+                songs: mergeNewItems(state.songs, payload, "id")
             };
 
         case getSongsSuccess().type:
@@ -146,8 +143,7 @@ export default (state = {}, { type, payload = {} }) => {
         case getAlbumsSuccess().type:
             return {
                 ...state,
-                albums: mergeNewItems(state.albums, payload.albums, "id"),
-                songs: mergeNewItems(state.songs, payload.tracks, "id")
+                albums: mergeNewItems(state.albums, payload, "id")
             };
         default:
             return state;

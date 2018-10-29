@@ -22,6 +22,11 @@ export default [
         getter: "album.name"
     },
     {
+        label: "Release Date",
+        dataKey: "releaseDate",
+        getter: "newReleaseMeta.release_date"
+    },
+    {
         label: "Artist",
         dataKey: "artist",
         getter: "artists.0.name"
