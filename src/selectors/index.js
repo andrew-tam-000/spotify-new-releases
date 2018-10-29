@@ -357,8 +357,8 @@ export const tracksForAlbumForIdSelector = createSelector(
         return {
             album,
             hydratedTracks: map(album.tracks.items, track => ({
-                track
-                //trackData: songData[track.id]
+                track,
+                trackData: songData[track.id]
             }))
         };
     }

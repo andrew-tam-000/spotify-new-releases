@@ -339,9 +339,10 @@ export function getSongsSuccess(songs) {
 // GET_SONG_DATA
 //
 ///////////////////////////////////////////////
-export function getSongDataStart() {
+export function getSongDataStart(trackIds) {
     return {
-        type: "spotify|GET_SONG_DATA_START"
+        type: "spotify|GET_SONG_DATA_START",
+        payload: trackIds
     };
 }
 

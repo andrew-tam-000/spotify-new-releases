@@ -29,12 +29,14 @@ import {
     debounce,
     catchError,
     switchMap,
-    mapTo
+    mapTo,
+    delay
 } from "rxjs/operators";
 import { getCurrentlyPlayingTrackStart, getCurrentlyPlayingTrackSuccess } from "../redux/actions";
 import {
     songsSelector,
     albumsSelector,
+    songDataSelector,
     artistDataSelector,
     librarySongsWithDataSelector,
     advancedSearchTracksSelector,
@@ -71,7 +73,9 @@ import {
     seekStart,
     seekSuccess,
     getNewReleasesStart,
-    getNewReleasesSuccess
+    getNewReleasesSuccess,
+    getSongDataStart,
+    getSongDataSuccess
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 
@@ -104,37 +108,34 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
 const getTracks = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getTracksStart().type),
-        mergeMap(action =>
-            thru(
-                thru(songsSelector(state$.value), songs =>
-                    filter(
-                        isArray(action.payload) ? action.payload : [action.payload],
-                        trackId => !songs[trackId]
-                    )
-                ),
-                trackIds =>
-                    size(trackIds)
-                        ? apiObservable(spotifyApi.getTracks, [trackIds], resp =>
-                              concat(
-                                  of(
-                                      getArtistsStart(
-                                          uniq(
-                                              flatMap(resp.tracks, track =>
-                                                  map(track.artists, artist => artist.id)
-                                              )
-                                          )
-                                      )
-                                  ),
-                                  action$.pipe(
-                                      ofType(getArtistsSuccess().type),
-                                      take(1),
-                                      mapTo(getTracksSuccess(resp))
-                                  )
+        mergeMap(action => {
+            const tracks = songsSelector(state$.value);
+            const idsToFetch = uniq(
+                filter(
+                    isArray(action.payload) ? action.payload : [action.payload],
+                    songId => !tracks[songId]
+                )
+            );
+            // Fixing rate limit issue
+            return size(idsToFetch)
+                ? forkJoin(
+                      ...map(chunk(idsToFetch, 50), (idSet, idx) =>
+                          timer(200 * idx).pipe(
+                              mergeMap(val =>
+                                  apiObservable(spotifyApi.getTracks, [idSet], resp => of(resp))
                               )
                           )
-                        : from(Promise.resolve()).pipe(mapTo(getTracksSuccess()))
-            )
-        )
+                      )
+                  ).pipe(
+                      mergeMap(nestedTracksArray => {
+                          console.log(nestedTracksArray);
+                          return of(
+                              getTracksSuccess(flatMap(nestedTracksArray, ({ tracks }) => tracks))
+                          );
+                      })
+                  )
+                : of(getArtistsSuccess([]));
+        })
     );
 
 const getArtists = (action$, state$, { spotifyApi }) =>
@@ -164,6 +165,38 @@ const getArtists = (action$, state$, { spotifyApi }) =>
                       )
                   )
                 : of(getArtistsSuccess([]));
+        })
+    );
+
+const getSongData = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getSongDataStart().type),
+        // Get relevant ids
+        mergeMap(action => {
+            const songData = songDataSelector(state$.value);
+            const idsToFetch = uniq(
+                filter(
+                    isArray(action.payload) ? action.payload : [action.payload],
+                    songId => !songData[songId]
+                )
+            );
+            return size(idsToFetch)
+                ? forkJoin(
+                      ...map(chunk(idsToFetch, 100), idSet =>
+                          apiObservable(spotifyApi.getAudioFeaturesForTracks, [idSet], resp =>
+                              of(resp)
+                          )
+                      )
+                  ).pipe(
+                      mergeMap(nestedTracksArray =>
+                          of(
+                              getSongDataSuccess(
+                                  flatMap(nestedTracksArray, ({ audio_features }) => audio_features)
+                              )
+                          )
+                      )
+                  )
+                : of(getSongDataSuccess([]));
         })
     );
 
@@ -394,10 +427,17 @@ const getAlbums = (action$, state$, { spotifyApi }) =>
                           thru(flatMap(nestedAlbumsArray, ({ albums }) => albums), albums =>
                               concat(
                                   of(getArtistsStart(flatMap(flatMap(albums, "artists"), "id"))),
-
-                                  action$.pipe(
-                                      ofType(getArtistsSuccess().type),
-                                      take(1),
+                                  of(getTracksStart(map(flatMap(albums, "tracks.items"), "id"))),
+                                  forkJoin(
+                                      action$.pipe(
+                                          ofType(getArtistsSuccess().type),
+                                          take(1)
+                                      ),
+                                      action$.pipe(
+                                          ofType(getTracksSuccess().type),
+                                          take(1)
+                                      )
+                                  ).pipe(
                                       mapTo(
                                           getAlbumsSuccess(albums, flatMap(albums, "tracks.items"))
                                       )
@@ -427,5 +467,6 @@ export default (...args) =>
         skipToPrevious(...args),
         seek(...args),
         getNewReleases(...args),
-        getAlbums(...args)
+        getAlbums(...args),
+        getSongData(...args)
     ).pipe(catchError(e => console.error(e)));

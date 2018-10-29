@@ -40,7 +40,7 @@ export default (...args) =>
         initializeOnDiscover(...args),
         initializeOnNewRelease(...args),
         getSongs(...args),
-        getSongData(...args),
+        //getSongData(...args),
         getArtistData(...args),
         spotifyApiTriggers(...args),
         discoverTriggers(...args)

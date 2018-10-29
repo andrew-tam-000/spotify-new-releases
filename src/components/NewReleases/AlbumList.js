@@ -19,7 +19,10 @@ const AlbumList = ({ tracksForAlbum: { album, hydratedTracks } }) => (
         {map(hydratedTracks, ({ track, trackData }) => (
             <ListItem key={track.id}>
                 <PlayButton uri={track.uri} />
-                <SmallListItemText primary={track.name} secondary={get(track, "artists.0.name")} />
+                <SmallListItemText
+                    primary={track.name}
+                    secondary={[get(track, "artists.0.name"), trackData.popularity]}
+                />
             </ListItem>
         ))}
     </List>
