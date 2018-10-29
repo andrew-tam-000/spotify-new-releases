@@ -24,6 +24,7 @@ import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import PlayDash from "./PlayDash";
 import Search from "./Search";
 import NewReleases from "./NewReleases";
+import NewReleasesTracksTable from "./NewReleases/NewReleasesTracksTable";
 import _Drawer from "@material-ui/core/Drawer";
 import { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";

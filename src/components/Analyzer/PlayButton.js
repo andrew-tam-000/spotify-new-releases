@@ -35,15 +35,20 @@ const PlayButton = ({
 };
 
 const mapDispatchToProps = (dispatch, { uris, uri, context_uri, offset }) => ({
-    pauseSongStart: () => dispatch(pauseSongStart()),
-    playSongStart: () =>
+    pauseSongStart: e => {
+        e.stopPropagation();
+        dispatch(pauseSongStart());
+    },
+    playSongStart: e => {
+        e.stopPropagation();
         dispatch(
             playSongStart(
                 omitBy({ uris: uris ? uris : uri ? [uri] : undefined, context_uri }, val =>
                     isUndefined(val)
                 )
             )
-        )
+        );
+    }
 });
 
 export default connect(

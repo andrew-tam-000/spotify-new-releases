@@ -19,6 +19,7 @@ import {
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
+import newReleasesByTrackConfig from "../tableConfigs/newReleasesByTrack";
 import queryString from "query-string";
 
 export const accessTokenSelector = createSelector(
@@ -356,25 +357,31 @@ export const newReleasesByTrackTableDataSelector = createSelector(
     songsSelector,
     (newReleases, artistData, albums, songs) => ({
         rows: flatMap(newReleases, newRelease =>
-            thru(
-                thru(map(get(albums, [newRelease.id, "tracks", "items"]), "id"), trackId => ({
-                    album: albums[newRelease.id],
-                    artists: map(newRelease.artists, artist => artistData[artist.id]),
-                    newReleaseMeta: newRelease,
-                    track: songs[trackId]
-                })),
-                row =>
-                    reduce(
-                        newReleasesByAlbumConfig,
-                        (acc, { dataKey, getter, formatter }) => ({
-                            ...acc,
-                            [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
-                        }),
-                        {}
-                    )
+            map(map(get(albums, [newRelease.id, "tracks", "items"]), "id"), trackId =>
+                thru(
+                    {
+                        album: albums[newRelease.id],
+                        artists: map(newRelease.artists, artist => artistData[artist.id]),
+                        newReleaseMeta: newRelease,
+                        track: songs[trackId]
+                    },
+                    row =>
+                        reduce(
+                            newReleasesByTrackConfig,
+                            (acc, { dataKey, getter, formatter }) => ({
+                                ...acc,
+                                [dataKey]: formatter
+                                    ? formatter(row)
+                                    : getter
+                                        ? get(row, getter)
+                                        : null
+                            }),
+                            {}
+                        )
+                )
             )
         ),
-        config: newReleasesByAlbumConfig
+        config: newReleasesByTrackConfig
     })
 );
 
