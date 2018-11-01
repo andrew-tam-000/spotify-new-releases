@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import { Router, Route } from "react-router-dom";
+import { Router, Route, Switch } from "react-router-dom";
 import createHashHistory from "history/createHashHistory";
 import styled from "styled-components";
 import _AppBar from "@material-ui/core/AppBar";
@@ -25,6 +25,7 @@ import PlayDash from "./PlayDash";
 import Search from "./Search";
 import NewReleases from "./NewReleases";
 import NewReleasesTracksTable from "./NewReleases/NewReleasesTracksTable";
+import NewReleasesAlbumsTable from "./NewReleases/NewReleasesAlbumsTable";
 import _Drawer from "@material-ui/core/Drawer";
 import { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";
@@ -100,11 +101,27 @@ class RouteProvider extends Component {
                     </AppBar>
                     <MainContent>
                         <Scrollable>
-                            <Route exact path="/new-releases" component={NewReleases} />
-                            <Route exact path="/discover" component={Discover} />
-                            <Route exact path="/analyzer" component={Analyzer} />
-                            <Route exact path="/:id([\d-]*)" component={Spotify} />
-                            <Route exact path="/" component={App} />
+                            <Switch>
+                                <Route
+                                    exact
+                                    path="/new-releases"
+                                    component={NewReleasesAlbumsTable}
+                                />
+                                <Route
+                                    exact
+                                    path="/new-releases/albums"
+                                    component={NewReleasesAlbumsTable}
+                                />
+                                <Route
+                                    exact
+                                    path="/new-releases/tracks"
+                                    component={NewReleasesTracksTable}
+                                />
+                                <Route exact path="/discover" component={Discover} />
+                                <Route exact path="/analyzer" component={Analyzer} />
+                                <Route exact path="/:id([\d-]*)" component={Spotify} />
+                                <Route exact path="/" component={App} />
+                            </Switch>
                         </Scrollable>
                         <Drawer anchor="right" open={searchPanel} onClose={searchClosePanel}>
                             <Search />
