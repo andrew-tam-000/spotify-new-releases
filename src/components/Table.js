@@ -77,9 +77,9 @@ class Table extends Component {
                     sortDirection={undefined}
                     sort={this.sortState.sort}
                     width={2000}
-                    height={300}
+                    height={500}
                     headerHeight={20}
-                    rowHeight={60}
+                    rowHeight={70}
                     rowCount={rows.length}
                     rowGetter={({ index }) => rows[index]}
                     {...virtualizedConfig}

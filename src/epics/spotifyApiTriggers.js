@@ -15,7 +15,8 @@ import {
     slice,
     size,
     compact,
-    orderBy
+    orderBy,
+    values
 } from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, concat, from, timer, of, interval, forkJoin } from "rxjs";
@@ -38,6 +39,7 @@ import {
     albumsSelector,
     songDataSelector,
     artistDataSelector,
+    newReleasesSelector,
     librarySongsWithDataSelector,
     advancedSearchTracksSelector,
     advancedSearchAttributesSelector,
@@ -75,9 +77,11 @@ import {
     getNewReleasesStart,
     getNewReleasesSuccess,
     getSongDataStart,
-    getSongDataSuccess
+    getSongDataSuccess,
+    setLocalStorage
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
+import lzString from "lz-string";
 
 const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
     interval(5000).pipe(mergeMap(() => of(getCurrentlyPlayingTrackStart())));
@@ -371,9 +375,25 @@ const getAdvancedSearchResults = (action$, state$, { spotifyApi }) =>
         })
     );
 
+// Each actino should be dispatched with a constant
+// and then the success shoudl also return it
 const getNewReleases = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
+        mergeMap(action =>
+            thru(
+                JSON.parse(lzString.decompressFromUTF16(localStorage.getItem("newReleases"))),
+                ({ newReleases, albums, artists, songs }) => [
+                    getAlbumsSuccess(values(albums)),
+                    getArtistsSuccess(values(artists)),
+                    getTracksSuccess(values(songs)),
+                    getNewReleasesSuccess(newReleases)
+                ]
+            )
+        )
+    );
+
+/*
         mapTo({ limit: 50, total: 1000, offset: 0, albums: [] }),
         expand(({ limit, total, offset, albums }) =>
             from(spotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
@@ -402,6 +422,7 @@ const getNewReleases = (action$, state$, { spotifyApi }) =>
         ),
         catchError(e => console.error(e))
     );
+*/
 
 const getAlbums = (action$, state$, { spotifyApi }) =>
     action$.pipe(
@@ -440,6 +461,26 @@ const getAlbums = (action$, state$, { spotifyApi }) =>
                       )
                   )
                 : of(getAlbumsSuccess([]));
+        })
+    );
+
+/*
+const newReleases = { newReleases: store.getState().app.spotify.newReleases, artists: store.getState().app.spotify.artistData, songs: store.getState().app.spotify.songs, albums: store.getState().app.spotify.albums}
+
+localStorage.setItem('newReleases', lzstring.compressToUTF16(JSON.stringify(newReleases)))
+*/
+
+const cacheNewReleaseData = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getNewReleasesSuccess().type),
+        mergeMap(action => {
+            const state = state$.value;
+            const newReleases = newReleasesSelector(state);
+            const artists = albumsSelector(state);
+            const tracks = songsSelector(state);
+            const albums = albumsSelector(state);
+            const newReleaseData = { newReleases, artists, tracks, albums };
+            return of(setLocalStorage("newReleaseData", newReleaseData));
         })
     );
 

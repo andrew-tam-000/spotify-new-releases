@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { compose } from "recompose";
+import styled from "styled-components";
 import "react-virtualized/styles.css";
 
 import { createStructuredSelector } from "reselect";
@@ -19,7 +20,18 @@ const ButtonCellRenderer = ({ cellData, rowData: { uri, id } }) => (
     </React.Fragment>
 );
 
-const AlbumImageCellRenderer = ({ cellData, rowData: { image } }) => <img alt="test" src={image} />;
+const DescriptionContainer = styled.div``;
+
+const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, album } }) => (
+    <div>
+        <img alt="test" src={image} />;
+        <DescriptionContainer>
+            {album}
+            {artist}
+            {type}
+        </DescriptionContainer>
+    </div>
+);
 
 const prefixColumnsProps = [
     {

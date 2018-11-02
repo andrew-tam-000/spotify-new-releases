@@ -19,27 +19,32 @@ export default [
     {
         label: "Album",
         dataKey: "album",
+        hidden: true,
         getter: "album.name"
     },
     {
         label: "Release Date",
         dataKey: "releaseDate",
-        getter: "newReleaseMeta.release_date"
+        getter: "newReleaseMeta.release_date",
+        width: 140
     },
     {
         label: "Artist",
         dataKey: "artist",
+        hidden: true,
         getter: "artists.0.name"
     },
     {
         label: "Album Popularity",
         dataKey: "albumPopularity",
-        getter: "album.popularity"
+        getter: "album.popularity",
+        width: 50
     },
     {
         label: "Artist Popularity",
         dataKey: "artistPopularity",
-        getter: "artists.0.popularity"
+        getter: "artists.0.popularity",
+        width: 50
     },
     {
         label: "Genre",
@@ -49,6 +54,7 @@ export default [
     {
         label: "Type",
         dataKey: "type",
-        getter: "album.album_type"
+        getter: "album.album_type",
+        hidden: true
     }
 ];

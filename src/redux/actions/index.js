@@ -726,3 +726,10 @@ export function setUserUrl(url) {
         payload: url
     };
 }
+
+export function setLocalStorage(key, data) {
+    return {
+        type: "localStorage|SET_DATA",
+        payload: { key, data }
+    };
+}
