@@ -1,26 +1,34 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { compose, withPropsOnChange } from "recompose";
+import { compose, withPropsOnChange } from "recompact";
 import "react-virtualized/styles.css";
 
 import { createStructuredSelector } from "reselect";
 import { queryParamsSelector } from "../selectors";
 import { connect } from "react-redux";
-import { Column, Table as _VirtualizedTable, SortIndicator } from "react-virtualized";
+import { AutoSizer, Column, Table as _VirtualizedTable, SortIndicator } from "react-virtualized";
 import createMultiSort from "./Analyzer/createMultiSort";
-import { map, filter, get, mapKeys, orderBy, toLower, includes } from "lodash";
-import TextField from "@material-ui/core/TextField";
+import {
+    thru,
+    intersection,
+    size,
+    map,
+    filter,
+    get,
+    mapKeys,
+    orderBy,
+    toLower,
+    includes
+} from "lodash";
 import { push } from "react-router-redux";
 import queryString from "query-string";
+import { encodedStringifiedToObj } from "../utils";
 
 const VirtualizedTable = styled(_VirtualizedTable)`
     .ReactVirtualized__Table__rowColumn:first-child {
         overflow: initial !important;
     }
 `;
-
-const encodedStringifiedToObj = encodedStringified =>
-    JSON.parse(encodedStringified ? decodeURI(encodedStringified) : "{}");
 
 class Table extends Component {
     sortState = createMultiSort(
@@ -51,68 +59,60 @@ class Table extends Component {
         );
     };
 
-    updateSearch = e =>
-        this.props.push({
-            search:
-                "?" +
-                queryString.stringify({
-                    ...this.props.queryParams,
-                    search: e.target.value
-                })
-        });
-
     render() {
         const {
             tableData: { rows, config },
-            queryParams: { search },
             prefixColumnsProps,
             suffixColumnsProps,
             virtualizedConfig
         } = this.props;
         return (
             <React.Fragment>
-                <TextField value={search} onChange={this.updateSearch} />
-                <VirtualizedTable
-                    sortBy={undefined}
-                    sortDirection={undefined}
-                    sort={this.sortState.sort}
-                    width={2000}
-                    height={500}
-                    headerHeight={20}
-                    rowHeight={70}
-                    rowCount={rows.length}
-                    rowGetter={({ index }) => rows[index]}
-                    {...virtualizedConfig}
-                >
-                    {map(prefixColumnsProps, ({ key, ...prefixColumnProps }) => (
-                        <Column
-                            key={key}
-                            headerRenderer={this.headerRenderer}
-                            width={300}
-                            dataKey="noop"
-                            {...prefixColumnProps}
-                        />
-                    ))}
+                <AutoSizer>
+                    {({ height }) => (
+                        <VirtualizedTable
+                            sortBy={undefined}
+                            sortDirection={undefined}
+                            sort={this.sortState.sort}
+                            width={2000}
+                            height={height}
+                            headerHeight={20}
+                            rowHeight={70}
+                            rowCount={rows.length}
+                            rowGetter={({ index }) => rows[index]}
+                            {...virtualizedConfig}
+                        >
+                            {map(prefixColumnsProps, ({ key, ...prefixColumnProps }) => (
+                                <Column
+                                    key={key}
+                                    headerRenderer={this.headerRenderer}
+                                    width={300}
+                                    dataKey="noop"
+                                    {...prefixColumnProps}
+                                />
+                            ))}
 
-                    {map(filter(config, column => !get(column, "hidden")), column => (
-                        <Column
-                            headerRenderer={this.headerRenderer}
-                            key={column.dataKey}
-                            width={300}
-                            {...column}
-                        />
-                    ))}
+                            {map(filter(config, column => !get(column, "hidden")), column => (
+                                <Column
+                                    headerRenderer={this.headerRenderer}
+                                    key={column.dataKey}
+                                    width={300}
+                                    {...column}
+                                />
+                            ))}
 
-                    {map(suffixColumnsProps, ({ key, ...suffixColumnProps }) => (
-                        <Column
-                            key={key}
-                            headerRenderer={this.headerRenderer}
-                            width={300}
-                            dataKey="noop"
-                            {...suffixColumnProps}
-                        />
-                    ))}
-                </VirtualizedTable>
+                            {map(suffixColumnsProps, ({ key, ...suffixColumnProps }) => (
+                                <Column
+                                    key={key}
+                                    headerRenderer={this.headerRenderer}
+                                    width={300}
+                                    dataKey="noop"
+                                    {...suffixColumnProps}
+                                />
+                            ))}
+                        </VirtualizedTable>
+                    )}
+                </AutoSizer>
             </React.Fragment>
         );
     }
@@ -129,25 +129,33 @@ export default compose(
     ),
     withPropsOnChange(
         ["queryParams", "tableData"],
-        ({ queryParams: { search, sort }, tableData: { rows, ...tableData } }) => {
-            const { sortBy, sortDirection } = encodedStringifiedToObj(sort);
-
-            return {
-                tableData: {
-                    ...tableData,
-                    rows: orderBy(
-                        filter(
-                            rows,
-                            row =>
-                                search
-                                    ? includes(toLower(JSON.stringify(row)), toLower(search))
-                                    : true
-                        ),
-                        sortBy,
-                        map(sortBy, sort => toLower(sortDirection[sort]))
-                    )
-                }
-            };
-        }
+        ({ queryParams: { search, sort, tags }, tableData: { rows, ...tableData } }) =>
+            thru(
+                [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
+                ([tags, { sortBy, sortDirection }]) => ({
+                    tableData: {
+                        ...tableData,
+                        rows: orderBy(
+                            // tags
+                            filter(
+                                // Search bar
+                                filter(
+                                    rows,
+                                    row =>
+                                        search
+                                            ? includes(
+                                                  toLower(JSON.stringify(row)),
+                                                  toLower(search)
+                                              )
+                                            : true
+                                ),
+                                row => (size(tags) ? size(intersection(row.genres, tags)) : true)
+                            ),
+                            sortBy,
+                            map(sortBy, sort => toLower(sortDirection[sort]))
+                        )
+                    }
+                })
+            )
     )
 )(Table);

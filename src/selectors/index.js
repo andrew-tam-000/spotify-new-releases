@@ -14,7 +14,10 @@ import {
     includes,
     toLower,
     sortBy,
-    flatMap
+    flatMap,
+    flatMapDeep,
+    countBy,
+    slice
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
@@ -321,6 +324,28 @@ export const queryParamsSelector = createSelector(
 export const newReleasesSelector = createSelector(
     state => get(state, "app.spotify.newReleases"),
     newReleases => newReleases
+);
+
+export const topNewReleaseGenresSelector = createSelector(
+    newReleasesSelector,
+    artistDataSelector,
+    (newReleases, artistData) =>
+        slice(
+            orderBy(
+                map(
+                    countBy(
+                        flatMapDeep(newReleases, newRelease =>
+                            map(newRelease.artists, artist => artistData[artist.id].genres)
+                        )
+                    ),
+                    (count, genre) => ({ count, genre })
+                ),
+                "count",
+                "desc"
+            ),
+            0,
+            10
+        )
 );
 
 export const newReleasesByAlbumTableDataSelector = createSelector(

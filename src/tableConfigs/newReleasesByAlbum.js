@@ -47,9 +47,9 @@ export default [
         width: 50
     },
     {
-        label: "Genre",
-        dataKey: "genre",
-        formatter: row => join(get(row, "artists.0.genres"), ", ")
+        label: "Genres",
+        dataKey: "genres",
+        getter: "artists.0.genres"
     },
     {
         label: "Type",
