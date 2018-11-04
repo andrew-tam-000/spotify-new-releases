@@ -1,5 +1,3 @@
-import { map, get, join } from "lodash";
-
 export default [
     {
         dataKey: "uri",
@@ -49,7 +47,7 @@ export default [
     {
         label: "Genres",
         dataKey: "genres",
-        getter: "artists.0.genres"
+        getter: "genres"
     },
     {
         label: "Type",

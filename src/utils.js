@@ -5,15 +5,15 @@ export function getAccessTokenFromUrl(win) {
     return qs.parse(hash.substr(hash.indexOf("access_token"))).access_token;
 }
 
-export const encodedStringifiedToObj = encodedStringified => {
+export const encodedStringifiedToObj = (encodedStringified, defaultVal = {}) => {
     if (!encodedStringified) {
-        return {};
+        return defaultVal;
     }
 
     try {
-        return JSON.parse(decodeURI(encodedStringified)) || {};
+        return JSON.parse(decodeURI(encodedStringified)) || defaultVal;
     } catch (e) {
         console.error(e);
-        return {};
+        return defaultVal;
     }
 };
