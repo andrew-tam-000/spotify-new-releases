@@ -1,3 +1,5 @@
+import { get, join } from "lodash";
+
 export default [
     {
         dataKey: "uri",
@@ -47,7 +49,7 @@ export default [
     {
         label: "Genres",
         dataKey: "genres",
-        getter: "genres"
+        formatter: row => join(get(row, "genres"), ", ")
     },
     {
         label: "Type",

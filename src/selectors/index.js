@@ -17,13 +17,18 @@ import {
     flatMap,
     flatMapDeep,
     countBy,
-    slice
+    slice,
+    compact,
+    find,
+    size,
+    intersection
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
 import newReleasesByTrackConfig from "../tableConfigs/newReleasesByTrack";
 import queryString from "query-string";
+import { encodedStringifiedToObj } from "../utils";
 
 export const accessTokenSelector = createSelector(
     state => get(state, "app.firebase.token"),
@@ -326,38 +331,84 @@ export const newReleasesSelector = createSelector(
     newReleases => newReleases
 );
 
+const backgroundColor = [
+    "#d32f2f",
+    "#c2185b",
+    "#7b1fa2",
+    "#512da8",
+    "#303f9f",
+    "#1976d2",
+    "#0288d1",
+    "#0097a7",
+    "#00796b",
+    "#388e3c"
+];
+
 export const topNewReleaseGenresSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     (newReleases, artistData) =>
-        slice(
-            orderBy(
-                map(
-                    countBy(
-                        flatMapDeep(newReleases, newRelease =>
-                            map(newRelease.artists, artist => artistData[artist.id].genres)
-                        )
+        map(
+            slice(
+                orderBy(
+                    map(
+                        countBy(
+                            flatMapDeep(newReleases, newRelease =>
+                                map(newRelease.artists, artist => artistData[artist.id].genres)
+                            )
+                        ),
+                        (count, genre) => ({ count, genre })
                     ),
-                    (count, genre) => ({ count, genre })
+                    "count",
+                    "desc"
                 ),
-                "count",
-                "desc"
+                0,
+                10
             ),
-            0,
-            10
+            (genreData, idx) => ({
+                ...genreData,
+                backgroundColor: backgroundColor[idx]
+            })
         )
 );
+
+const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
+    thru(
+        [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
+        ([tags, { sortBy, sortDirection }]) =>
+            orderBy(
+                // tags
+                filter(
+                    // Search bar
+                    filter(
+                        rows,
+                        row =>
+                            search ? includes(toLower(JSON.stringify(row)), toLower(search)) : true
+                    ),
+                    row =>
+                        size(tags)
+                            ? size(intersection(get(row, "meta.genres"), tags)) === size(tags)
+                            : true
+                ),
+                sortBy,
+                map(sortBy, sort => toLower(sortDirection[sort]))
+            )
+    );
 
 export const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     albumsSelector,
-    (newReleases, artistData, albums) => ({
+    topNewReleaseGenresSelector,
+    (newReleases, artistData, albums, topNewReleaseGenres) => ({
         rows: map(newReleases, newRelease =>
             thru(
                 {
                     album: albums[newRelease.id],
                     artists: map(newRelease.artists, artist => artistData[artist.id]),
+                    genres: uniq(
+                        flatMap(newRelease.artists, artist => artistData[artist.id].genres)
+                    ),
                     newReleaseMeta: newRelease
                 },
                 row =>
@@ -367,11 +418,35 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                             ...acc,
                             [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
                         }),
-                        {}
+                        {
+                            meta: {
+                                genres: row.genres,
+                                backgroundColors: compact(
+                                    map(row.genres, genre =>
+                                        get(
+                                            find(
+                                                topNewReleaseGenres,
+                                                genreData => genreData.genre === genre
+                                            ),
+                                            "backgroundColor"
+                                        )
+                                    )
+                                )
+                            }
+                        }
                     )
             )
         ),
         config: newReleasesByAlbumConfig
+    })
+);
+
+export const newReleasesByAlbumTableDataWithFiltersSelector = createSelector(
+    newReleasesByAlbumTableDataSelector,
+    queryParamsSelector,
+    ({ rows, ...newReleasesByAlbumTableData }, queryParams) => ({
+        ...newReleasesByAlbumTableData,
+        rows: tableDataFilter({ queryParams, rows })
     })
 );
 

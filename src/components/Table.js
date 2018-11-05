@@ -1,33 +1,27 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { compose, withPropsOnChange } from "recompact";
-import "react-virtualized/styles.css";
-
+import { compose } from "recompact";
 import { createStructuredSelector } from "reselect";
-import { queryParamsSelector } from "../selectors";
 import { connect } from "react-redux";
 import { AutoSizer, Column, Table as _VirtualizedTable, SortIndicator } from "react-virtualized";
-import createMultiSort from "./Analyzer/createMultiSort";
-import {
-    thru,
-    intersection,
-    size,
-    map,
-    filter,
-    get,
-    mapKeys,
-    orderBy,
-    toLower,
-    includes
-} from "lodash";
+import { map, filter, get, mapKeys } from "lodash";
 import { push } from "react-router-redux";
 import queryString from "query-string";
+
+import createMultiSort from "./Analyzer/createMultiSort";
+import { queryParamsSelector } from "../selectors";
 import { encodedStringifiedToObj } from "../utils";
+
+import "react-virtualized/styles.css";
 
 const VirtualizedTable = styled(_VirtualizedTable)`
     .ReactVirtualized__Table__rowColumn:first-child {
         overflow: initial !important;
     }
+`;
+
+const TableWrapper = styled.div`
+    flex: 1;
 `;
 
 class Table extends Component {
@@ -47,16 +41,14 @@ class Table extends Component {
         )
     );
 
-    headerRenderer = ({ dataKey, label }) => {
+    headerRenderer = data => {
+        const { dataKey, label } = data;
+        const headerRenderer = get(this.props, "columnConfig.headerRenderer");
         const showSortIndicator = this.sortState.sortBy.includes(dataKey);
-        return (
-            <React.Fragment>
-                <span title={label}>{label}</span>
-                {showSortIndicator && (
-                    <SortIndicator sortDirection={this.sortState.sortDirection[dataKey]} />
-                )}
-            </React.Fragment>
+        const sortIndicator = showSortIndicator && (
+            <SortIndicator sortDirection={this.sortState.sortDirection[dataKey]} />
         );
+        return headerRenderer ? headerRenderer({ ...data, sortIndicator }) : <span>{label}</span>;
     };
 
     render() {
@@ -64,17 +56,18 @@ class Table extends Component {
             tableData: { rows, config },
             prefixColumnsProps,
             suffixColumnsProps,
+            columnConfig,
             virtualizedConfig
         } = this.props;
         return (
-            <React.Fragment>
+            <TableWrapper>
                 <AutoSizer>
-                    {({ height }) => (
+                    {({ height, width }) => (
                         <VirtualizedTable
                             sortBy={undefined}
                             sortDirection={undefined}
                             sort={this.sortState.sort}
-                            width={2000}
+                            width={width}
                             height={height}
                             headerHeight={20}
                             rowHeight={70}
@@ -85,18 +78,20 @@ class Table extends Component {
                             {map(prefixColumnsProps, ({ key, ...prefixColumnProps }) => (
                                 <Column
                                     key={key}
-                                    headerRenderer={this.headerRenderer}
                                     width={300}
                                     dataKey="noop"
+                                    {...columnConfig}
+                                    headerRenderer={this.headerRenderer}
                                     {...prefixColumnProps}
                                 />
                             ))}
 
                             {map(filter(config, column => !get(column, "hidden")), column => (
                                 <Column
-                                    headerRenderer={this.headerRenderer}
                                     key={column.dataKey}
                                     width={300}
+                                    {...columnConfig}
+                                    headerRenderer={this.headerRenderer}
                                     {...column}
                                 />
                             ))}
@@ -104,16 +99,17 @@ class Table extends Component {
                             {map(suffixColumnsProps, ({ key, ...suffixColumnProps }) => (
                                 <Column
                                     key={key}
-                                    headerRenderer={this.headerRenderer}
                                     width={300}
                                     dataKey="noop"
+                                    {...columnConfig}
+                                    headerRenderer={this.headerRenderer}
                                     {...suffixColumnProps}
                                 />
                             ))}
                         </VirtualizedTable>
                     )}
                 </AutoSizer>
-            </React.Fragment>
+            </TableWrapper>
         );
     }
 }
@@ -126,36 +122,5 @@ export default compose(
     connect(
         mapStateToProps,
         { push }
-    ),
-    withPropsOnChange(
-        ["queryParams", "tableData"],
-        ({ queryParams: { search, sort, tags }, tableData: { rows, ...tableData } }) =>
-            thru(
-                [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
-                ([tags, { sortBy, sortDirection }]) => ({
-                    tableData: {
-                        ...tableData,
-                        rows: orderBy(
-                            // tags
-                            filter(
-                                // Search bar
-                                filter(
-                                    rows,
-                                    row =>
-                                        search
-                                            ? includes(
-                                                  toLower(JSON.stringify(row)),
-                                                  toLower(search)
-                                              )
-                                            : true
-                                ),
-                                row => (size(tags) ? size(intersection(row.genres, tags)) : true)
-                            ),
-                            sortBy,
-                            map(sortBy, sort => toLower(sortDirection[sort]))
-                        )
-                    }
-                })
-            )
     )
 )(Table);
