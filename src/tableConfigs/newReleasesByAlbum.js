@@ -1,4 +1,5 @@
 import { get, join } from "lodash";
+const star = String.fromCharCode(parseInt(2605, 16));
 
 export default [
     {
@@ -35,16 +36,16 @@ export default [
         getter: "artists.0.name"
     },
     {
-        label: "Album Popularity",
+        label: `Album ${star}`,
         dataKey: "albumPopularity",
         getter: "album.popularity",
-        width: 50
+        width: 100
     },
     {
-        label: "Artist Popularity",
+        label: `Artist ${star}`,
         dataKey: "artistPopularity",
         getter: "artists.0.popularity",
-        width: 50
+        width: 100
     },
     {
         label: "Genres",

@@ -59,12 +59,22 @@ const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, albu
     <AlbumImageCellRendererWrapper>
         <img alt="test" src={image} />
         <DescriptionContainer>
-            <Typography>{album}</Typography>
-            <Typography>{artist}</Typography>
-            <Typography>{type}</Typography>
+            <div>
+                <Typography>{album}</Typography>
+            </div>
+            <div>
+                <Typography>{artist}</Typography>
+            </div>
+            <div>
+                <Typography>{type}</Typography>
+            </div>
         </DescriptionContainer>
     </AlbumImageCellRendererWrapper>
 );
+
+const HeaderCell = styled.div`
+    display: flex;
+`;
 
 const prefixColumnsProps = [
     {
@@ -80,10 +90,10 @@ const prefixColumnsProps = [
 
 const ColumnCellRenderer = ({ cellData }) => <Typography>{cellData}</Typography>;
 const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
-    <React.Fragment>
+    <HeaderCell>
         <Typography title={label}>{label}</Typography>
-        {sortIndicator && sortIndicator}
-    </React.Fragment>
+        <span>{sortIndicator && sortIndicator}</span>
+    </HeaderCell>
 );
 
 class NewReleasesAlbumsTable extends Component {
