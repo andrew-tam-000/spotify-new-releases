@@ -2,7 +2,13 @@ import analyzer from "./analyzer";
 import spotify from "./spotify";
 import discover from "./discover";
 import { combineReducers } from "redux";
-import { addTracksToPlaylistSuccess, showSideBar, hideSideBar, setDiscover } from "../actions/";
+import {
+    addTracksToPlaylistSuccess,
+    addGenreColors,
+    showSideBar,
+    hideSideBar,
+    setDiscover
+} from "../actions/";
 
 const appReducer = combineReducers({
     analyzer,
@@ -83,7 +89,18 @@ const appReducer = combineReducers({
                 return state;
         }
     },
-    discover
+    discover,
+    genreColors: (state = {}, { type, payload }) => {
+        switch (type) {
+            case addGenreColors().type:
+                return {
+                    ...state,
+                    [payload.genre]: payload.color
+                };
+            default:
+                return state;
+        }
+    }
 });
 
 export default appReducer;

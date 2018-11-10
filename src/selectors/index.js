@@ -15,13 +15,15 @@ import {
     toLower,
     sortBy,
     flatMap,
+    indexOf,
     flatMapDeep,
     countBy,
     slice,
     compact,
     find,
     size,
-    intersection
+    intersection,
+    every
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
@@ -344,34 +346,41 @@ const backgroundColor = [
     "#388e3c"
 ];
 
-export const topNewReleaseGenresSelector = createSelector(
+const newReleaseGenresSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     (newReleases, artistData) =>
-        map(
-            slice(
-                orderBy(
-                    map(
-                        countBy(
-                            flatMapDeep(newReleases, newRelease =>
-                                map(newRelease.artists, artist => artistData[artist.id].genres)
-                            )
-                        ),
-                        (count, genre) => ({ count, genre })
-                    ),
-                    "count",
-                    "desc"
+        orderBy(
+            map(
+                countBy(
+                    flatMapDeep(newReleases, newRelease =>
+                        map(newRelease.artists, artist => artistData[artist.id].genres)
+                    )
                 ),
-                0,
-                10
+                (count, genre) => ({ count, genre })
             ),
-            (genreData, idx) => ({
-                ...genreData,
-                backgroundColor: backgroundColor[idx]
-            })
+            "count",
+            "desc"
         )
 );
 
+export const topNewReleaseGenresSelector = createSelector(
+    newReleaseGenresSelector,
+    newReleaseGenres =>
+        map(slice(newReleaseGenres, 0, 10), (genreObj, idx) => ({
+            ...genreObj,
+            backgroundColor: backgroundColor[idx]
+        }))
+);
+
+export const availableGenresSelector = createSelector(
+    newReleaseGenresSelector,
+    queryParamsSelector,
+    (newReleaseGenres, { tags }) =>
+        filter(newReleaseGenres, ({ genre }) => !find(encodedStringifiedToObj(tags, []), genre))
+);
+
+// Preserve the order of the filters
 const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
     thru(
         [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
@@ -387,7 +396,13 @@ const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
                     ),
                     row =>
                         size(tags)
-                            ? size(intersection(get(row, "meta.genres"), tags)) === size(tags)
+                            ? // Check that the size is right
+                              // Check that the order is right
+                              size(intersection(get(row, "meta.genres"), tags)) === size(tags) &&
+                              every(
+                                  map(tags, tag => indexOf(get(row, "meta.genres"), tag)),
+                                  (val, idx, arr) => idx === 0 || val > arr[idx - 1]
+                              )
                             : true
                 ),
                 sortBy,

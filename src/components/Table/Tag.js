@@ -8,14 +8,12 @@ import queryString from "query-string";
 import { queryParamsSelector } from "../../selectors";
 import { encodedStringifiedToObj } from "../../utils";
 import { thru, includes, concat, filter } from "lodash";
+import hex2rgba from "hex2rgba";
 
 const TagWrapper = styled.span.attrs({
-    backgroundColor: props => props.backgroundColor,
     fontWeight: props => (props.active ? 600 : 400)
 })`
-    background-color: ${props => props.backgroundColor}
-    font-weight:  ${props => props.fontWeight}
-    color: white;
+    background-color: ${props => props.backgroundColor};
     padding: 10px;
     white-space: nowrap;
     text-align: center;

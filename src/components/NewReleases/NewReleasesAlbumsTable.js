@@ -8,7 +8,9 @@ import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import {
     newReleasesByAlbumTableDataWithFiltersSelector,
-    topNewReleaseGenresSelector
+    topNewReleaseGenresSelector,
+    queryParamsSelector,
+    availableGenresSelector
 } from "../../selectors";
 import PlayButton from "../Analyzer/PlayButton";
 import AddToPlaylistButton from "../AddToPlaylistButton";
@@ -18,8 +20,22 @@ import Table from "../Table";
 import { showSideBar } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import Tag from "../Table/Tag";
-import { map, startCase, get, size, join, first } from "lodash";
+import {
+    map,
+    startCase,
+    get,
+    size,
+    join,
+    first,
+    includes,
+    reduce,
+    difference,
+    filter,
+    find,
+    compact
+} from "lodash";
 import SearchBar from "../Table/SearchBar";
+import { encodedStringifiedToObj } from "../../utils";
 
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
@@ -55,18 +71,24 @@ const Tags = styled.div`
     }
 `;
 
+const ActiveDivider = styled.div`
+    min-width: 20px;
+    max-width: 20px;
+`;
+
+// TODO: Add a way to have custom tags
 const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, album } }) => (
     <AlbumImageCellRendererWrapper>
         <img alt="test" src={image} />
         <DescriptionContainer>
             <div>
-                <Typography>{album}</Typography>
+                <Typography variant="h6">{album}</Typography>
             </div>
             <div>
                 <Typography>{artist}</Typography>
             </div>
             <div>
-                <Typography>{type}</Typography>
+                <Typography variant="caption">{type}</Typography>
             </div>
         </DescriptionContainer>
     </AlbumImageCellRendererWrapper>
@@ -92,7 +114,7 @@ const ColumnCellRenderer = ({ cellData }) => <Typography>{cellData}</Typography>
 const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
     <HeaderCell>
         <Typography title={label}>{label}</Typography>
-        <span>{sortIndicator && sortIndicator}</span>
+        <Typography>{sortIndicator && sortIndicator}</Typography>
     </HeaderCell>
 );
 
@@ -123,14 +145,35 @@ class NewReleasesAlbumsTable extends Component {
 
     // TODO: Use html encode library, he to encode strings
     render() {
-        const { tableData, topNewReleaseGenres } = this.props;
+        const { tableData, topNewReleaseGenres, queryParams, availableGenres } = this.props;
+        const active = compact(
+            map(encodedStringifiedToObj(queryParams.tags, []), tagGenre =>
+                find(topNewReleaseGenres, ({ genre }) => genre === tagGenre)
+            )
+        );
+        const inactive = difference(topNewReleaseGenres, active);
         return (
             <NewReleasesAlbumsTableWrapper>
                 <SearchBar />
+                <Typography>Top Genres</Typography>
                 <Tags>
-                    {map(topNewReleaseGenres, ({ genre, backgroundColor }) => (
+                    {map(active, ({ genre, backgroundColor }) => (
                         <Tag id={genre} backgroundColor={backgroundColor}>
-                            {startCase(genre)}
+                            <Typography>{genre}</Typography>
+                        </Tag>
+                    ))}
+                    {active.length ? <ActiveDivider /> : null}
+                    {map(inactive, ({ genre, backgroundColor }) => (
+                        <Tag id={genre} backgroundColor={backgroundColor}>
+                            <Typography>{genre}</Typography>
+                        </Tag>
+                    ))}
+                </Tags>
+                <Typography>Custom Genres</Typography>
+                <Tags>
+                    {map(availableGenres, ({ genre }) => (
+                        <Tag id={genre}>
+                            <Typography>{genre}</Typography>
                         </Tag>
                     ))}
                 </Tags>
@@ -147,7 +190,9 @@ class NewReleasesAlbumsTable extends Component {
 
 const mapStateToProps = createStructuredSelector({
     tableData: newReleasesByAlbumTableDataWithFiltersSelector,
-    topNewReleaseGenres: topNewReleaseGenresSelector
+    topNewReleaseGenres: topNewReleaseGenresSelector,
+    queryParams: queryParamsSelector,
+    availableGenres: availableGenresSelector
 });
 
 export default compose(

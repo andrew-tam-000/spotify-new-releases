@@ -733,3 +733,10 @@ export function setLocalStorage(key, data) {
         payload: { key, data }
     };
 }
+
+export function addGenreColors(genre, color) {
+    return {
+        type: "genreColors|ADD_GENRES_WITH_COLOR",
+        payload: { genre, color }
+    };
+}

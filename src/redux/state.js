@@ -2,6 +2,7 @@ import spotifyApi from "../spotifyApi";
 
 export default {
     app: {
+        tagColors: {},
         spotify: {
             albums: {},
             nowPlaying: {},

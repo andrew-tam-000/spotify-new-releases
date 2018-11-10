@@ -9,7 +9,7 @@ import TextField from "@material-ui/core/TextField";
 
 // Dependes on query strings!
 const Search = ({ queryParams: { search }, onChange }) => (
-    <TextField value={search} onChange={onChange} />
+    <TextField label="Search..." value={search} onChange={onChange} />
 );
 
 export default compose(
