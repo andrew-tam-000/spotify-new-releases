@@ -333,20 +333,7 @@ export const newReleasesSelector = createSelector(
     newReleases => newReleases
 );
 
-const backgroundColor = [
-    "#d32f2f",
-    "#c2185b",
-    "#7b1fa2",
-    "#512da8",
-    "#303f9f",
-    "#1976d2",
-    "#0288d1",
-    "#0097a7",
-    "#00796b",
-    "#388e3c"
-];
-
-const newReleaseGenresSelector = createSelector(
+export const newReleaseGenresSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     (newReleases, artistData) =>
@@ -364,12 +351,18 @@ const newReleaseGenresSelector = createSelector(
         )
 );
 
+export const genreColorsSelector = createSelector(
+    state => get(state, "app.genreColors"),
+    genreColors => genreColors
+);
+
 export const topNewReleaseGenresSelector = createSelector(
     newReleaseGenresSelector,
-    newReleaseGenres =>
+    genreColorsSelector,
+    (newReleaseGenres, genreColors) =>
         map(slice(newReleaseGenres, 0, 10), (genreObj, idx) => ({
             ...genreObj,
-            backgroundColor: backgroundColor[idx]
+            backgroundColor: genreColors[genreObj.genre]
         }))
 );
 

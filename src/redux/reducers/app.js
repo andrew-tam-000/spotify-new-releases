@@ -5,10 +5,12 @@ import { combineReducers } from "redux";
 import {
     addTracksToPlaylistSuccess,
     addGenreColors,
+    removeGenreColors,
     showSideBar,
     hideSideBar,
     setDiscover
 } from "../actions/";
+import { reduce, set, omit } from "lodash";
 
 const appReducer = combineReducers({
     analyzer,
@@ -95,8 +97,10 @@ const appReducer = combineReducers({
             case addGenreColors().type:
                 return {
                     ...state,
-                    [payload.genre]: payload.color
+                    ...reduce(payload, (acc, { genre, color }) => set(acc, genre, color), {})
                 };
+            case removeGenreColors().type:
+                return omit(state, payload);
             default:
                 return state;
         }

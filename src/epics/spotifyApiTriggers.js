@@ -44,7 +44,8 @@ import {
     advancedSearchTracksSelector,
     advancedSearchAttributesSelector,
     advancedSearchGenresSelector,
-    advancedSearchArtistsSelector
+    advancedSearchArtistsSelector,
+    newReleaseGenresSelector
 } from "../selectors";
 import {
     getArtistsStart,
@@ -78,7 +79,8 @@ import {
     getNewReleasesSuccess,
     getSongDataStart,
     getSongDataSuccess,
-    setLocalStorage
+    setLocalStorage,
+    addGenreColors
 } from "../redux/actions";
 import { apiObservable } from "./helpers";
 import lzString from "lz-string";
@@ -135,7 +137,7 @@ const getTracks = (action$, state$, { spotifyApi }) =>
                           of(getTracksSuccess(flatMap(nestedTracksArray, ({ tracks }) => tracks)))
                       )
                   )
-                : of(getArtistsSuccess([]));
+                : of(getTracksSuccess([]));
         })
     );
 
@@ -375,6 +377,39 @@ const getAdvancedSearchResults = (action$, state$, { spotifyApi }) =>
         })
     );
 
+const getNewReleasesCallback = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getNewReleasesSuccess().type),
+        mergeMap(action =>
+            thru(
+                [
+                    "#d32f2f",
+                    "#c2185b",
+                    "#7b1fa2",
+                    "#512da8",
+                    "#303f9f",
+                    "#1976d2",
+                    "#0288d1",
+                    "#0097a7",
+                    "#00796b",
+                    "#388e3c"
+                ],
+                backgroundColor =>
+                    of(
+                        addGenreColors(
+                            map(
+                                slice(newReleaseGenresSelector(state$.value), 0, 10),
+                                (genre, idx) => ({
+                                    ...genre,
+                                    color: backgroundColor[idx]
+                                })
+                            )
+                        )
+                    )
+            )
+        )
+    );
+
 // Each actino should be dispatched with a constant
 // and then the success shoudl also return it
 const getNewReleases = (action$, state$, { spotifyApi }) =>
@@ -502,5 +537,6 @@ export default (...args) =>
         seek(...args),
         getNewReleases(...args),
         getAlbums(...args),
-        getSongData(...args)
+        getSongData(...args),
+        getNewReleasesCallback(...args)
     ).pipe(catchError(e => console.error(e)));

@@ -734,9 +734,16 @@ export function setLocalStorage(key, data) {
     };
 }
 
-export function addGenreColors(genre, color) {
+export function addGenreColors(genreColors) {
     return {
         type: "genreColors|ADD_GENRES_WITH_COLOR",
-        payload: { genre, color }
+        payload: genreColors
+    };
+}
+
+export function removeGenreColors(genres) {
+    return {
+        type: "genreColors|REMOVE_GENRE_COLOR",
+        payload: genres
     };
 }
