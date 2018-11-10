@@ -4,7 +4,7 @@ import { compose } from "recompact";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { AutoSizer, Column, Table as _VirtualizedTable, SortIndicator } from "react-virtualized";
-import { map, filter, get, mapKeys, includes } from "lodash";
+import { map, filter, get, mapKeys } from "lodash";
 import { push } from "react-router-redux";
 import queryString from "query-string";
 
@@ -50,6 +50,7 @@ class Table extends Component {
         const { dataKey, label } = data;
         const headerRenderer = get(this.props, "columnConfig.headerRenderer");
         const showSortIndicator = this.sortState.sortBy.includes(dataKey);
+        //TODO: Don't use this - because the sort is kept in state
         const sortIndicator = showSortIndicator && (
             <SortIndicator sortDirection={this.sortState.sortDirection[dataKey]} />
         );

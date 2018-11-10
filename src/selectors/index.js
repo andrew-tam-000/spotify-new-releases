@@ -351,7 +351,7 @@ export const newReleaseGenresSelector = createSelector(
         )
 );
 
-export const genreColorsSelector = createSelector(
+const genreColorsSelector = createSelector(
     state => get(state, "app.genreColors"),
     genreColors => genreColors
 );

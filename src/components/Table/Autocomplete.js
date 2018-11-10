@@ -194,8 +194,10 @@ class IntegrationReactSelect extends React.Component {
                 styles={selectStyles}
                 options={slice(this.props.options, 0, 10)}
                 components={components}
-                value={this.state.single}
-                onChange={this.handleChange("single")}
+                value={this.props.value}
+                //value={this.state.single}
+                onChange={this.props.onChange}
+                //onChange={this.handleChange("single")}
                 placeholder="Find a genre"
             />
         );

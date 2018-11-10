@@ -1,10 +1,13 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 import { defaultTableHeaderRowRenderer } from "react-virtualized";
 import { compose } from "recompose";
+import materialStyled from "../../materialStyled";
 import styled from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
+import { ChromePicker } from "react-color";
+import _Menu from "@material-ui/core/Menu";
 import {
     newReleasesByAlbumTableDataWithFiltersSelector,
     topNewReleaseGenresSelector,
@@ -13,7 +16,7 @@ import {
 } from "../../selectors";
 import Autocomplete from "../Table/Autocomplete";
 import Table from "../Table";
-import { showSideBar } from "../../redux/actions";
+import { showSideBar, addGenreColors } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import Tag from "../Table/Tag";
 import { map, get, size, join, first, difference, filter, find, compact } from "lodash";
@@ -22,6 +25,7 @@ import { encodedStringifiedToObj } from "../../utils";
 import AddIcon from "@material-ui/icons/Add";
 import Button from "@material-ui/core/Button";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
+import RootRef from "@material-ui/core/RootRef";
 
 const HeaderRowRenderer = styled(defaultTableHeaderRowRenderer)`
     display: flex;
@@ -59,6 +63,10 @@ const HeaderCell = styled.div`
     justify-content: flex-start;
     align-items: center;
 `;
+
+const Menu = materialStyled(_Menu)({
+    padding: 20
+});
 
 const prefixColumnsProps = [
     {
@@ -106,6 +114,34 @@ class NewReleasesAlbumsTable extends Component {
         headerRenderer: HeaderCellRenderer
     };
 
+    state = {
+        addMenuOpen: false,
+        genre: undefined,
+        color: "#FFFFFF"
+    };
+
+    constructor(props) {
+        super(props);
+        this.addButton = createRef();
+    }
+
+    closeAddMenu = () =>
+        this.setState({
+            addMenuOpen: false
+        });
+
+    openAddMenu = () =>
+        this.setState({
+            addMenuOpen: true
+        });
+
+    handleChangeColor = color => this.setState({ color });
+    handleSelectGenre = genre => this.setState({ genre });
+    addGenreColors = () =>
+        this.props.addGenreColors([
+            { color: get(this.state, "color.hex"), genre: get(this.state, "genre.value") }
+        ]) && this.setState({ genre: undefined, color: "#FFFFFF", addMenuOpen: false });
+
     // TODO: Use html encode library, he to encode strings
     render() {
         const { tableData, topNewReleaseGenres, queryParams, availableGenres } = this.props;
@@ -118,9 +154,46 @@ class NewReleasesAlbumsTable extends Component {
         return (
             <NewReleasesAlbumsTableWrapper>
                 <TagsWithButton>
-                    <Button mini variant="fab" color="primary" aria-label="Add">
-                        <AddIcon />
-                    </Button>
+                    <RootRef rootRef={this.addButton}>
+                        <Button
+                            mini
+                            variant="fab"
+                            color="primary"
+                            aria-label="Add"
+                            onClick={this.openAddMenu}
+                        >
+                            <AddIcon />
+                        </Button>
+                    </RootRef>
+                    <Menu
+                        anchorEl={this.addButton.current}
+                        open={this.state.addMenuOpen}
+                        onClose={this.closeAddMenu}
+                    >
+                        <Autocomplete
+                            onChange={this.handleSelectGenre}
+                            value={this.state.genre}
+                            options={map(
+                                filter(
+                                    availableGenres,
+                                    availableGenre =>
+                                        !find(
+                                            topNewReleaseGenres,
+                                            topGenre => topGenre.genre === availableGenre.genre
+                                        )
+                                ),
+                                ({ genre }) => ({ value: genre, label: genre })
+                            )}
+                        />
+                        <Typography>Pick a color</Typography>
+                        <ChromePicker
+                            color={this.state.color}
+                            onChangeComplete={this.handleChangeColor}
+                        />
+                        <Button variant="contained" color="primary" onClick={this.addGenreColors}>
+                            Add genre
+                        </Button>
+                    </Menu>
                     <Tags>
                         {map(active, ({ genre, backgroundColor }) => (
                             <Tag id={genre} backgroundColor={backgroundColor}>
@@ -135,19 +208,6 @@ class NewReleasesAlbumsTable extends Component {
                         ))}
                     </Tags>
                 </TagsWithButton>
-                <Autocomplete
-                    options={map(
-                        filter(
-                            availableGenres,
-                            availableGenre =>
-                                !find(
-                                    topNewReleaseGenres,
-                                    topGenre => topGenre.genre === availableGenre.genre
-                                )
-                        ),
-                        ({ genre }) => ({ value: genre, label: genre })
-                    )}
-                />
                 <Table
                     tableData={tableData}
                     prefixColumnsProps={prefixColumnsProps}
@@ -170,6 +230,6 @@ export default compose(
     fetchNewReleases,
     connect(
         mapStateToProps,
-        { showSideBar }
+        { showSideBar, addGenreColors }
     )
 )(NewReleasesAlbumsTable);
