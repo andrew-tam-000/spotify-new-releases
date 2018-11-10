@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { compose } from "recompose";
+import { compose, withProps } from "recompose";
 import styled from "styled-components";
 import "react-virtualized/styles.css";
 import materialStyled from "../../materialStyled";
@@ -89,6 +89,8 @@ const Description = styled.div`
     overflow: hidden;
 `;
 
+const Cell = withProps(() => ({ variant: "overline" }))(Typography);
+
 // TODO: Add a way to have custom tags
 const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, album } }) => (
     <AlbumImageCellRendererWrapper>
@@ -107,19 +109,15 @@ const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, albu
 
 const HeaderCell = styled.div`
     display: flex;
+    justify-content: flex-start;
+    align-items: center;
 `;
 
 const prefixColumnsProps = [
-    /*
-    {
-        cellRenderer: ButtonCellRenderer,
-        key: "button",
-        width: 50
-    },
-    */
     {
         cellRenderer: AlbumImageCellRenderer,
-        key: "album"
+        key: "album",
+        width: 140
     }
 ];
 
@@ -149,7 +147,8 @@ class NewReleasesAlbumsTable extends Component {
                 }
             );
         },
-        rowHeight: 50
+        rowHeight: 50,
+        headerHeight: 30
     };
 
     columnConfig = {
