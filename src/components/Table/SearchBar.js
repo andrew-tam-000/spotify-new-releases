@@ -8,8 +8,8 @@ import { queryParamsSelector } from "../../selectors";
 import TextField from "@material-ui/core/TextField";
 
 // Dependes on query strings!
-const Search = ({ queryParams: { search }, onChange }) => (
-    <TextField label="Search..." value={search} onChange={onChange} />
+const Search = ({ queryParams: { search }, onChange, ...props }) => (
+    <TextField placeholder="Search..." value={search} onChange={onChange} {...props} />
 );
 
 export default compose(

@@ -28,8 +28,10 @@ const Controls = styled.div`
     flex-direction: column;
 `;
 
+const PlayDashWrapper = styled.div``;
+
 const PlayDash = ({ uri, track }) => (
-    <React.Fragment>
+    <PlayDashWrapper>
         <div>
             <Title variant="headline">{track.name}</Title>
             <Artist variant="title">{first(track.artists).name}</Artist>
@@ -43,7 +45,7 @@ const PlayDash = ({ uri, track }) => (
             </div>
             <Seek />
         </Controls>
-    </React.Fragment>
+    </PlayDashWrapper>
 );
 
 export default compose(

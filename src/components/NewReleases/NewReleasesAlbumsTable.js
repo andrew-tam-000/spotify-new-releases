@@ -1,9 +1,7 @@
 import React, { Component } from "react";
-import { compose, withProps } from "recompose";
+import { defaultTableHeaderRowRenderer } from "react-virtualized";
+import { compose } from "recompose";
 import styled from "styled-components";
-import "react-virtualized/styles.css";
-import materialStyled from "../../materialStyled";
-
 import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
@@ -13,47 +11,21 @@ import {
     queryParamsSelector,
     availableGenresSelector
 } from "../../selectors";
-import PlayButton from "../Analyzer/PlayButton";
 import Autocomplete from "../Table/Autocomplete";
-import AddToPlaylistButton from "../AddToPlaylistButton";
-import AddToAdvancedSearchButton from "../Analyzer/AddToAdvancedSearchButton";
-import StartTreeButton from "../Discover/StartTreeButton";
 import Table from "../Table";
 import { showSideBar } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import Tag from "../Table/Tag";
-import {
-    map,
-    startCase,
-    get,
-    size,
-    join,
-    first,
-    includes,
-    reduce,
-    difference,
-    filter,
-    find,
-    compact
-} from "lodash";
+import { map, get, size, join, first, difference, filter, find, compact } from "lodash";
 import SearchBar from "../Table/SearchBar";
 import { encodedStringifiedToObj } from "../../utils";
+import AddIcon from "@material-ui/icons/Add";
+import Button from "@material-ui/core/Button";
+import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 
-// <AddToAdvancedSearchButton id={id} />
-// <AddToPlaylistButton uri={uri} />
-// <StartTreeButton uri={uri} />
-const ButtonCellRenderer = ({ cellData, rowData: { uri, id } }) => (
-    <React.Fragment>
-        <PlayButton context_uri={uri} />
-    </React.Fragment>
-);
-
-const AlbumImageCellRendererWrapper = styled.div`
+const HeaderRowRenderer = styled(defaultTableHeaderRowRenderer)`
     display: flex;
-    align-items: center;
-    overflow: hidden;
 `;
-
 const NewReleasesAlbumsTableWrapper = styled.div`
     display: flex;
     height: 100%;
@@ -66,46 +38,21 @@ const Tags = styled.div`
     display: flex;
     flex-wrap: none;
     overflow: auto;
+    flex: 1;
     > * {
         flex: 1;
     }
+`;
+
+const TagsWithButton = styled.div`
+    display: flex;
+    overflow: hidden;
 `;
 
 const ActiveDivider = styled.div`
     min-width: 20px;
     max-width: 20px;
 `;
-
-const AlbumImage = styled.img`
-    height: 40px;
-    margin-right: 5px;
-`;
-
-const AlbumTitle = materialStyled(Typography)({
-    lineHeight: 1
-});
-
-const Description = styled.div`
-    overflow: hidden;
-`;
-
-const Cell = withProps(() => ({ variant: "overline" }))(Typography);
-
-// TODO: Add a way to have custom tags
-const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, album } }) => (
-    <AlbumImageCellRendererWrapper>
-        <AlbumImage alt="test" src={image} />
-        <Description>
-            <Typography noWrap={true}>{artist}</Typography>
-            <AlbumTitle noWrap={true} variant="overline">
-                {album}
-            </AlbumTitle>
-            <Typography noWrap={true} variant="caption">
-                {type}
-            </Typography>
-        </Description>
-    </AlbumImageCellRendererWrapper>
-);
 
 const HeaderCell = styled.div`
     display: flex;
@@ -117,7 +64,9 @@ const prefixColumnsProps = [
     {
         cellRenderer: AlbumImageCellRenderer,
         key: "album",
-        width: 140
+        width: 140,
+        headerRenderer: () => <SearchBar />,
+        disableSort: true
     }
 ];
 
@@ -148,7 +97,8 @@ class NewReleasesAlbumsTable extends Component {
             );
         },
         rowHeight: 50,
-        headerHeight: 30
+        headerHeight: 32,
+        headerRenderer: HeaderRowRenderer
     };
 
     columnConfig = {
@@ -167,22 +117,24 @@ class NewReleasesAlbumsTable extends Component {
         const inactive = difference(topNewReleaseGenres, active);
         return (
             <NewReleasesAlbumsTableWrapper>
-                <SearchBar />
-                <Typography>Top Genres</Typography>
-                <Tags>
-                    {map(active, ({ genre, backgroundColor }) => (
-                        <Tag id={genre} backgroundColor={backgroundColor}>
-                            <Typography>{genre}</Typography>
-                        </Tag>
-                    ))}
-                    {active.length ? <ActiveDivider /> : null}
-                    {map(inactive, ({ genre, backgroundColor }) => (
-                        <Tag id={genre} backgroundColor={backgroundColor}>
-                            <Typography>{genre}</Typography>
-                        </Tag>
-                    ))}
-                </Tags>
-                <Typography>Custom Genres</Typography>
+                <TagsWithButton>
+                    <Button mini variant="fab" color="primary" aria-label="Add">
+                        <AddIcon />
+                    </Button>
+                    <Tags>
+                        {map(active, ({ genre, backgroundColor }) => (
+                            <Tag id={genre} backgroundColor={backgroundColor}>
+                                <Typography>{genre}</Typography>
+                            </Tag>
+                        ))}
+                        {active.length ? <ActiveDivider /> : null}
+                        {map(inactive, ({ genre, backgroundColor }) => (
+                            <Tag id={genre} backgroundColor={backgroundColor}>
+                                <Typography>{genre}</Typography>
+                            </Tag>
+                        ))}
+                    </Tags>
+                </TagsWithButton>
                 <Autocomplete
                     options={map(
                         filter(

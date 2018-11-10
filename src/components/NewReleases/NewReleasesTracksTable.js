@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { compose } from "recompose";
 import styled from "styled-components";
-import "react-virtualized/styles.css";
 
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";

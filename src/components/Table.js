@@ -4,19 +4,23 @@ import { compose } from "recompact";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { AutoSizer, Column, Table as _VirtualizedTable, SortIndicator } from "react-virtualized";
-import { map, filter, get, mapKeys } from "lodash";
+import { map, filter, get, mapKeys, includes } from "lodash";
 import { push } from "react-router-redux";
 import queryString from "query-string";
+
+import "react-virtualized/styles.css";
 
 import createMultiSort from "./Analyzer/createMultiSort";
 import { queryParamsSelector } from "../selectors";
 import { encodedStringifiedToObj } from "../utils";
 
-import "react-virtualized/styles.css";
-
 const VirtualizedTable = styled(_VirtualizedTable)`
     .ReactVirtualized__Table__rowColumn:first-child {
         overflow: initial !important;
+    }
+    .ReactVirtualized__Table__headerRow {
+        text-transform: inherit !important;
+        font-weight: inherit !important;
     }
 `;
 
@@ -26,6 +30,7 @@ const TableWrapper = styled.div`
 
 class Table extends Component {
     sortState = createMultiSort(
+        // Don't do anything if we have a noop
         sortParams =>
             this.props.push({
                 search:
