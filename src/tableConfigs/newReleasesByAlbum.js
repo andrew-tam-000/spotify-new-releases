@@ -1,5 +1,9 @@
+import React from "react";
+import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
+import PersonIcon from "@material-ui/icons/Person";
+import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import { get, join } from "lodash";
-const star = String.fromCharCode(parseInt(2605, 16));
+//const star = String.fromCharCode(parseInt(2605, 16));
 
 export default [
     {
@@ -24,7 +28,7 @@ export default [
         getter: "album.name"
     },
     {
-        label: "Release Date",
+        label: <CalendarTodayIcon />,
         dataKey: "releaseDate",
         getter: "newReleaseMeta.release_date",
         width: 140
@@ -36,21 +40,22 @@ export default [
         getter: "artists.0.name"
     },
     {
-        label: `Album ${star}`,
+        label: <LibraryMusicIcon />,
         dataKey: "albumPopularity",
         getter: "album.popularity",
-        width: 100
+        width: 40
     },
     {
-        label: `Artist ${star}`,
+        label: <PersonIcon />,
         dataKey: "artistPopularity",
         getter: "artists.0.popularity",
-        width: 100
+        width: 40
     },
     {
         label: "Genres",
         dataKey: "genres",
-        formatter: row => join(get(row, "genres"), ", ")
+        formatter: row => join(get(row, "genres"), ", "),
+        hidden: true
     },
     {
         label: "Type",

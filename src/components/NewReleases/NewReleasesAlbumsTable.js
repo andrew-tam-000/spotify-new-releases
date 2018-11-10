@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { compose } from "recompose";
 import styled from "styled-components";
 import "react-virtualized/styles.css";
+import materialStyled from "../../materialStyled";
 
 import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
@@ -47,12 +48,10 @@ const ButtonCellRenderer = ({ cellData, rowData: { uri, id } }) => (
     </React.Fragment>
 );
 
-const DescriptionContainer = styled.div`
-    margin-left: 10px;
-`;
-
 const AlbumImageCellRendererWrapper = styled.div`
     display: flex;
+    align-items: center;
+    overflow: hidden;
 `;
 
 const NewReleasesAlbumsTableWrapper = styled.div`
@@ -77,21 +76,32 @@ const ActiveDivider = styled.div`
     max-width: 20px;
 `;
 
+const AlbumImage = styled.img`
+    height: 40px;
+    margin-right: 5px;
+`;
+
+const AlbumTitle = materialStyled(Typography)({
+    lineHeight: 1
+});
+
+const Description = styled.div`
+    overflow: hidden;
+`;
+
 // TODO: Add a way to have custom tags
 const AlbumImageCellRenderer = ({ cellData, rowData: { image, artist, type, album } }) => (
     <AlbumImageCellRendererWrapper>
-        <img alt="test" src={image} />
-        <DescriptionContainer>
-            <div>
-                <Typography variant="h6">{album}</Typography>
-            </div>
-            <div>
-                <Typography>{artist}</Typography>
-            </div>
-            <div>
-                <Typography variant="caption">{type}</Typography>
-            </div>
-        </DescriptionContainer>
+        <AlbumImage alt="test" src={image} />
+        <Description>
+            <Typography noWrap={true}>{artist}</Typography>
+            <AlbumTitle noWrap={true} variant="overline">
+                {album}
+            </AlbumTitle>
+            <Typography noWrap={true} variant="caption">
+                {type}
+            </Typography>
+        </Description>
     </AlbumImageCellRendererWrapper>
 );
 
@@ -100,11 +110,13 @@ const HeaderCell = styled.div`
 `;
 
 const prefixColumnsProps = [
+    /*
     {
         cellRenderer: ButtonCellRenderer,
         key: "button",
         width: 50
     },
+    */
     {
         cellRenderer: AlbumImageCellRenderer,
         key: "album"
@@ -136,7 +148,8 @@ class NewReleasesAlbumsTable extends Component {
                             : first(backgroundColors)
                 }
             );
-        }
+        },
+        rowHeight: 50
     };
 
     columnConfig = {
