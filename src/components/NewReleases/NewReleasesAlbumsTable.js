@@ -13,6 +13,7 @@ import {
     availableGenresSelector
 } from "../../selectors";
 import PlayButton from "../Analyzer/PlayButton";
+import Autocomplete from "../Table/Autocomplete";
 import AddToPlaylistButton from "../AddToPlaylistButton";
 import AddToAdvancedSearchButton from "../Analyzer/AddToAdvancedSearchButton";
 import StartTreeButton from "../Discover/StartTreeButton";
@@ -170,13 +171,19 @@ class NewReleasesAlbumsTable extends Component {
                     ))}
                 </Tags>
                 <Typography>Custom Genres</Typography>
-                <Tags>
-                    {map(availableGenres, ({ genre }) => (
-                        <Tag id={genre}>
-                            <Typography>{genre}</Typography>
-                        </Tag>
-                    ))}
-                </Tags>
+                <Autocomplete
+                    options={map(
+                        filter(
+                            availableGenres,
+                            availableGenre =>
+                                !find(
+                                    topNewReleaseGenres,
+                                    topGenre => topGenre.genre === availableGenre.genre
+                                )
+                        ),
+                        ({ genre }) => ({ value: genre, label: genre })
+                    )}
+                />
                 <Table
                     tableData={tableData}
                     prefixColumnsProps={prefixColumnsProps}
