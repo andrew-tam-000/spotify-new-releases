@@ -367,6 +367,11 @@ export const genreColorsSelector = createSelector(
     genreColors => genreColors
 );
 
+// TODO: Refactor to use this!
+export const genreColorsMapSelector = createSelector(genreColorsSelector, genreColors =>
+    reduce(genreColors, (acc, { genre, color }) => set(acc, genre, color), {})
+);
+
 export const availableGenresSelector = createSelector(
     newReleaseGenresSelector,
     queryParamsTagsSelector,
@@ -431,7 +436,7 @@ const tableDataFilter = ({ search, tags, rows }) =>
         row => rowHasTags({ row, tags })
     );
 
-const formatRow = ({ rowData, genreColors, showColors }) =>
+const formatRow = ({ rowData, genreColorsMap, showColors }) =>
     reduce(
         newReleasesByAlbumConfig,
         (acc, { dataKey, getter, formatter }) => ({
@@ -445,12 +450,7 @@ const formatRow = ({ rowData, genreColors, showColors }) =>
                 ...(showColors
                     ? {
                           backgroundColors: compact(
-                              map(rowData.genres, genre =>
-                                  get(
-                                      find(genreColors, genreData => genreData.genre === genre),
-                                      "color"
-                                  )
-                              )
+                              map(rowData.genres, genre => genreColorsMap[genre])
                           )
                       }
                     : {})
@@ -458,7 +458,7 @@ const formatRow = ({ rowData, genreColors, showColors }) =>
         }
     );
 
-const formatTrackRows = ({ rowData, songs, genreColors, showColors }) =>
+const formatTrackRows = ({ rowData, songs, genreColorsMap, showColors }) =>
     map(get(rowData, "album.tracks.items"), track =>
         thru(
             {
@@ -468,7 +468,7 @@ const formatTrackRows = ({ rowData, songs, genreColors, showColors }) =>
             rowData =>
                 formatRow({
                     rowData,
-                    genreColors,
+                    genreColorsMap,
                     showColors
                 })
         )
@@ -478,7 +478,7 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     albumsSelector,
-    genreColorsSelector,
+    genreColorsMapSelector,
     songsSelector,
     newReleasesTableOpenAlbumsSelector,
     newReleasesTableShowColorsSelector,
@@ -489,7 +489,7 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
         newReleases,
         artistData,
         albums,
-        genreColors,
+        genreColorsMap,
         songs,
         newReleasesTableOpenAlbums,
         newReleasesTableShowColors,
@@ -515,7 +515,7 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                                 rowData,
                                 tableRow: formatRow({
                                     rowData,
-                                    genreColors,
+                                    genreColorsMap,
                                     showColors: newReleasesTableShowColors
                                 })
                             })
@@ -539,7 +539,7 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                                         ? formatTrackRows({
                                               rowData,
                                               songs,
-                                              genreColors,
+                                              genreColorsMap,
                                               showColors: newReleasesTableShowColors
                                           })
                                         : [])

@@ -3,7 +3,11 @@ import { createStructuredSelector } from "reselect";
 import { push } from "react-router-redux";
 import { connect } from "react-redux";
 import queryString from "query-string";
-import { queryParamsSelector, queryParamsTagsSelector, genreColorsSelector } from "../../selectors";
+import {
+    queryParamsSelector,
+    queryParamsTagsSelector,
+    genreColorsMapSelector
+} from "../../selectors";
 import { encodedStringifiedToObj } from "../../utils";
 import { get, thru, includes, concat, filter, find } from "lodash";
 
@@ -20,15 +24,15 @@ export default compose(
         createStructuredSelector({
             queryParamsTags: queryParamsTagsSelector,
             queryParams: queryParamsSelector,
-            genreColors: genreColorsSelector
+            genreColorsMap: genreColorsMapSelector
         }),
         { push }
     ),
     withPropsOnChange(
-        ["queryParamsTags", "id", "genreColors"],
-        ({ queryParamsTags, id, genreColors }) => ({
+        ["queryParamsTags", "id", "genreColorsMap"],
+        ({ queryParamsTags, id, genreColorsMap }) => ({
             active: includes(queryParamsTags, id),
-            color: get(find(genreColors, ({ genre }) => genre === id), "color")
+            color: genreColorsMap[id]
         })
     ),
     withHandlers({
