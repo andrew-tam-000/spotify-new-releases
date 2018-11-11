@@ -373,15 +373,29 @@ const newReleasesTableOpenAlbumsSelector = createSelector(
     newReleasesTable => get(newReleasesTable, "openAlbums")
 );
 
-const newReleasesTableShowColorsSelector = createSelector(
+export const newReleasesTableShowColorsSelector = createSelector(
     newReleasesTableSelector,
     newReleasesTable => get(newReleasesTable, "showColors")
 );
 
-const newReleasesTableShowAllTracksSelector = createSelector(
+export const newReleasesTableShowAllTracksSelector = createSelector(
     newReleasesTableSelector,
     newReleasesTable => get(newReleasesTable, "showAllTracks")
 );
+
+const rowHasTags = ({ row, tags }) =>
+    size(tags)
+        ? // Check that the size is right
+          // Check that the order is right
+          size(intersection(get(row, "meta.genres"), tags)) === size(tags) &&
+          every(
+              map(tags, tag => indexOf(get(row, "meta.genres"), tag)),
+              (val, idx, arr) => idx === 0 || val > arr[idx - 1]
+          )
+        : true;
+
+const rowHasSearch = ({ row, search }) =>
+    search ? includes(toLower(JSON.stringify(row)), toLower(search)) : true;
 
 // Preserve the order of the filters
 const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
@@ -392,21 +406,8 @@ const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
                 // tags
                 filter(
                     // Search bar
-                    filter(
-                        rows,
-                        row =>
-                            search ? includes(toLower(JSON.stringify(row)), toLower(search)) : true
-                    ),
-                    row =>
-                        size(tags)
-                            ? // Check that the size is right
-                              // Check that the order is right
-                              size(intersection(get(row, "meta.genres"), tags)) === size(tags) &&
-                              every(
-                                  map(tags, tag => indexOf(get(row, "meta.genres"), tag)),
-                                  (val, idx, arr) => idx === 0 || val > arr[idx - 1]
-                              )
-                            : true
+                    filter(rows, row => rowHasSearch({ row, search })),
+                    row => rowHasTags({ row, tags })
                 ),
                 sortBy,
                 map(sortBy, sort => toLower(sortDirection[sort]))
@@ -465,6 +466,7 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesTableOpenAlbumsSelector,
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector,
+    queryParamsSelector,
     (
         newReleases,
         artistData,
@@ -473,42 +475,47 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
         songs,
         newReleasesTableOpenAlbums,
         newReleasesTableShowColors,
-        newReleasesTableShowAllTracks
-    ) => ({
-        rows: flatMap(newReleases, newRelease =>
-            thru(
-                {
-                    album: albums[newRelease.id],
-                    artists: map(newRelease.artists, artist => artistData[artist.id]),
-                    genres: uniq(
-                        flatMap(newRelease.artists, artist => artistData[artist.id].genres)
-                    ),
-                    newReleaseMeta: newRelease
-                },
-                row => [
-                    ...(newReleasesTableShowAllTracks
-                        ? []
-                        : [
-                              formatRow({
-                                  row,
-                                  genreColors,
-                                  showColors: newReleasesTableShowColors
-                              })
-                          ]),
-                    ...(newReleasesTableShowAllTracks ||
-                    newReleasesTableOpenAlbums[get(row, "album.id")]
-                        ? formatTrackRows({
-                              row,
-                              songs,
-                              genreColors,
-                              showColors: newReleasesTableShowColors
-                          })
-                        : [])
-                ]
-            )
-        ),
-        config: newReleasesByAlbumConfig
-    })
+        newReleasesTableShowAllTracks,
+        { search, sort, tags }
+    ) =>
+        thru(
+            [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
+            ([tags, { sortBy, sortDirection }]) => ({
+                rows: flatMap(newReleases, newRelease =>
+                    thru(
+                        {
+                            album: albums[newRelease.id],
+                            artists: map(newRelease.artists, artist => artistData[artist.id]),
+                            genres: uniq(
+                                flatMap(newRelease.artists, artist => artistData[artist.id].genres)
+                            ),
+                            newReleaseMeta: newRelease
+                        },
+                        row => [
+                            ...(newReleasesTableShowAllTracks
+                                ? []
+                                : [
+                                      formatRow({
+                                          row,
+                                          genreColors,
+                                          showColors: newReleasesTableShowColors
+                                      })
+                                  ]),
+                            ...(newReleasesTableShowAllTracks ||
+                            newReleasesTableOpenAlbums[get(row, "album.id")]
+                                ? formatTrackRows({
+                                      row,
+                                      songs,
+                                      genreColors,
+                                      showColors: newReleasesTableShowColors
+                                  })
+                                : [])
+                        ]
+                    )
+                ),
+                config: newReleasesByAlbumConfig
+            })
+        )
 );
 
 // Do the sorting first

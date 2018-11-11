@@ -1,4 +1,4 @@
-import React, { Component, createRef } from "react";
+import React, { Component } from "react";
 import { defaultTableHeaderRowRenderer } from "react-virtualized";
 import { compose } from "recompose";
 import materialStyled from "../../materialStyled";
@@ -10,14 +10,22 @@ import { connect } from "react-redux";
 import { ChromePicker } from "react-color";
 import Modal from "@material-ui/core/Modal";
 import {
-    newReleasesByAlbumTableDataWithFiltersSelector,
+    newReleasesByAlbumTableDataSelector,
     genreColorsSelector,
     queryParamsSelector,
-    availableGenresSelector
+    availableGenresSelector,
+    newReleasesTableShowColorsSelector,
+    newReleasesTableShowAllTracksSelector
 } from "../../selectors";
 import Autocomplete from "../Table/Autocomplete";
 import Table from "../Table";
-import { toggleNewReleaseAlbum, showSideBar, addGenreColors } from "../../redux/actions";
+import {
+    toggleNewReleaseAlbum,
+    showSideBar,
+    addGenreColors,
+    toggleShowAllNewReleaseTracks,
+    toggleNewReleaseColors
+} from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import Tag from "../Table/Tag";
 import { noop, map, get, size, join, first, difference, filter, find, compact } from "lodash";
@@ -26,7 +34,12 @@ import { encodedStringifiedToObj } from "../../utils";
 import AddIcon from "@material-ui/icons/Add";
 import Button from "@material-ui/core/Button";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
-import RootRef from "@material-ui/core/RootRef";
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
+import AudiotrackIcon from "@material-ui/icons/Audiotrack";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 
 const HeaderRowRenderer = styled(defaultTableHeaderRowRenderer)`
     display: flex;
@@ -62,6 +75,12 @@ const ActiveDivider = styled.div`
 const HeaderCell = styled.div`
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+`;
+
+const Settings = styled.div`
+    display: flex;
+    justify-content: space-between;
     align-items: center;
 `;
 
@@ -130,11 +149,6 @@ class NewReleasesAlbumsTable extends Component {
 
     state = this.initialState;
 
-    constructor(props) {
-        super(props);
-        this.addButton = createRef();
-    }
-
     closeAddModal = () => this.setState(this.initialState);
 
     openAddModal = () =>
@@ -157,7 +171,16 @@ class NewReleasesAlbumsTable extends Component {
 
     // TODO: Use html encode library, he to encode strings
     render() {
-        const { tableData, genreColors, queryParams, availableGenres } = this.props;
+        const {
+            tableData,
+            genreColors,
+            queryParams,
+            availableGenres,
+            newReleasesTableShowColors,
+            newReleasesTableShowAllTracks,
+            toggleShowAllNewReleaseTracks,
+            toggleNewReleaseColors
+        } = this.props;
         const active = compact(
             map(encodedStringifiedToObj(queryParams.tags, []), tagGenre =>
                 find(genreColors, ({ genre }) => genre === tagGenre)
@@ -167,22 +190,16 @@ class NewReleasesAlbumsTable extends Component {
         return (
             <NewReleasesAlbumsTableWrapper>
                 <TagsWithButton>
-                    <RootRef rootRef={this.addButton}>
-                        <Button
-                            mini
-                            variant="fab"
-                            color="primary"
-                            aria-label="Add"
-                            onClick={this.openAddModal}
-                        >
-                            <AddIcon />
-                        </Button>
-                    </RootRef>
-                    <Modal
-                        anchorEl={this.addButton.current}
-                        open={this.state.addModalOpen}
-                        onClose={this.closeAddModal}
+                    <Button
+                        mini
+                        variant="fab"
+                        color="primary"
+                        aria-label="Add"
+                        onClick={this.openAddModal}
                     >
+                        <AddIcon />
+                    </Button>
+                    <Modal open={this.state.addModalOpen} onClose={this.closeAddModal}>
                         <Paper>
                             {this.state.error && <Typography>{this.state.error}</Typography>}
                             <Autocomplete
@@ -235,6 +252,31 @@ class NewReleasesAlbumsTable extends Component {
                         ))}
                     </Tags>
                 </TagsWithButton>
+                <Settings>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={newReleasesTableShowColors}
+                                onChange={toggleNewReleaseColors}
+                                value="Tet"
+                            />
+                        }
+                        label="Colors?"
+                    />
+                    <div>
+                        <ToggleButtonGroup
+                            onChange={toggleShowAllNewReleaseTracks}
+                            value={newReleasesTableShowAllTracks ? "tracks" : "albums"}
+                        >
+                            <ToggleButton value="tracks">
+                                <AudiotrackIcon />
+                            </ToggleButton>
+                            <ToggleButton value="albums">
+                                <LibraryMusicIcon />
+                            </ToggleButton>
+                        </ToggleButtonGroup>
+                    </div>
+                </Settings>
                 <Table
                     tableData={tableData}
                     prefixColumnsProps={prefixColumnsProps}
@@ -247,16 +289,24 @@ class NewReleasesAlbumsTable extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-    tableData: newReleasesByAlbumTableDataWithFiltersSelector,
+    tableData: newReleasesByAlbumTableDataSelector,
     genreColors: genreColorsSelector,
     queryParams: queryParamsSelector,
-    availableGenres: availableGenresSelector
+    availableGenres: availableGenresSelector,
+    newReleasesTableShowColors: newReleasesTableShowColorsSelector,
+    newReleasesTableShowAllTracks: newReleasesTableShowAllTracksSelector
 });
 
 export default compose(
     fetchNewReleases,
     connect(
         mapStateToProps,
-        { showSideBar, addGenreColors, toggleNewReleaseAlbum }
+        {
+            showSideBar,
+            addGenreColors,
+            toggleNewReleaseAlbum,
+            toggleShowAllNewReleaseTracks,
+            toggleNewReleaseColors
+        }
     )
 )(NewReleasesAlbumsTable);

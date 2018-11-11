@@ -755,26 +755,14 @@ export function toggleNewReleaseAlbum(albumId) {
     };
 }
 
-export function showNewReleaseColors() {
+export function toggleNewReleaseColors() {
     return {
-        type: "newReleases|SHOW_NEW_RELEASE_COLORS"
+        type: "newReleases|TOGGLE_NEW_RELEASE_COLORS"
     };
 }
 
-export function hideNewReleaseColors() {
+export function toggleShowAllNewReleaseTracks() {
     return {
-        type: "newReleases|HIDE_NEW_RELEASE_COLORS"
-    };
-}
-
-export function showAllNewReleaseTracks() {
-    return {
-        type: "newReleases|SHOW_ALL_NEW_RELEASE_TRACKS"
-    };
-}
-
-export function hideAllNewReleaseTracks() {
-    return {
-        type: "newReleases|HIDE_ALL_NEW_RELEASE_TRACKS"
+        type: "newReleases|TOGGLE_SHOW_ALL_NEW_RELEASE_TRACKS"
     };
 }

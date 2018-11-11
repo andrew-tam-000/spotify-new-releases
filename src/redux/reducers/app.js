@@ -9,7 +9,9 @@ import {
     showSideBar,
     hideSideBar,
     setDiscover,
-    toggleNewReleaseAlbum
+    toggleNewReleaseAlbum,
+    toggleShowAllNewReleaseTracks,
+    toggleNewReleaseColors
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -128,6 +130,16 @@ const appReducer = combineReducers({
                         ...state.openAlbums,
                         [payload]: !state.openAlbums[payload]
                     }
+                };
+            case toggleShowAllNewReleaseTracks().type:
+                return {
+                    ...state,
+                    showAllTracks: !state.showAllTracks
+                };
+            case toggleNewReleaseColors().type:
+                return {
+                    ...state,
+                    showColors: !state.showColors
                 };
             default:
                 return state;

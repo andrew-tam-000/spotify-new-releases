@@ -80,9 +80,9 @@ const AlbumImageCellRenderer = ({
             <NewReleasesTrackPlayButton uri={uri} />
             <Description>
                 <Typography noWrap={true}>{track}</Typography>
-                <AlbumTitle noWrap={true} variant="overline">
-                    {album}
-                </AlbumTitle>
+                <Typography noWrap={true} variant="caption">
+                    {artist}
+                </Typography>
             </Description>
         </TrackBlurbCellRendererWrapper>
     ) : (
@@ -92,9 +92,9 @@ const AlbumImageCellRenderer = ({
                 <AlbumImage alt="test" src={image} />
             </AlbumWrapper>
             <Description>
-                <Typography noWrap={true}>{artist}</Typography>
-                <AlbumTitle noWrap={true} variant="overline">
-                    {album}
+                <Typography noWrap={true}>{album}</Typography>
+                <AlbumTitle noWrap={true} variant="caption">
+                    {artist}
                 </AlbumTitle>
                 <Typography noWrap={true} variant="caption">
                     {type}
