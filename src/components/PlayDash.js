@@ -11,17 +11,15 @@ import Typography from "@material-ui/core/Typography";
 import StartTreeButton from "./Discover/StartTreeButton";
 import Seek from "./PlayDash/Seek";
 import styled from "styled-components";
+import materialStyled from "../materialStyled";
 
-const Title = styled(Typography)`
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-`;
-const Artist = styled(Typography)`
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-`;
+const typographyStyles = {
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    lineHeight: 1
+};
+const Header = materialStyled(Typography)(typographyStyles);
 
 const Controls = styled.div`
     display: flex;
@@ -33,8 +31,8 @@ const PlayDashWrapper = styled.div``;
 const PlayDash = ({ uri, track }) => (
     <PlayDashWrapper>
         <div>
-            <Title variant="headline">{track.name}</Title>
-            <Artist variant="title">{first(track.artists).name}</Artist>
+            <Header variant="body1">{track.name}</Header>
+            <Header variant="body2">{first(track.artists).name}</Header>
         </div>
         <Controls>
             <div>

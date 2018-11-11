@@ -3,11 +3,12 @@ import { defaultTableHeaderRowRenderer } from "react-virtualized";
 import { compose } from "recompose";
 import materialStyled from "../../materialStyled";
 import styled from "styled-components";
+import _Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { ChromePicker } from "react-color";
-import _Menu from "@material-ui/core/Menu";
+import Modal from "@material-ui/core/Modal";
 import {
     newReleasesByAlbumTableDataWithFiltersSelector,
     genreColorsSelector,
@@ -64,8 +65,13 @@ const HeaderCell = styled.div`
     align-items: center;
 `;
 
-const Menu = materialStyled(_Menu)({
-    padding: 20
+const Paper = materialStyled(_Paper)({
+    padding: 20,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    maxWidth: "90%"
 });
 
 const prefixColumnsProps = [
@@ -114,33 +120,39 @@ class NewReleasesAlbumsTable extends Component {
         headerRenderer: HeaderCellRenderer
     };
 
-    state = {
-        addMenuOpen: false,
+    initialState = {
+        addModalOpen: false,
         genre: undefined,
-        color: "#FFFFFF"
+        color: "#FFFFFF",
+        error: undefined
     };
+
+    state = this.initialState;
 
     constructor(props) {
         super(props);
         this.addButton = createRef();
     }
 
-    closeAddMenu = () =>
-        this.setState({
-            addMenuOpen: false
-        });
+    closeAddModal = () => this.setState(this.initialState);
 
-    openAddMenu = () =>
+    openAddModal = () =>
         this.setState({
-            addMenuOpen: true
+            addModalOpen: true
         });
 
     handleChangeColor = color => this.setState({ color });
     handleSelectGenre = genre => this.setState({ genre });
-    addGenreColors = () =>
-        this.props.addGenreColors([
-            { color: get(this.state, "color.hex"), genre: get(this.state, "genre.value") }
-        ]) && this.setState({ genre: undefined, color: "#FFFFFF", addMenuOpen: false });
+    addGenreColors = () => {
+        const color = get(this.state, "color.hex");
+        const genre = get(this.state, "genre.value");
+        if (color && genre) {
+            this.props.addGenreColors([{ color, genre }]);
+            this.setState(this.initialState);
+        } else {
+            this.setState({ error: "Please select a genre and a color" });
+        }
+    };
 
     // TODO: Use html encode library, he to encode strings
     render() {
@@ -160,40 +172,54 @@ class NewReleasesAlbumsTable extends Component {
                             variant="fab"
                             color="primary"
                             aria-label="Add"
-                            onClick={this.openAddMenu}
+                            onClick={this.openAddModal}
                         >
                             <AddIcon />
                         </Button>
                     </RootRef>
-                    <Menu
+                    <Modal
                         anchorEl={this.addButton.current}
-                        open={this.state.addMenuOpen}
-                        onClose={this.closeAddMenu}
+                        open={this.state.addModalOpen}
+                        onClose={this.closeAddModal}
                     >
-                        <Autocomplete
-                            onChange={this.handleSelectGenre}
-                            value={this.state.genre}
-                            options={map(
-                                filter(
-                                    availableGenres,
-                                    availableGenre =>
-                                        !find(
-                                            genreColors,
-                                            topGenre => topGenre.genre === availableGenre.genre
-                                        )
-                                ),
-                                ({ genre }) => ({ value: genre, label: genre })
-                            )}
-                        />
-                        <Typography>Pick a color</Typography>
-                        <ChromePicker
-                            color={this.state.color}
-                            onChangeComplete={this.handleChangeColor}
-                        />
-                        <Button variant="contained" color="primary" onClick={this.addGenreColors}>
-                            Add genre
-                        </Button>
-                    </Menu>
+                        <Paper>
+                            {this.state.error && <Typography>{this.state.error}</Typography>}
+                            <Autocomplete
+                                onChange={this.handleSelectGenre}
+                                value={this.state.genre}
+                                options={map(
+                                    filter(
+                                        availableGenres,
+                                        availableGenre =>
+                                            !find(
+                                                genreColors,
+                                                topGenre => topGenre.genre === availableGenre.genre
+                                            )
+                                    ),
+                                    ({ genre }) => ({ value: genre, label: genre })
+                                )}
+                            />
+                            <Typography>Pick a color</Typography>
+                            <ChromePicker
+                                color={this.state.color}
+                                onChangeComplete={this.handleChangeColor}
+                            />
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={this.addGenreColors}
+                            >
+                                Add genre
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={this.closeAddModal}
+                            >
+                                Cancel
+                            </Button>
+                        </Paper>
+                    </Modal>
                     <Tags>
                         {map(active, ({ genre, color }) => (
                             <Tag id={genre} backgroundColor={color}>
