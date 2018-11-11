@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import { ChromePicker } from "react-color";
 import Modal from "@material-ui/core/Modal";
 import {
-    newReleasesByAlbumTableDataSelector,
+    newReleasesByAlbumTableDataWithFiltersSelector,
     genreColorsSelector,
     queryParamsSelector,
     availableGenresSelector,
@@ -289,7 +289,7 @@ class NewReleasesAlbumsTable extends Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-    tableData: newReleasesByAlbumTableDataSelector,
+    tableData: newReleasesByAlbumTableDataWithFiltersSelector,
     genreColors: genreColorsSelector,
     queryParams: queryParamsSelector,
     availableGenres: availableGenresSelector,

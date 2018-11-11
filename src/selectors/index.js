@@ -18,7 +18,6 @@ import {
     indexOf,
     flatMapDeep,
     countBy,
-    slice,
     compact,
     find,
     size,
@@ -328,6 +327,18 @@ export const queryParamsSelector = createSelector(
     query => queryString.parse(query)
 );
 
+export const queryParamsTagsSelector = createSelector(queryParamsSelector, queryParams =>
+    encodedStringifiedToObj(get(queryParams, "tags"), [])
+);
+
+export const queryParamsSortSelector = createSelector(queryParamsSelector, queryParams =>
+    encodedStringifiedToObj(get(queryParams, "sort"))
+);
+
+export const queryParamsSearchSelector = createSelector(queryParamsSelector, queryParams =>
+    get(queryParams, "search")
+);
+
 export const newReleasesSelector = createSelector(
     state => get(state, "app.spotify.newReleases"),
     newReleases => newReleases
@@ -358,9 +369,8 @@ export const genreColorsSelector = createSelector(
 
 export const availableGenresSelector = createSelector(
     newReleaseGenresSelector,
-    queryParamsSelector,
-    (newReleaseGenres, { tags }) =>
-        filter(newReleaseGenres, ({ genre }) => !find(encodedStringifiedToObj(tags, []), genre))
+    queryParamsTagsSelector,
+    (newReleaseGenres, tags) => filter(newReleaseGenres, ({ genre }) => !find(tags, genre))
 );
 
 const newReleasesTableSelector = createSelector(
@@ -398,37 +408,29 @@ const rowHasSearch = ({ row, search }) =>
     search ? includes(toLower(JSON.stringify(row)), toLower(search)) : true;
 
 // Preserve the order of the filters
-const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
-    thru(
-        [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
-        ([tags, { sortBy, sortDirection }]) =>
-            orderBy(
-                // tags
-                filter(
-                    // Search bar
-                    filter(rows, row => rowHasSearch({ row, search })),
-                    row => rowHasTags({ row, tags })
-                ),
-                sortBy,
-                map(sortBy, sort => toLower(sortDirection[sort]))
-            )
+const tableDataFilter = ({ search, tags, rows }) =>
+    // tags
+    filter(
+        // Search bar
+        filter(rows, row => rowHasSearch({ row, search })),
+        row => rowHasTags({ row, tags })
     );
 
-const formatRow = ({ row, genreColors, showColors }) =>
+const formatRow = ({ rowData, genreColors, showColors }) =>
     reduce(
         newReleasesByAlbumConfig,
         (acc, { dataKey, getter, formatter }) => ({
             ...acc,
-            [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
+            [dataKey]: formatter ? formatter(rowData) : getter ? get(rowData, getter) : null
         }),
         {
             meta: {
                 // Here for searchability
-                genres: row.genres,
+                genres: rowData.genres,
                 ...(showColors
                     ? {
                           backgroundColors: compact(
-                              map(row.genres, genre =>
+                              map(rowData.genres, genre =>
                                   get(
                                       find(genreColors, genreData => genreData.genre === genre),
                                       "color"
@@ -441,16 +443,16 @@ const formatRow = ({ row, genreColors, showColors }) =>
         }
     );
 
-const formatTrackRows = ({ row, songs, genreColors, showColors }) =>
-    map(get(row, "album.tracks.items"), track =>
+const formatTrackRows = ({ rowData, songs, genreColors, showColors }) =>
+    map(get(rowData, "album.tracks.items"), track =>
         thru(
             {
-                ...row,
+                ...rowData,
                 track: songs[track.id]
             },
-            row =>
+            rowData =>
                 formatRow({
-                    row,
+                    rowData,
                     genreColors,
                     showColors
                 })
@@ -466,7 +468,8 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesTableOpenAlbumsSelector,
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector,
-    queryParamsSelector,
+    queryParamsTagsSelector,
+    queryParamsSortSelector,
     (
         newReleases,
         artistData,
@@ -476,12 +479,13 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
         newReleasesTableOpenAlbums,
         newReleasesTableShowColors,
         newReleasesTableShowAllTracks,
-        { search, sort, tags }
+        tags,
+        { sortBy, sortDirection }
     ) =>
         thru(
-            [encodedStringifiedToObj(tags), encodedStringifiedToObj(sort)],
-            ([tags, { sortBy, sortDirection }]) => ({
-                rows: flatMap(newReleases, newRelease =>
+            reduce(
+                newReleases,
+                (acc, newRelease) =>
                     thru(
                         {
                             album: albums[newRelease.id],
@@ -491,30 +495,43 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                             ),
                             newReleaseMeta: newRelease
                         },
-                        row => [
-                            ...(newReleasesTableShowAllTracks
-                                ? []
-                                : [
-                                      formatRow({
-                                          row,
+                        rowData =>
+                            set(acc, get(rowData, "album.id"), {
+                                rowData,
+                                tableRow: formatRow({
+                                    rowData,
+                                    genreColors,
+                                    showColors: newReleasesTableShowColors
+                                })
+                            })
+                    ),
+                {}
+            ),
+            albumListData =>
+                thru(
+                    orderBy(
+                        map(values(albumListData), ({ tableRow }) => tableRow),
+                        sortBy,
+                        map(sortBy, sort => toLower(sortDirection[sort]))
+                    ),
+                    orderedAlbumsListData => ({
+                        rows: flatMap(orderedAlbumsListData, tableRow =>
+                            thru(albumListData[tableRow.id].rowData, rowData => [
+                                ...(newReleasesTableShowAllTracks ? [] : [tableRow]),
+                                ...(newReleasesTableShowAllTracks ||
+                                newReleasesTableOpenAlbums[tableRow.id]
+                                    ? formatTrackRows({
+                                          rowData,
+                                          songs,
                                           genreColors,
                                           showColors: newReleasesTableShowColors
                                       })
-                                  ]),
-                            ...(newReleasesTableShowAllTracks ||
-                            newReleasesTableOpenAlbums[get(row, "album.id")]
-                                ? formatTrackRows({
-                                      row,
-                                      songs,
-                                      genreColors,
-                                      showColors: newReleasesTableShowColors
-                                  })
-                                : [])
-                        ]
-                    )
-                ),
-                config: newReleasesByAlbumConfig
-            })
+                                    : [])
+                            ])
+                        ),
+                        config: newReleasesByAlbumConfig
+                    })
+                )
         )
 );
 
@@ -523,10 +540,11 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
 // And then do the search filter
 export const newReleasesByAlbumTableDataWithFiltersSelector = createSelector(
     newReleasesByAlbumTableDataSelector,
-    queryParamsSelector,
-    ({ rows, ...newReleasesByAlbumTableData }, queryParams) => ({
+    queryParamsTagsSelector,
+    queryParamsSearchSelector,
+    ({ rows, ...newReleasesByAlbumTableData }, tags, search) => ({
         ...newReleasesByAlbumTableData,
-        rows: tableDataFilter({ queryParams, rows })
+        rows: tableDataFilter({ tags, search, rows })
     })
 );
 
