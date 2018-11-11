@@ -1,5 +1,6 @@
 import React from "react";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
+import Stars from "@material-ui/icons/Stars";
 import PersonIcon from "@material-ui/icons/Person";
 import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import { get, join } from "lodash";
@@ -46,7 +47,7 @@ export default [
         getter: "artists.0.name"
     },
     {
-        label: <LibraryMusicIcon />,
+        label: <Stars />,
         dataKey: "albumPopularity",
         formatter: row =>
             !get(row, "track") ? get(row, "album.popularity") : get(row, "track.popularity"),

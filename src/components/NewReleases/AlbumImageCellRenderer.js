@@ -63,7 +63,11 @@ const NewReleasesAlbumPlayButton = props => (
 const NewReleasesTrackPlayButton = props => (
     <PlayButtonProvider {...props}>
         {({ isPlaying, pauseSongStart, playSongStart }) =>
-            isPlaying ? <PauseButton /> : <PlayButton />
+            isPlaying ? (
+                <PauseButton onClick={pauseSongStart} />
+            ) : (
+                <PlayButton onClick={playSongStart} />
+            )
         }
     </PlayButtonProvider>
 );

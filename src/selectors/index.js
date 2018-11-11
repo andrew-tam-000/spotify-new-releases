@@ -514,23 +514,33 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                         sortBy,
                         map(sortBy, sort => toLower(sortDirection[sort]))
                     ),
-                    orderedAlbumsListData => ({
-                        rows: flatMap(orderedAlbumsListData, tableRow =>
-                            thru(albumListData[tableRow.id].rowData, rowData => [
-                                ...(newReleasesTableShowAllTracks ? [] : [tableRow]),
-                                ...(newReleasesTableShowAllTracks ||
-                                newReleasesTableOpenAlbums[tableRow.id]
-                                    ? formatTrackRows({
-                                          rowData,
-                                          songs,
-                                          genreColors,
-                                          showColors: newReleasesTableShowColors
-                                      })
-                                    : [])
-                            ])
-                        ),
-                        config: newReleasesByAlbumConfig
-                    })
+                    orderedAlbumsListData =>
+                        thru(
+                            flatMap(orderedAlbumsListData, tableRow =>
+                                thru(albumListData[tableRow.id].rowData, rowData => [
+                                    ...(newReleasesTableShowAllTracks ? [] : [tableRow]),
+                                    ...(newReleasesTableShowAllTracks ||
+                                    newReleasesTableOpenAlbums[tableRow.id]
+                                        ? formatTrackRows({
+                                              rowData,
+                                              songs,
+                                              genreColors,
+                                              showColors: newReleasesTableShowColors
+                                          })
+                                        : [])
+                                ])
+                            ),
+                            rows => ({
+                                rows: newReleasesTableShowAllTracks
+                                    ? orderBy(
+                                          rows,
+                                          sortBy,
+                                          map(sortBy, sort => toLower(sortDirection[sort]))
+                                      )
+                                    : rows,
+                                config: newReleasesByAlbumConfig
+                            })
+                        )
                 )
         )
 );
