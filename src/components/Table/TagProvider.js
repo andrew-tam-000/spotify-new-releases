@@ -1,5 +1,3 @@
-import React from "react";
-import styled from "styled-components";
 import { compose, withProps, withHandlers } from "recompose";
 import { createStructuredSelector } from "reselect";
 import { push } from "react-router-redux";
@@ -8,20 +6,13 @@ import queryString from "query-string";
 import { queryParamsSelector } from "../../selectors";
 import { encodedStringifiedToObj } from "../../utils";
 import { thru, includes, concat, filter } from "lodash";
-import hex2rgba from "hex2rgba";
-
-const TagWrapper = styled.span.attrs({
-    fontWeight: props => (props.active ? 600 : 400)
-})`
-    background-color: ${props => props.backgroundColor};
-    padding: 10px;
-    white-space: nowrap;
-    text-align: center;
-    cursor: pointer;
-`;
 
 // Dependes on query strings!
-const Tag = ({ children, onClick, active, element }) => element;
+const TagProvider = ({ children, onClick, active }) =>
+    children({
+        onClick,
+        active
+    });
 
 export default compose(
     connect(
@@ -51,15 +42,5 @@ export default compose(
                         )
                     })
             })
-    }),
-    withProps(({ active, backgroundColor, onClick, children }) => ({
-        element: (
-            <TagWrapper
-                onClick={onClick}
-                active={active}
-                children={children}
-                backgroundColor={backgroundColor}
-            />
-        )
-    }))
-)(Tag);
+    })
+)(TagProvider);

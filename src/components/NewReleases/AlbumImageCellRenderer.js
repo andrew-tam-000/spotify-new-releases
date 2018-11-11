@@ -3,6 +3,8 @@ import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
+import TagProvider from "../Table/TagProvider";
+import { map } from "lodash";
 
 import materialStyled from "../../materialStyled";
 import PlayButtonProvider from "../core/PlayButtonProvider";
@@ -73,12 +75,36 @@ const NewReleasesTrackPlayButton = props => (
     </PlayButtonProvider>
 );
 
+const Genres = styled.div`
+    display: flex;
+    flex-wrap: none;
+    overflow: auto;
+`;
+
+const Tag = styled.span`
+    padding: 0 2px;
+    border: 1px solid white;
+    margin-left: 2px;
+    &:first {
+        margin-left: 0;
+    }
+`;
+
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
 // <StartTreeButton uri={uri} />
 const AlbumImageCellRenderer = ({
     cellData,
-    rowData: { uri, image, artist, track, type, album, isTrack }
+    rowData: {
+        uri,
+        image,
+        artist,
+        track,
+        type,
+        album,
+        isTrack,
+        meta: { genres }
+    }
 }) =>
     isTrack ? (
         <TrackBlurbCellRendererWrapper>
@@ -101,9 +127,17 @@ const AlbumImageCellRenderer = ({
                 <AlbumTitle noWrap={true} variant="caption">
                     {artist}
                 </AlbumTitle>
-                <Typography noWrap={true} variant="caption">
-                    {type}
-                </Typography>
+                <Genres>
+                    {map(genres, genre => (
+                        <TagProvider id={genre}>
+                            {({ active, onClick }) => (
+                                <Tag>
+                                    <Typography variant="caption">{genre}</Typography>
+                                </Tag>
+                            )}
+                        </TagProvider>
+                    ))}
+                </Genres>
             </Description>
         </AlbumImageCellRendererWrapper>
     );

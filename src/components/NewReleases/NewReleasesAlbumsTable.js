@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 import { defaultTableHeaderRowRenderer } from "react-virtualized";
 import { compose } from "recompose";
-import materialStyled from "../../materialStyled";
 import styled from "styled-components";
-import _Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
-import { ChromePicker } from "react-color";
-import Modal from "@material-ui/core/Modal";
+import NewReleasesAddTagModal from "./NewReleasesAddTagModal";
 import {
     newReleasesByAlbumTableDataWithFiltersSelector,
     genreColorsSelector,
@@ -17,7 +14,6 @@ import {
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector
 } from "../../selectors";
-import Autocomplete from "../Table/Autocomplete";
 import Table from "../Table";
 import {
     toggleNewReleaseAlbum,
@@ -27,8 +23,8 @@ import {
     toggleNewReleaseColors
 } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
-import Tag from "../Table/Tag";
-import { noop, map, get, size, join, first, difference, filter, find, compact } from "lodash";
+import TagProvider from "../Table/TagProvider";
+import { noop, map, get, size, join, first, difference, find, compact } from "lodash";
 import SearchBar from "../Table/SearchBar";
 import { encodedStringifiedToObj } from "../../utils";
 import AddIcon from "@material-ui/icons/Add";
@@ -40,6 +36,16 @@ import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+
+const Tag = styled.span.attrs({
+    fontWeight: props => (props.active ? 600 : 400)
+})`
+    background-color: ${props => props.backgroundColor};
+    padding: 10px;
+    white-space: nowrap;
+    text-align: center;
+    cursor: pointer;
+`;
 
 const HeaderRowRenderer = styled(defaultTableHeaderRowRenderer)`
     display: flex;
@@ -84,15 +90,6 @@ const Settings = styled.div`
     align-items: center;
 `;
 
-const Paper = materialStyled(_Paper)({
-    padding: 20,
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    maxWidth: "90%"
-});
-
 const prefixColumnsProps = [
     {
         cellRenderer: AlbumImageCellRenderer,
@@ -130,7 +127,7 @@ class NewReleasesAlbumsTable extends Component {
                 }
             );
         },
-        rowHeight: 50,
+        rowHeight: 60,
         headerHeight: 32,
         headerRenderer: HeaderRowRenderer
     };
@@ -199,56 +196,35 @@ class NewReleasesAlbumsTable extends Component {
                     >
                         <AddIcon />
                     </Button>
-                    <Modal open={this.state.addModalOpen} onClose={this.closeAddModal}>
-                        <Paper>
-                            {this.state.error && <Typography>{this.state.error}</Typography>}
-                            <Autocomplete
-                                onChange={this.handleSelectGenre}
-                                value={this.state.genre}
-                                options={map(
-                                    filter(
-                                        availableGenres,
-                                        availableGenre =>
-                                            !find(
-                                                genreColors,
-                                                topGenre => topGenre.genre === availableGenre.genre
-                                            )
-                                    ),
-                                    ({ genre }) => ({ value: genre, label: genre })
-                                )}
-                            />
-                            <Typography>Pick a color</Typography>
-                            <ChromePicker
-                                color={this.state.color}
-                                onChangeComplete={this.handleChangeColor}
-                            />
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={this.addGenreColors}
-                            >
-                                Add genre
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={this.closeAddModal}
-                            >
-                                Cancel
-                            </Button>
-                        </Paper>
-                    </Modal>
+                    <NewReleasesAddTagModal
+                        open={this.state.addModalOpen}
+                        onClose={this.closeAddModal}
+                        error={this.state.error}
+                        onChangeGenre={this.handleSelectGenre}
+                        onChangeColor={this.handleChangeColor}
+                        genreValue={this.state.genre}
+                        colorValue={this.state.color}
+                        onSubmit={this.addGenreColors}
+                    />
                     <Tags>
                         {map(active, ({ genre, color }) => (
-                            <Tag id={genre} backgroundColor={color}>
-                                <Typography>{genre}</Typography>
-                            </Tag>
+                            <TagProvider id={genre} backgroundColor={color}>
+                                {({ active, onClick }) => (
+                                    <Tag onClick={onClick} active={active} backgroundColor={color}>
+                                        <Typography>{genre}</Typography>
+                                    </Tag>
+                                )}
+                            </TagProvider>
                         ))}
                         {active.length ? <ActiveDivider /> : null}
                         {map(inactive, ({ genre, color }) => (
-                            <Tag id={genre} backgroundColor={color}>
-                                <Typography>{genre}</Typography>
-                            </Tag>
+                            <TagProvider id={genre}>
+                                {({ active, onClick }) => (
+                                    <Tag onClick={onClick} active={active} backgroundColor={color}>
+                                        <Typography>{genre}</Typography>
+                                    </Tag>
+                                )}
+                            </TagProvider>
                         ))}
                     </Tags>
                 </TagsWithButton>
