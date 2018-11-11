@@ -351,20 +351,11 @@ export const newReleaseGenresSelector = createSelector(
         )
 );
 
-const genreColorsSelector = createSelector(
+export const genreColorsSelector = createSelector(
     state => get(state, "app.genreColors"),
     genreColors => genreColors
 );
 
-export const topNewReleaseGenresSelector = createSelector(
-    newReleaseGenresSelector,
-    genreColorsSelector,
-    (newReleaseGenres, genreColors) =>
-        map(slice(newReleaseGenres, 0, 10), (genreObj, idx) => ({
-            ...genreObj,
-            backgroundColor: genreColors[genreObj.genre]
-        }))
-);
 
 export const availableGenresSelector = createSelector(
     newReleaseGenresSelector,
@@ -407,8 +398,8 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     albumsSelector,
-    topNewReleaseGenresSelector,
-    (newReleases, artistData, albums, topNewReleaseGenres) => ({
+    genreColorsSelector,
+    (newReleases, artistData, albums, genreColors) => ({
         rows: map(newReleases, newRelease =>
             thru(
                 {
@@ -433,10 +424,10 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                                     map(row.genres, genre =>
                                         get(
                                             find(
-                                                topNewReleaseGenres,
+                                                genreColors,
                                                 genreData => genreData.genre === genre
                                             ),
-                                            "backgroundColor"
+                                            "color"
                                         )
                                     )
                                 )

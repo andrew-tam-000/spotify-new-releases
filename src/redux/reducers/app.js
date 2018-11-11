@@ -10,7 +10,7 @@ import {
     hideSideBar,
     setDiscover
 } from "../actions/";
-import { reduce, set, omit } from "lodash";
+import { filter, map, omit, find } from "lodash";
 
 const appReducer = combineReducers({
     analyzer,
@@ -92,14 +92,27 @@ const appReducer = combineReducers({
         }
     },
     discover,
-    genreColors: (state = {}, { type, payload }) => {
+    genreColors: (state = [], { type, payload }) => {
         switch (type) {
             case addGenreColors().type:
-                return {
-                    ...state,
-                    ...reduce(payload, (acc, { genre, color }) => set(acc, genre, color), {})
-                };
+                return [
+                    ...map(
+                        state,
+                        existingGenre =>
+                            find(payload, newGenre => newGenre.genre === existingGenre.genre) ||
+                            existingGenre
+                    ),
+                    // Filter the newly added genres
+                    ...filter(
+                        payload,
+                        newGenre =>
+                            // If you can't find the new genre in the existing genre
+                            // then we should filter it out
+                            !find(state, existingGenre => existingGenre.genre === newGenre.genre)
+                    )
+                ];
             case removeGenreColors().type:
+                // TODO;
                 return omit(state, payload);
             default:
                 return state;

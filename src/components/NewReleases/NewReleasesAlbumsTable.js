@@ -10,7 +10,7 @@ import { ChromePicker } from "react-color";
 import _Menu from "@material-ui/core/Menu";
 import {
     newReleasesByAlbumTableDataWithFiltersSelector,
-    topNewReleaseGenresSelector,
+    genreColorsSelector,
     queryParamsSelector,
     availableGenresSelector
 } from "../../selectors";
@@ -144,13 +144,13 @@ class NewReleasesAlbumsTable extends Component {
 
     // TODO: Use html encode library, he to encode strings
     render() {
-        const { tableData, topNewReleaseGenres, queryParams, availableGenres } = this.props;
+        const { tableData, genreColors, queryParams, availableGenres } = this.props;
         const active = compact(
             map(encodedStringifiedToObj(queryParams.tags, []), tagGenre =>
-                find(topNewReleaseGenres, ({ genre }) => genre === tagGenre)
+                find(genreColors, ({ genre }) => genre === tagGenre)
             )
         );
-        const inactive = difference(topNewReleaseGenres, active);
+        const inactive = difference(genreColors, active);
         return (
             <NewReleasesAlbumsTableWrapper>
                 <TagsWithButton>
@@ -178,7 +178,7 @@ class NewReleasesAlbumsTable extends Component {
                                     availableGenres,
                                     availableGenre =>
                                         !find(
-                                            topNewReleaseGenres,
+                                            genreColors,
                                             topGenre => topGenre.genre === availableGenre.genre
                                         )
                                 ),
@@ -195,14 +195,14 @@ class NewReleasesAlbumsTable extends Component {
                         </Button>
                     </Menu>
                     <Tags>
-                        {map(active, ({ genre, backgroundColor }) => (
-                            <Tag id={genre} backgroundColor={backgroundColor}>
+                        {map(active, ({ genre, color }) => (
+                            <Tag id={genre} backgroundColor={color}>
                                 <Typography>{genre}</Typography>
                             </Tag>
                         ))}
                         {active.length ? <ActiveDivider /> : null}
-                        {map(inactive, ({ genre, backgroundColor }) => (
-                            <Tag id={genre} backgroundColor={backgroundColor}>
+                        {map(inactive, ({ genre, color }) => (
+                            <Tag id={genre} backgroundColor={color}>
                                 <Typography>{genre}</Typography>
                             </Tag>
                         ))}
@@ -221,7 +221,7 @@ class NewReleasesAlbumsTable extends Component {
 
 const mapStateToProps = createStructuredSelector({
     tableData: newReleasesByAlbumTableDataWithFiltersSelector,
-    topNewReleaseGenres: topNewReleaseGenresSelector,
+    genreColors: genreColorsSelector,
     queryParams: queryParamsSelector,
     availableGenres: availableGenresSelector
 });
