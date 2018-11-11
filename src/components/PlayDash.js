@@ -19,28 +19,39 @@ const typographyStyles = {
     overflow: "hidden",
     lineHeight: 1
 };
-const Header = materialStyled(Typography)(typographyStyles);
+const Title = materialStyled(Typography)(typographyStyles);
+const Artist = materialStyled(Typography)({ ...typographyStyles, marginTop: 5 });
 
 const Controls = styled.div`
     display: flex;
     flex-direction: column;
+    margin-top: 5px;
 `;
 
-const PlayDashWrapper = styled.div``;
+const PlayDashWrapper = styled.div`
+    overflow: hidden;
+    padding: 10px;
+`;
+
+const Buttons = styled.div`
+    display: flex;
+    margin-bottom: 5px;
+    justify-content: space-between;
+`;
 
 const PlayDash = ({ uri, track }) => (
     <PlayDashWrapper>
         <div>
-            <Header variant="body1">{track.name}</Header>
-            <Header variant="body2">{first(track.artists).name}</Header>
+            <Title variant="h5">{track.name}</Title>
+            <Artist variant="h6">{first(track.artists).name}</Artist>
         </div>
         <Controls>
-            <div>
+            <Buttons>
                 <StartTreeButton uri={uri} />
                 <SkipToPreviousButton />
                 <PlayButton uri={uri} />
                 <SkipToNextButton />
-            </div>
+            </Buttons>
             <Seek />
         </Controls>
     </PlayDashWrapper>
