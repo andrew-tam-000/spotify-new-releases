@@ -1,27 +1,36 @@
-import { compose, withProps, withHandlers } from "recompose";
+import { compose, withProps, withPropsOnChange, withHandlers } from "recompose";
 import { createStructuredSelector } from "reselect";
 import { push } from "react-router-redux";
 import { connect } from "react-redux";
 import queryString from "query-string";
-import { queryParamsSelector } from "../../selectors";
+import { queryParamsSelector, queryParamsTagsSelector, genreColorsSelector } from "../../selectors";
 import { encodedStringifiedToObj } from "../../utils";
-import { thru, includes, concat, filter } from "lodash";
+import { get, thru, includes, concat, filter, find } from "lodash";
 
 // Dependes on query strings!
-const TagProvider = ({ children, onClick, active }) =>
+const TagProvider = ({ children, onClick, active, color }) =>
     children({
         onClick,
-        active
+        active,
+        color
     });
 
 export default compose(
     connect(
-        createStructuredSelector({ queryParams: queryParamsSelector }),
+        createStructuredSelector({
+            queryParamsTags: queryParamsTagsSelector,
+            queryParams: queryParamsSelector,
+            genreColors: genreColorsSelector
+        }),
         { push }
     ),
-    withProps(({ queryParams: { tags }, id }) => ({
-        active: includes(encodedStringifiedToObj(tags), id)
-    })),
+    withPropsOnChange(
+        ["queryParamsTags", "id", "genreColors"],
+        ({ queryParamsTags, id, genreColors }) => ({
+            active: includes(queryParamsTags, id),
+            color: get(find(genreColors, ({ genre }) => genre === id), "color")
+        })
+    ),
     withHandlers({
         onClick: ({ push, queryParams, id, active }) => () =>
             push({

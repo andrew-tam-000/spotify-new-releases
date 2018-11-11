@@ -80,17 +80,16 @@ const NewReleasesTrackPlayButton = props => (
 
 const Genres = styled.div`
     display: flex;
-    flex-wrap: none;
+    flex-wrap: nowrap;
     overflow: auto;
+    margin-top: 2px;
 `;
 
 const Tag = styled.span`
+    background-color: ${props => props.color};
     padding: 0 2px;
-    border: 1px solid white;
-    margin-left: 2px;
-    &:first {
-        margin-left: 0;
-    }
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    margin-right: 2px;
 `;
 
 const withOpenModal = compose(
@@ -150,8 +149,8 @@ const AlbumImageCellRenderer = ({
                 <Genres>
                     {map(genres, genre => (
                         <TagProvider id={genre}>
-                            {({ active, onClick }) => (
-                                <Tag>
+                            {({ active, onClick, color }) => (
+                                <Tag color={color}>
                                     <TypographyWithOpenModal genre={genre} variant="caption">
                                         {genre}
                                     </TypographyWithOpenModal>
