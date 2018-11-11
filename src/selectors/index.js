@@ -356,7 +356,6 @@ export const genreColorsSelector = createSelector(
     genreColors => genreColors
 );
 
-
 export const availableGenresSelector = createSelector(
     newReleaseGenresSelector,
     queryParamsSelector,
@@ -399,8 +398,9 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
     artistDataSelector,
     albumsSelector,
     genreColorsSelector,
-    (newReleases, artistData, albums, genreColors) => ({
-        rows: map(newReleases, newRelease =>
+    songsSelector,
+    (newReleases, artistData, albums, genreColors, songs) => ({
+        rows: flatMap(newReleases, newRelease =>
             thru(
                 {
                     album: albums[newRelease.id],
@@ -410,7 +410,7 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                     ),
                     newReleaseMeta: newRelease
                 },
-                row =>
+                row => [
                     reduce(
                         newReleasesByAlbumConfig,
                         (acc, { dataKey, getter, formatter }) => ({
@@ -433,13 +433,55 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                                 )
                             }
                         }
+                    ),
+                    // TODO: HERE
+                    // Add tracks to the list
+                    ...map(get(row, "album.tracks.items"), track =>
+                        thru(
+                            {
+                                ...row,
+                                track: songs[track.id]
+                            },
+                            row =>
+                                reduce(
+                                    newReleasesByAlbumConfig,
+                                    (acc, { dataKey, getter, formatter }) => ({
+                                        ...acc,
+                                        [dataKey]: formatter
+                                            ? formatter(row)
+                                            : getter
+                                                ? get(row, getter)
+                                                : null
+                                    }),
+                                    {
+                                        meta: {
+                                            genres: row.genres,
+                                            backgroundColors: compact(
+                                                map(row.genres, genre =>
+                                                    get(
+                                                        find(
+                                                            genreColors,
+                                                            genreData => genreData.genre === genre
+                                                        ),
+                                                        "color"
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    }
+                                )
+                        )
                     )
+                ]
             )
         ),
         config: newReleasesByAlbumConfig
     })
 );
 
+// Do the sorting first
+// Then add in the songs
+// And then do the search filter
 export const newReleasesByAlbumTableDataWithFiltersSelector = createSelector(
     newReleasesByAlbumTableDataSelector,
     queryParamsSelector,

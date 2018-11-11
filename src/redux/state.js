@@ -34,15 +34,6 @@ export default {
             text: ""
         },
         user: {},
-        newReleases: {
-            sort: {
-                sortBy: ["artist", "popularity"],
-                sortDirection: {
-                    popularity: "DESC",
-                    artist: "ASC"
-                }
-            }
-        },
         analyzer: {
             openSearchPanel: false,
             searchTerm: "",

@@ -13,6 +13,8 @@ const AlbumImageCellRendererWrapper = styled.div`
     overflow: hidden;
 `;
 
+const TrackBlurbCellRendererWrapper = styled(AlbumImageCellRendererWrapper)``;
+
 const AlbumImage = styled.img`
     height: 40px;
     display: block;
@@ -48,7 +50,7 @@ const ButtonWrapper = styled.div`
 
 const PauseButton = materialStyled(PauseCircleOutlineIcon)(buttonStyles);
 const PlayButton = materialStyled(PlayCircleOutlineIcon)(buttonStyles);
-const NewReleasesPlayButton = props => (
+const NewReleasesAlbumPlayButton = props => (
     <PlayButtonProvider {...props}>
         {({ isPlaying, pauseSongStart, playSongStart }) => (
             <ButtonWrapper onClick={isPlaying ? pauseSongStart : playSongStart}>
@@ -58,25 +60,47 @@ const NewReleasesPlayButton = props => (
     </PlayButtonProvider>
 );
 
+const NewReleasesTrackPlayButton = props => (
+    <PlayButtonProvider {...props}>
+        {({ isPlaying, pauseSongStart, playSongStart }) =>
+            isPlaying ? <PauseButton /> : <PlayButton />
+        }
+    </PlayButtonProvider>
+);
+
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
 // <StartTreeButton uri={uri} />
-const AlbumImageCellRenderer = ({ cellData, rowData: { uri, image, artist, type, album } }) => (
-    <AlbumImageCellRendererWrapper>
-        <AlbumWrapper>
-            <NewReleasesPlayButton context_uri={uri} />
-            <AlbumImage alt="test" src={image} />
-        </AlbumWrapper>
-        <Description>
-            <Typography noWrap={true}>{artist}</Typography>
-            <AlbumTitle noWrap={true} variant="overline">
-                {album}
-            </AlbumTitle>
-            <Typography noWrap={true} variant="caption">
-                {type}
-            </Typography>
-        </Description>
-    </AlbumImageCellRendererWrapper>
-);
+const AlbumImageCellRenderer = ({
+    cellData,
+    rowData: { uri, image, artist, track, type, album, isTrack }
+}) =>
+    isTrack ? (
+        <TrackBlurbCellRendererWrapper>
+            <NewReleasesTrackPlayButton uri={uri} />
+            <Description>
+                <Typography noWrap={true}>{track}</Typography>
+                <AlbumTitle noWrap={true} variant="overline">
+                    {album}
+                </AlbumTitle>
+            </Description>
+        </TrackBlurbCellRendererWrapper>
+    ) : (
+        <AlbumImageCellRendererWrapper>
+            <AlbumWrapper>
+                <NewReleasesAlbumPlayButton context_uri={uri} />
+                <AlbumImage alt="test" src={image} />
+            </AlbumWrapper>
+            <Description>
+                <Typography noWrap={true}>{artist}</Typography>
+                <AlbumTitle noWrap={true} variant="overline">
+                    {album}
+                </AlbumTitle>
+                <Typography noWrap={true} variant="caption">
+                    {type}
+                </Typography>
+            </Description>
+        </AlbumImageCellRendererWrapper>
+    );
 
 export default AlbumImageCellRenderer;

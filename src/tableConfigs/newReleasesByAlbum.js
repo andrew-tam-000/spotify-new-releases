@@ -8,12 +8,12 @@ import { get, join } from "lodash";
 export default [
     {
         dataKey: "uri",
-        getter: "album.uri",
+        formatter: row => (!get(row, "track") ? get(row, "album.uri") : get(row, "track.uri")),
         hidden: true
     },
     {
         dataKey: "id",
-        getter: "album.id",
+        formatter: row => (!get(row, "track") ? get(row, "album.id") : get(row, "track.id")),
         hidden: true
     },
     {
@@ -26,6 +26,12 @@ export default [
         dataKey: "album",
         hidden: true,
         getter: "album.name"
+    },
+    {
+        label: "Track",
+        dataKey: "track",
+        hidden: true,
+        getter: "track.name"
     },
     {
         label: <CalendarTodayIcon />,
@@ -42,7 +48,8 @@ export default [
     {
         label: <LibraryMusicIcon />,
         dataKey: "albumPopularity",
-        getter: "album.popularity",
+        formatter: row =>
+            !get(row, "track") ? get(row, "album.popularity") : get(row, "track.popularity"),
         width: 40
     },
     {
@@ -61,6 +68,12 @@ export default [
         label: "Type",
         dataKey: "type",
         getter: "album.album_type",
+        hidden: true
+    },
+    {
+        label: "noop",
+        dataKey: "isTrack",
+        formatter: row => !!get(row, "track"),
         hidden: true
     }
 ];
