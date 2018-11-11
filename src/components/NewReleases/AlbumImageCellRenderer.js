@@ -98,10 +98,10 @@ const withOpenModal = compose(
         null,
         { openNewReleaseModal }
     ),
-    withProps(({ openNewReleaseModal }) => ({
+    withProps(({ openNewReleaseModal, genre }) => ({
         onClick: e => {
             e.stopPropagation();
-            openNewReleaseModal();
+            openNewReleaseModal(genre);
         }
     }))
 );
@@ -152,7 +152,7 @@ const AlbumImageCellRenderer = ({
                         <TagProvider id={genre}>
                             {({ active, onClick }) => (
                                 <Tag>
-                                    <TypographyWithOpenModal variant="caption">
+                                    <TypographyWithOpenModal genre={genre} variant="caption">
                                         {genre}
                                     </TypographyWithOpenModal>
                                 </Tag>

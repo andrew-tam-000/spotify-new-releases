@@ -767,14 +767,29 @@ export function toggleShowAllNewReleaseTracks() {
     };
 }
 
-export function openNewReleaseModal() {
+export function openNewReleaseModal(defaultGenre) {
     return {
-        type: "newReleases|OPEN_NEW_RELEASE_MODAL"
+        type: "newReleases|OPEN_NEW_RELEASE_MODAL",
+        payload: defaultGenre
     };
 }
 
 export function closeNewReleaseModal() {
     return {
         type: "newReleases|CLOSE_NEW_RELEASE_MODAL"
+    };
+}
+
+export function setNewReleaseModalColor(color) {
+    return {
+        type: "newReleases|SET_NEW_RELEASE_MODAL_COLOR",
+        payload: color
+    };
+}
+
+export function setNewReleaseModalGenre(genre) {
+    return {
+        type: "newReleases|SET_NEW_RELEASE_MODAL_GENRE",
+        payload: genre
     };
 }

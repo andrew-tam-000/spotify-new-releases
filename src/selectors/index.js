@@ -403,6 +403,11 @@ export const newReleasesTableModalGenreSelector = createSelector(
     newReleasesTable => get(newReleasesTable, "modalGenre")
 );
 
+export const newReleasesTableModalColorSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "modalColor")
+);
+
 const rowHasTags = ({ row, tags }) =>
     size(tags)
         ? // Check that the size is right

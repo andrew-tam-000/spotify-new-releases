@@ -13,7 +13,10 @@ import {
     toggleShowAllNewReleaseTracks,
     toggleNewReleaseColors,
     openNewReleaseModal,
-    closeNewReleaseModal
+    closeNewReleaseModal,
+    setNewReleaseModalGenre,
+    setNewReleaseModalColor,
+    setNewReleaseModalError
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -146,12 +149,24 @@ const appReducer = combineReducers({
             case openNewReleaseModal().type:
                 return {
                     ...state,
-                    modal: true
+                    modal: true,
+                    modalGenre: payload
                 };
             case closeNewReleaseModal().type:
                 return {
                     ...state,
                     modal: false
+                };
+
+            case setNewReleaseModalGenre().type:
+                return {
+                    ...state,
+                    modalGenre: payload
+                };
+            case setNewReleaseModalColor().type:
+                return {
+                    ...state,
+                    modalColor: payload
                 };
             default:
                 return state;

@@ -138,6 +138,8 @@ class NewReleasesAlbumsTable extends Component {
         headerRenderer: HeaderCellRenderer
     };
 
+    openNewReleaseModal = () => this.props.openNewReleaseModal();
+
     // TODO: Use html encode library, he to encode strings
     render() {
         const {
@@ -148,7 +150,6 @@ class NewReleasesAlbumsTable extends Component {
             newReleasesTableShowAllTracks,
             toggleShowAllNewReleaseTracks,
             toggleNewReleaseColors,
-            openNewReleaseModal,
             closeNewReleaseModal
         } = this.props;
         const active = compact(
@@ -165,7 +166,7 @@ class NewReleasesAlbumsTable extends Component {
                         variant="fab"
                         color="primary"
                         aria-label="Add"
-                        onClick={openNewReleaseModal}
+                        onClick={this.openNewReleaseModal}
                     >
                         <AddIcon />
                     </Button>
@@ -198,7 +199,6 @@ class NewReleasesAlbumsTable extends Component {
                             <Switch
                                 checked={newReleasesTableShowColors}
                                 onChange={toggleNewReleaseColors}
-                                value="Tet"
                             />
                         }
                         label="Colors?"

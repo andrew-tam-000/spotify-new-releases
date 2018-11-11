@@ -190,6 +190,7 @@ class IntegrationReactSelect extends React.Component {
 
         return (
             <Select
+                isDisabled={this.props.isDisabled}
                 classes={classes}
                 styles={selectStyles}
                 options={slice(this.props.options, 0, 10)}

@@ -9,12 +9,19 @@ import Autocomplete from "../Table/Autocomplete";
 import { get, map, filter, find } from "lodash";
 import { ChromePicker } from "react-color";
 import Button from "@material-ui/core/Button";
-import { addGenreColors, closeNewReleaseModal } from "../../redux/actions";
+import {
+    addGenreColors,
+    closeNewReleaseModal,
+    setNewReleaseModalColor,
+    setNewReleaseModalGenre
+} from "../../redux/actions";
 
 import {
     newReleasesTableModalSelector,
     availableGenresSelector,
-    genreColorsSelector
+    genreColorsSelector,
+    newReleasesTableModalGenreSelector,
+    newReleasesTableModalColorSelector
 } from "../../selectors";
 
 const Paper = materialStyled(_Paper)({
@@ -27,17 +34,13 @@ const Paper = materialStyled(_Paper)({
 });
 
 class NewReleasesAddTagModal extends Component {
-    initialState = {
-        genre: undefined,
-        color: "#FFFFFF",
+    state = {
         error: undefined
     };
 
-    state = this.initialState;
-
     addGenreColors = () => {
-        const color = get(this.state, "color.hex");
-        const genre = get(this.state, "genre.value");
+        const color = this.props.newReleasesTableModalColor;
+        const genre = this.props.newReleasesTableModalGenre;
         if (color && genre) {
             this.props.addGenreColors([{ color, genre }]);
             this.props.closeNewReleaseModal();
@@ -46,14 +49,17 @@ class NewReleasesAddTagModal extends Component {
         }
     };
 
-    handleChangeColor = color => this.setState({ color });
-    handleSelectGenre = genre => this.setState({ genre });
+    handleChangeColor = ({ hex }) => this.props.setNewReleaseModalColor(hex);
+    handleSelectGenre = ({ value }) => this.props.setNewReleaseModalGenre(value);
+
     render() {
         const {
             availableGenres,
             genreColors,
             newReleasesTableModal,
-            closeNewReleaseModal
+            closeNewReleaseModal,
+            newReleasesTableModalGenre,
+            newReleasesTableModalColor
         } = this.props;
         return (
             <Modal open={newReleasesTableModal} onClose={closeNewReleaseModal}>
@@ -61,7 +67,14 @@ class NewReleasesAddTagModal extends Component {
                     {this.state.error && <Typography>{this.state.error}</Typography>}
                     <Autocomplete
                         onChange={this.handleSelectGenre}
-                        value={this.state.genre}
+                        value={
+                            newReleasesTableModalGenre
+                                ? {
+                                      value: newReleasesTableModalGenre,
+                                      label: newReleasesTableModalGenre
+                                  }
+                                : undefined
+                        }
                         options={map(
                             filter(
                                 availableGenres,
@@ -76,7 +89,7 @@ class NewReleasesAddTagModal extends Component {
                     />
                     <Typography>Pick a color</Typography>
                     <ChromePicker
-                        color={this.state.color}
+                        color={newReleasesTableModalColor}
                         onChangeComplete={this.handleChangeColor}
                     />
                     <Button variant="contained" color="primary" onClick={this.addGenreColors}>
@@ -93,9 +106,11 @@ class NewReleasesAddTagModal extends Component {
 
 export default connect(
     createStructuredSelector({
+        newReleasesTableModalGenre: newReleasesTableModalGenreSelector,
+        newReleasesTableModalColor: newReleasesTableModalColorSelector,
         newReleasesTableModal: newReleasesTableModalSelector,
         availableGenres: availableGenresSelector,
         genreColors: genreColorsSelector
     }),
-    { addGenreColors, closeNewReleaseModal }
+    { addGenreColors, closeNewReleaseModal, setNewReleaseModalColor, setNewReleaseModalGenre }
 )(NewReleasesAddTagModal);
