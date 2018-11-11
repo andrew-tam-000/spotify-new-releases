@@ -767,10 +767,9 @@ export function toggleShowAllNewReleaseTracks() {
     };
 }
 
-export function openNewReleaseModal(defaultGenre) {
+export function openNewReleaseModal() {
     return {
-        type: "newReleases|OPEN_NEW_RELEASE_MODAL",
-        payload: defaultGenre
+        type: "newReleases|OPEN_NEW_RELEASE_MODAL"
     };
 }
 

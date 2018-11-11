@@ -149,8 +149,7 @@ const appReducer = combineReducers({
             case openNewReleaseModal().type:
                 return {
                     ...state,
-                    modal: true,
-                    modalGenre: payload
+                    modal: true
                 };
             case closeNewReleaseModal().type:
                 return {

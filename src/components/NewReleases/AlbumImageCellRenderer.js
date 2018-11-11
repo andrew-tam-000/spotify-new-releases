@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { compose, withProps } from "recompact";
-import { openNewReleaseModal } from "../../redux/actions";
+import { openNewReleaseModal, setNewReleaseModalGenre } from "../../redux/actions";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import Typography from "@material-ui/core/Typography";
@@ -96,12 +96,13 @@ const Tag = styled.span`
 const withOpenModal = compose(
     connect(
         null,
-        { openNewReleaseModal }
+        { openNewReleaseModal, setNewReleaseModalGenre }
     ),
-    withProps(({ openNewReleaseModal, genre }) => ({
+    withProps(({ openNewReleaseModal, genre, setNewReleaseModalGenre }) => ({
         onClick: e => {
             e.stopPropagation();
-            openNewReleaseModal(genre);
+            openNewReleaseModal();
+            setNewReleaseModalGenre(genre);
         }
     }))
 );
