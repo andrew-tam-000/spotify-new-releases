@@ -415,20 +415,7 @@ const getNewReleasesCallback = (action$, state$, { spotifyApi }) =>
 const getNewReleases = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
-        mergeMap(action =>
-            thru(
-                JSON.parse(lzString.decompressFromUTF16(localStorage.getItem("newReleases"))),
-                ({ newReleases, albums, artists, songs }) => [
-                    getAlbumsSuccess(values(albums)),
-                    getArtistsSuccess(values(artists)),
-                    getTracksSuccess(values(songs)),
-                    getNewReleasesSuccess(newReleases)
-                ]
-            )
-        )
-    );
-
-/*
+        /*
         mapTo({ limit: 50, total: 1000, offset: 0, albums: [] }),
         expand(({ limit, total, offset, albums }) =>
             from(spotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
@@ -456,7 +443,24 @@ const getNewReleases = (action$, state$, { spotifyApi }) =>
             )
         ),
         catchError(e => console.error(e))
+        */
+        mergeMap(action =>
+            thru(
+                JSON.parse(lzString.decompressFromUTF16(localStorage.getItem("newReleases"))),
+                ({ newReleases, albums, artists, songs }) => [
+                    getAlbumsSuccess(values(albums)),
+                    getArtistsSuccess(values(artists)),
+                    getTracksSuccess(values(songs)),
+                    getNewReleasesSuccess(newReleases)
+                ]
+            )
+        )
     );
+
+/*
+const newReleases = { newReleases: store.getState().app.spotify.newReleases, artists: store.getState().app.spotify.artistData, songs: store.getState().app.spotify.songs, albums: store.getState().app.spotify.albums}
+
+localStorage.setItem('newReleases', lzstring.compressToUTF16(JSON.stringify(newReleases)))
 */
 
 const getAlbums = (action$, state$, { spotifyApi }) =>
@@ -498,13 +502,6 @@ const getAlbums = (action$, state$, { spotifyApi }) =>
                 : of(getAlbumsSuccess([]));
         })
     );
-
-/*
-const newReleases = { newReleases: store.getState().app.spotify.newReleases, artists: store.getState().app.spotify.artistData, songs: store.getState().app.spotify.songs, albums: store.getState().app.spotify.albums}
-
-localStorage.setItem('newReleases', lzstring.compressToUTF16(JSON.stringify(newReleases)))
-*/
-
 const cacheNewReleaseData = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesSuccess().type),

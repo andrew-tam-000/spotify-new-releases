@@ -33,10 +33,6 @@ const AlbumWrapper = styled.div`
     position: relative;
 `;
 
-const buttonStyles = {
-    fontSize: 20,
-    color: "white"
-};
 const ButtonWrapper = styled.div`
     position: absolute;
     width: 100%;
@@ -48,6 +44,11 @@ const ButtonWrapper = styled.div`
     align-items: center;
 `;
 
+const buttonStyles = {
+    fontSize: 20,
+    color: "white",
+    cursor: "pointer"
+};
 const PauseButton = materialStyled(PauseCircleOutlineIcon)(buttonStyles);
 const PlayButton = materialStyled(PlayCircleOutlineIcon)(buttonStyles);
 const NewReleasesAlbumPlayButton = props => (
