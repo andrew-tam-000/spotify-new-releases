@@ -1,4 +1,7 @@
 import React from "react";
+import { connect } from "react-redux";
+import { compose, withProps } from "recompact";
+import { openNewReleaseModal } from "../../redux/actions";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import Typography from "@material-ui/core/Typography";
@@ -90,6 +93,21 @@ const Tag = styled.span`
     }
 `;
 
+const withOpenModal = compose(
+    connect(
+        null,
+        { openNewReleaseModal }
+    ),
+    withProps(({ openNewReleaseModal }) => ({
+        onClick: e => {
+            e.stopPropagation();
+            openNewReleaseModal();
+        }
+    }))
+);
+
+const TypographyWithOpenModal = withOpenModal(Typography);
+
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
 // <StartTreeButton uri={uri} />
@@ -104,7 +122,9 @@ const AlbumImageCellRenderer = ({
         album,
         isTrack,
         meta: { genres }
-    }
+    },
+    modalOpen,
+    setModalOpen
 }) =>
     isTrack ? (
         <TrackBlurbCellRendererWrapper>
@@ -132,7 +152,9 @@ const AlbumImageCellRenderer = ({
                         <TagProvider id={genre}>
                             {({ active, onClick }) => (
                                 <Tag>
-                                    <Typography variant="caption">{genre}</Typography>
+                                    <TypographyWithOpenModal variant="caption">
+                                        {genre}
+                                    </TypographyWithOpenModal>
                                 </Tag>
                             )}
                         </TagProvider>

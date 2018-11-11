@@ -10,7 +10,6 @@ import {
     newReleasesByAlbumTableDataWithFiltersSelector,
     genreColorsSelector,
     queryParamsSelector,
-    availableGenresSelector,
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector
 } from "../../selectors";
@@ -20,7 +19,9 @@ import {
     showSideBar,
     addGenreColors,
     toggleShowAllNewReleaseTracks,
-    toggleNewReleaseColors
+    toggleNewReleaseColors,
+    openNewReleaseModal,
+    closeNewReleaseModal
 } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import TagProvider from "../Table/TagProvider";
@@ -137,46 +138,18 @@ class NewReleasesAlbumsTable extends Component {
         headerRenderer: HeaderCellRenderer
     };
 
-    initialState = {
-        addModalOpen: false,
-        genre: undefined,
-        color: "#FFFFFF",
-        error: undefined
-    };
-
-    state = this.initialState;
-
-    closeAddModal = () => this.setState(this.initialState);
-
-    openAddModal = () =>
-        this.setState({
-            addModalOpen: true
-        });
-
-    handleChangeColor = color => this.setState({ color });
-    handleSelectGenre = genre => this.setState({ genre });
-    addGenreColors = () => {
-        const color = get(this.state, "color.hex");
-        const genre = get(this.state, "genre.value");
-        if (color && genre) {
-            this.props.addGenreColors([{ color, genre }]);
-            this.setState(this.initialState);
-        } else {
-            this.setState({ error: "Please select a genre and a color" });
-        }
-    };
-
     // TODO: Use html encode library, he to encode strings
     render() {
         const {
             tableData,
             genreColors,
             queryParams,
-            availableGenres,
             newReleasesTableShowColors,
             newReleasesTableShowAllTracks,
             toggleShowAllNewReleaseTracks,
-            toggleNewReleaseColors
+            toggleNewReleaseColors,
+            openNewReleaseModal,
+            closeNewReleaseModal
         } = this.props;
         const active = compact(
             map(encodedStringifiedToObj(queryParams.tags, []), tagGenre =>
@@ -192,20 +165,11 @@ class NewReleasesAlbumsTable extends Component {
                         variant="fab"
                         color="primary"
                         aria-label="Add"
-                        onClick={this.openAddModal}
+                        onClick={openNewReleaseModal}
                     >
                         <AddIcon />
                     </Button>
-                    <NewReleasesAddTagModal
-                        open={this.state.addModalOpen}
-                        onClose={this.closeAddModal}
-                        error={this.state.error}
-                        onChangeGenre={this.handleSelectGenre}
-                        onChangeColor={this.handleChangeColor}
-                        genreValue={this.state.genre}
-                        colorValue={this.state.color}
-                        onSubmit={this.addGenreColors}
-                    />
+                    <NewReleasesAddTagModal />
                     <Tags>
                         {map(active, ({ genre, color }) => (
                             <TagProvider id={genre} backgroundColor={color}>
@@ -268,7 +232,6 @@ const mapStateToProps = createStructuredSelector({
     tableData: newReleasesByAlbumTableDataWithFiltersSelector,
     genreColors: genreColorsSelector,
     queryParams: queryParamsSelector,
-    availableGenres: availableGenresSelector,
     newReleasesTableShowColors: newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracks: newReleasesTableShowAllTracksSelector
 });
@@ -282,7 +245,9 @@ export default compose(
             addGenreColors,
             toggleNewReleaseAlbum,
             toggleShowAllNewReleaseTracks,
-            toggleNewReleaseColors
+            toggleNewReleaseColors,
+            openNewReleaseModal,
+            closeNewReleaseModal
         }
     )
 )(NewReleasesAlbumsTable);

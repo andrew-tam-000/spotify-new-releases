@@ -393,6 +393,16 @@ export const newReleasesTableShowAllTracksSelector = createSelector(
     newReleasesTable => get(newReleasesTable, "showAllTracks")
 );
 
+export const newReleasesTableModalSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "modal")
+);
+
+export const newReleasesTableModalGenreSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "modalGenre")
+);
+
 const rowHasTags = ({ row, tags }) =>
     size(tags)
         ? // Check that the size is right

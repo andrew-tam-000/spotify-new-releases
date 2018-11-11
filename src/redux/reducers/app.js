@@ -11,7 +11,9 @@ import {
     setDiscover,
     toggleNewReleaseAlbum,
     toggleShowAllNewReleaseTracks,
-    toggleNewReleaseColors
+    toggleNewReleaseColors,
+    openNewReleaseModal,
+    closeNewReleaseModal
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -140,6 +142,16 @@ const appReducer = combineReducers({
                 return {
                     ...state,
                     showColors: !state.showColors
+                };
+            case openNewReleaseModal().type:
+                return {
+                    ...state,
+                    modal: true
+                };
+            case closeNewReleaseModal().type:
+                return {
+                    ...state,
+                    modal: false
                 };
             default:
                 return state;

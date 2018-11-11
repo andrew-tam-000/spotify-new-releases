@@ -23,7 +23,9 @@ export default {
         newReleases: {
             openAlbums: {},
             showColors: true,
-            showAllTracks: false
+            showAllTracks: false,
+            modal: false,
+            modalGenre: ""
         },
         // has 'type' and 'data' as keys
         showSideBar: false,

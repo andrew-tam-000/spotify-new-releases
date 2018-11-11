@@ -766,3 +766,15 @@ export function toggleShowAllNewReleaseTracks() {
         type: "newReleases|TOGGLE_SHOW_ALL_NEW_RELEASE_TRACKS"
     };
 }
+
+export function openNewReleaseModal() {
+    return {
+        type: "newReleases|OPEN_NEW_RELEASE_MODAL"
+    };
+}
+
+export function closeNewReleaseModal() {
+    return {
+        type: "newReleases|CLOSE_NEW_RELEASE_MODAL"
+    };
+}
