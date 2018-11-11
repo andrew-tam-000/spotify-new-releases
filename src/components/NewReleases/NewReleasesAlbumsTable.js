@@ -97,7 +97,8 @@ const prefixColumnsProps = [
         key: "album",
         width: 140,
         headerRenderer: () => <SearchBar />,
-        disableSort: true
+        disableSort: true,
+        flexGrow: 5
     }
 ];
 

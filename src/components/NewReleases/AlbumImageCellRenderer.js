@@ -90,6 +90,7 @@ const Tag = styled.span`
     padding: 0 2px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     margin-right: 2px;
+    cursor: pointer;
 `;
 
 const withOpenModal = compose(

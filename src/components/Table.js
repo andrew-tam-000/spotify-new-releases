@@ -86,6 +86,7 @@ class Table extends Component {
                                     key={key}
                                     width={300}
                                     dataKey="noop"
+                                    flexGrow={1}
                                     {...columnConfig}
                                     headerRenderer={this.headerRenderer}
                                     {...prefixColumnProps}
@@ -96,6 +97,7 @@ class Table extends Component {
                                 <Column
                                     key={column.dataKey}
                                     width={300}
+                                    flexGrow={1}
                                     {...columnConfig}
                                     headerRenderer={this.headerRenderer}
                                     {...column}
@@ -107,6 +109,7 @@ class Table extends Component {
                                     key={key}
                                     width={300}
                                     dataKey="noop"
+                                    flexGrow={1}
                                     {...columnConfig}
                                     headerRenderer={this.headerRenderer}
                                     {...suffixColumnProps}
