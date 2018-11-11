@@ -17,10 +17,10 @@ import {
 } from "../../selectors";
 import Autocomplete from "../Table/Autocomplete";
 import Table from "../Table";
-import { showSideBar, addGenreColors } from "../../redux/actions";
+import { toggleNewReleaseAlbum, showSideBar, addGenreColors } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import Tag from "../Table/Tag";
-import { map, get, size, join, first, difference, filter, find, compact } from "lodash";
+import { noop, map, get, size, join, first, difference, filter, find, compact } from "lodash";
 import SearchBar from "../Table/SearchBar";
 import { encodedStringifiedToObj } from "../../utils";
 import AddIcon from "@material-ui/icons/Add";
@@ -94,7 +94,8 @@ const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
 
 class NewReleasesAlbumsTable extends Component {
     virtualizedConfig = {
-        onRowClick: ({ event, index, rowData: { uri } }) => this.props.showSideBar("album", uri),
+        onRowClick: ({ event, index, rowData: { uri, id, isTrack } }) =>
+            !isTrack ? this.props.toggleNewReleaseAlbum(id) : noop,
         rowStyle: ({ index }) => {
             const {
                 tableData: { rows }
@@ -256,6 +257,6 @@ export default compose(
     fetchNewReleases,
     connect(
         mapStateToProps,
-        { showSideBar, addGenreColors }
+        { showSideBar, addGenreColors, toggleNewReleaseAlbum }
     )
 )(NewReleasesAlbumsTable);

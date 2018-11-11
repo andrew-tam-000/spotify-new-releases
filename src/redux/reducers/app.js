@@ -8,7 +8,8 @@ import {
     removeGenreColors,
     showSideBar,
     hideSideBar,
-    setDiscover
+    setDiscover,
+    toggleNewReleaseAlbum
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -114,6 +115,20 @@ const appReducer = combineReducers({
             case removeGenreColors().type:
                 // TODO;
                 return omit(state, payload);
+            default:
+                return state;
+        }
+    },
+    newReleases: (state = {}, { type, payload }) => {
+        switch (type) {
+            case toggleNewReleaseAlbum().type:
+                return {
+                    ...state,
+                    openAlbums: {
+                        ...state.openAlbums,
+                        [payload]: !state.openAlbums[payload]
+                    }
+                };
             default:
                 return state;
         }

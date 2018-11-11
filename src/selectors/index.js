@@ -363,6 +363,26 @@ export const availableGenresSelector = createSelector(
         filter(newReleaseGenres, ({ genre }) => !find(encodedStringifiedToObj(tags, []), genre))
 );
 
+const newReleasesTableSelector = createSelector(
+    state => get(state, "app.newReleases"),
+    newReleases => newReleases
+);
+
+const newReleasesTableOpenAlbumsSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "openAlbums")
+);
+
+const newReleasesTableShowColorsSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "showColors")
+);
+
+const newReleasesTableShowAllTracksSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "showAllTracks")
+);
+
 // Preserve the order of the filters
 const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
     thru(
@@ -393,13 +413,68 @@ const tableDataFilter = ({ queryParams: { search, sort, tags }, rows }) =>
             )
     );
 
+const formatRow = ({ row, genreColors, showColors }) =>
+    reduce(
+        newReleasesByAlbumConfig,
+        (acc, { dataKey, getter, formatter }) => ({
+            ...acc,
+            [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
+        }),
+        {
+            meta: {
+                // Here for searchability
+                genres: row.genres,
+                ...(showColors
+                    ? {
+                          backgroundColors: compact(
+                              map(row.genres, genre =>
+                                  get(
+                                      find(genreColors, genreData => genreData.genre === genre),
+                                      "color"
+                                  )
+                              )
+                          )
+                      }
+                    : {})
+            }
+        }
+    );
+
+const formatTrackRows = ({ row, songs, genreColors, showColors }) =>
+    map(get(row, "album.tracks.items"), track =>
+        thru(
+            {
+                ...row,
+                track: songs[track.id]
+            },
+            row =>
+                formatRow({
+                    row,
+                    genreColors,
+                    showColors
+                })
+        )
+    );
+
 export const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesSelector,
     artistDataSelector,
     albumsSelector,
     genreColorsSelector,
     songsSelector,
-    (newReleases, artistData, albums, genreColors, songs) => ({
+    newReleasesTableOpenAlbumsSelector,
+    newReleasesTableShowColorsSelector,
+    newReleasesTableShowAllTracksSelector,
+    (
+        newReleases,
+        artistData,
+        albums,
+        genreColors,
+        songs,
+        newReleasesTableOpenAlbums,
+        newReleasesTableShowColors,
+        newReleasesTableShowAllTracks
+    ) => ({
         rows: flatMap(newReleases, newRelease =>
             thru(
                 {
@@ -411,67 +486,24 @@ export const newReleasesByAlbumTableDataSelector = createSelector(
                     newReleaseMeta: newRelease
                 },
                 row => [
-                    reduce(
-                        newReleasesByAlbumConfig,
-                        (acc, { dataKey, getter, formatter }) => ({
-                            ...acc,
-                            [dataKey]: formatter ? formatter(row) : getter ? get(row, getter) : null
-                        }),
-                        {
-                            meta: {
-                                genres: row.genres,
-                                backgroundColors: compact(
-                                    map(row.genres, genre =>
-                                        get(
-                                            find(
-                                                genreColors,
-                                                genreData => genreData.genre === genre
-                                            ),
-                                            "color"
-                                        )
-                                    )
-                                )
-                            }
-                        }
-                    ),
-                    // TODO: HERE
-                    // Add tracks to the list
-                    ...map(get(row, "album.tracks.items"), track =>
-                        thru(
-                            {
-                                ...row,
-                                track: songs[track.id]
-                            },
-                            row =>
-                                reduce(
-                                    newReleasesByAlbumConfig,
-                                    (acc, { dataKey, getter, formatter }) => ({
-                                        ...acc,
-                                        [dataKey]: formatter
-                                            ? formatter(row)
-                                            : getter
-                                                ? get(row, getter)
-                                                : null
-                                    }),
-                                    {
-                                        meta: {
-                                            genres: row.genres,
-                                            backgroundColors: compact(
-                                                map(row.genres, genre =>
-                                                    get(
-                                                        find(
-                                                            genreColors,
-                                                            genreData => genreData.genre === genre
-                                                        ),
-                                                        "color"
-                                                    )
-                                                )
-                                            )
-                                        }
-                                    }
-                                )
-                        )
-                    )
+                    ...(newReleasesTableShowAllTracks
+                        ? []
+                        : [
+                              formatRow({
+                                  row,
+                                  genreColors,
+                                  showColors: newReleasesTableShowColors
+                              })
+                          ]),
+                    ...(newReleasesTableShowAllTracks ||
+                    newReleasesTableOpenAlbums[get(row, "album.id")]
+                        ? formatTrackRows({
+                              row,
+                              songs,
+                              genreColors,
+                              showColors: newReleasesTableShowColors
+                          })
+                        : [])
                 ]
             )
         ),

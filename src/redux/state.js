@@ -20,6 +20,11 @@ export default {
         discover: {
             nodes: {}
         },
+        newReleases: {
+            openAlbums: {},
+            showColors: true,
+            showAllTracks: false
+        },
         // has 'type' and 'data' as keys
         showSideBar: false,
         // Let's sync this with firebase

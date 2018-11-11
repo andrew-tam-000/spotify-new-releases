@@ -747,3 +747,34 @@ export function removeGenreColors(genres) {
         payload: genres
     };
 }
+
+export function toggleNewReleaseAlbum(albumId) {
+    return {
+        type: "newReleases|TOGGLE_NEW_RELEASE_ALBUM",
+        payload: albumId
+    };
+}
+
+export function showNewReleaseColors() {
+    return {
+        type: "newReleases|SHOW_NEW_RELEASE_COLORS"
+    };
+}
+
+export function hideNewReleaseColors() {
+    return {
+        type: "newReleases|HIDE_NEW_RELEASE_COLORS"
+    };
+}
+
+export function showAllNewReleaseTracks() {
+    return {
+        type: "newReleases|SHOW_ALL_NEW_RELEASE_TRACKS"
+    };
+}
+
+export function hideAllNewReleaseTracks() {
+    return {
+        type: "newReleases|HIDE_ALL_NEW_RELEASE_TRACKS"
+    };
+}
