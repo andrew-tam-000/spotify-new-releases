@@ -6,13 +6,13 @@ import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import NewReleasesAddTagModal from "./NewReleasesAddTagModal";
 import {
-    newReleasesByAlbumTableDataWithFiltersSelector,
     genreColorsSelector,
     queryParamsSelector,
     albumsSelector,
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector
 } from "../../selectors";
+import { newReleasesByAlbumTableDataWithFiltersSelector } from "../../selectors/tables";
 import Table from "../Table";
 import {
     toggleNewReleaseAlbum,
