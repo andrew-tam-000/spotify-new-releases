@@ -12,7 +12,6 @@ import {
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector
 } from "../../selectors";
-import { newReleasesByAlbumTableDataWithFiltersSelector } from "../../selectors/tables";
 import Table from "../Table";
 import {
     toggleNewReleaseAlbum,

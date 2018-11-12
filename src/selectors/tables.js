@@ -109,38 +109,52 @@ const createHydratedData = ({
         list,
         (acc, item) =>
             thru(
-                type === "newRelease"
-                    ? {
-                          album: albums[item.id],
+                type === "librarySongs"
+                    ? thru([item, songs[item.track]], ([originalItem, item]) => ({
+                          id: item.id,
+                          album: albums[get(item, "album.id")],
                           artists: map(item.artists, artist => artistData[artist.id]),
                           genres: uniq(
                               flatMap(item.artists, artist => artistData[artist.id].genres)
                           ),
-                          id: item.id,
-                          meta: {
-                              release_date: item.release_date
-                          }
-                      }
-                    : type === "album"
+                          track: item,
+                          meta: { release_date: originalItem.added_at }
+                      }))
+                    : type === "newRelease"
                         ? {
-                              id: item.id,
-                              album: item,
+                              album: albums[item.id],
                               artists: map(item.artists, artist => artistData[artist.id]),
                               genres: uniq(
                                   flatMap(item.artists, artist => artistData[artist.id].genres)
-                              )
+                              ),
+                              id: item.id,
+                              meta: {
+                                  release_date: item.release_date
+                              }
                           }
-                        : type === "track"
+                        : type === "album"
                             ? {
                                   id: item.id,
-                                  album: albums[get(item, "album.id")],
+                                  album: item,
                                   artists: map(item.artists, artist => artistData[artist.id]),
                                   genres: uniq(
                                       flatMap(item.artists, artist => artistData[artist.id].genres)
-                                  ),
-                                  track: item
+                                  )
                               }
-                            : {},
+                            : type === "track"
+                                ? {
+                                      id: item.id,
+                                      album: albums[get(item, "album.id")],
+                                      artists: map(item.artists, artist => artistData[artist.id]),
+                                      genres: uniq(
+                                          flatMap(
+                                              item.artists,
+                                              artist => artistData[artist.id].genres
+                                          )
+                                      ),
+                                      track: item
+                                  }
+                                : {},
                 rowData =>
                     set(acc, rowData.id, {
                         rowData,
@@ -178,8 +192,8 @@ export const myLibraryDataSelector = createSelector(
         { sortBy, sortDirection },
         tags,
         search
-    ) =>
-        tableDataFilter({
+    ) => ({
+        rows: tableDataFilter({
             tags,
             search,
             rows: orderBy(
@@ -200,7 +214,9 @@ export const myLibraryDataSelector = createSelector(
                 sortBy,
                 map(sortBy, sort => toLower(sortDirection[sort]))
             )
-        })
+        }),
+        config: newReleasesByAlbumConfig
+    })
 );
 
 const newReleasesByAlbumTableDataSelector = createSelector(
