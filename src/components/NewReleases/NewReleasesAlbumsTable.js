@@ -26,7 +26,6 @@ import {
     reorderQueryTags
 } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
-import TagProvider from "../Table/TagProvider";
 import {
     noop,
     flatMap,
@@ -53,17 +52,7 @@ import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import PlayAll from "../PlayAll";
 import Switch from "@material-ui/core/Switch";
-import { SortableContainer, SortableElement, arrayMove } from "react-sortable-hoc";
-
-const Tag = styled.span.attrs({
-    fontWeight: props => (props.active ? 600 : 400)
-})`
-    background-color: ${props => props.backgroundColor};
-    padding: 10px;
-    white-space: nowrap;
-    text-align: center;
-    cursor: pointer;
-`;
+import TagList from "../Table/TagList";
 
 const NewReleasesAlbumsTableWrapper = styled.div`
     display: flex;
@@ -120,31 +109,6 @@ const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
         <Typography>{sortIndicator && sortIndicator}</Typography>
     </HeaderCell>
 );
-
-const SortableTag = SortableElement(Tag);
-
-const TagListWrapper = styled.div`
-    display: flex;
-`;
-const TagList = SortableContainer(({ tags, onClick, disabled }) => (
-    <TagListWrapper>
-        {map(tags, ({ genre, color }, index) => (
-            <TagProvider key={genre} id={genre} backgroundColor={color}>
-                {({ active, onClick }) => (
-                    <SortableTag
-                        disabled={disabled}
-                        index={index}
-                        onClick={onClick}
-                        active={active}
-                        backgroundColor={color}
-                    >
-                        <Typography>{genre}</Typography>
-                    </SortableTag>
-                )}
-            </TagProvider>
-        ))}
-    </TagListWrapper>
-));
 
 class NewReleasesAlbumsTable extends Component {
     virtualizedConfig = {
