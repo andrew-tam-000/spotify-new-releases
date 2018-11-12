@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { defaultTableHeaderRowRenderer } from "react-virtualized";
 import { compose, withPropsOnChange } from "recompact";
 import styled from "styled-components";
 import Typography from "@material-ui/core/Typography";
@@ -22,7 +21,9 @@ import {
     hideAllNewReleaseTracks,
     showAllNewReleaseTracks,
     toggleNewReleaseColors,
-    openNewReleaseModal
+    openNewReleaseModal,
+    reorderTags,
+    reorderQueryTags
 } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import TagProvider from "../Table/TagProvider";
@@ -52,6 +53,7 @@ import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import PlayAll from "../PlayAll";
 import Switch from "@material-ui/core/Switch";
+import { SortableContainer, SortableElement, arrayMove } from "react-sortable-hoc";
 
 const Tag = styled.span.attrs({
     fontWeight: props => (props.active ? 600 : 400)
@@ -63,9 +65,6 @@ const Tag = styled.span.attrs({
     cursor: pointer;
 `;
 
-const HeaderRowRenderer = styled(defaultTableHeaderRowRenderer)`
-    display: flex;
-`;
 const NewReleasesAlbumsTableWrapper = styled.div`
     display: flex;
     height: 100%;
@@ -76,12 +75,9 @@ const NewReleasesAlbumsTableWrapper = styled.div`
 
 const Tags = styled.div`
     display: flex;
-    flex-wrap: none;
+    flex-wrap: nowrap;
     overflow: auto;
     flex: 1;
-    > * {
-        flex: 1;
-    }
 `;
 
 const TagsWithButton = styled.div`
@@ -125,6 +121,31 @@ const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
     </HeaderCell>
 );
 
+const SortableTag = SortableElement(Tag);
+
+const TagListWrapper = styled.div`
+    display: flex;
+`;
+const TagList = SortableContainer(({ tags, onClick, disabled }) => (
+    <TagListWrapper>
+        {map(tags, ({ genre, color }, index) => (
+            <TagProvider key={genre} id={genre} backgroundColor={color}>
+                {({ active, onClick }) => (
+                    <SortableTag
+                        disabled={disabled}
+                        index={index}
+                        onClick={onClick}
+                        active={active}
+                        backgroundColor={color}
+                    >
+                        <Typography>{genre}</Typography>
+                    </SortableTag>
+                )}
+            </TagProvider>
+        ))}
+    </TagListWrapper>
+));
+
 class NewReleasesAlbumsTable extends Component {
     virtualizedConfig = {
         onRowClick: ({ event, index, rowData: { uri, id, isTrack } }) =>
@@ -145,8 +166,7 @@ class NewReleasesAlbumsTable extends Component {
             );
         },
         rowHeight: 60,
-        headerHeight: 32,
-        headerRenderer: HeaderRowRenderer
+        headerHeight: 32
     };
 
     columnConfig = {
@@ -162,6 +182,9 @@ class NewReleasesAlbumsTable extends Component {
             this.props.hideAllNewReleaseTracks();
         }
     };
+    handleQueryTagSort = ({ oldIndex, newIndex }) =>
+        this.props.reorderQueryTags(oldIndex, newIndex);
+    handleTagSort = ({ oldIndex, newIndex }) => this.props.reorderTags(oldIndex, newIndex);
 
     // TODO: Use html encode library, he to encode strings
     render() {
@@ -194,25 +217,19 @@ class NewReleasesAlbumsTable extends Component {
                     </Button>
                     <NewReleasesAddTagModal />
                     <Tags>
-                        {map(active, ({ genre, color }) => (
-                            <TagProvider id={genre} backgroundColor={color}>
-                                {({ active, onClick }) => (
-                                    <Tag onClick={onClick} active={active} backgroundColor={color}>
-                                        <Typography>{genre}</Typography>
-                                    </Tag>
-                                )}
-                            </TagProvider>
-                        ))}
+                        <TagList
+                            axis="x"
+                            distance={10}
+                            tags={active}
+                            onSortEnd={this.handleQueryTagSort}
+                        />
                         {active.length ? <ActiveDivider /> : null}
-                        {map(inactive, ({ genre, color }) => (
-                            <TagProvider id={genre}>
-                                {({ active, onClick }) => (
-                                    <Tag onClick={onClick} active={active} backgroundColor={color}>
-                                        <Typography>{genre}</Typography>
-                                    </Tag>
-                                )}
-                            </TagProvider>
-                        ))}
+                        <TagList
+                            axis="x"
+                            disabled={true}
+                            tags={inactive}
+                            onSortEnd={this.handleTagSort}
+                        />
                     </Tags>
                 </TagsWithButton>
                 <Settings>
@@ -272,7 +289,9 @@ export default compose(
             showAllNewReleaseTracks,
             hideAllNewReleaseTracks,
             toggleNewReleaseColors,
-            openNewReleaseModal
+            openNewReleaseModal,
+            reorderTags,
+            reorderQueryTags
         }
     ),
     withPropsOnChange(

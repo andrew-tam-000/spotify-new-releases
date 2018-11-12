@@ -1,11 +1,10 @@
 import analyzer from "./analyzer";
 import spotify from "./spotify";
 import discover from "./discover";
+import genreColors from "./genreColors";
 import { combineReducers } from "redux";
 import {
     addTracksToPlaylistSuccess,
-    addGenreColors,
-    removeGenreColors,
     showSideBar,
     hideSideBar,
     setDiscover,
@@ -17,7 +16,8 @@ import {
     setNewReleaseModalColor,
     setNewReleaseModalError,
     hideAllNewReleaseTracks,
-    showAllNewReleaseTracks
+    showAllNewReleaseTracks,
+    reorderTags
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -101,34 +101,7 @@ const appReducer = combineReducers({
         }
     },
     discover,
-    genreColors: (state = [], { type, payload }) => {
-        switch (type) {
-            case addGenreColors().type:
-                return [
-                    ...map(
-                        state,
-                        existingGenre =>
-                            find(
-                                payload.genreColors,
-                                newGenre => newGenre.genre === existingGenre.genre
-                            ) || existingGenre
-                    ),
-                    // Filter the newly added genres
-                    ...filter(
-                        payload.genreColors,
-                        newGenre =>
-                            // If you can't find the new genre in the existing genre
-                            // then we should filter it out
-                            !find(state, existingGenre => existingGenre.genre === newGenre.genre)
-                    )
-                ];
-            case removeGenreColors().type:
-                // TODO;
-                return omit(state, payload);
-            default:
-                return state;
-        }
-    },
+    genreColors,
     newReleases: (state = {}, { type, payload }) => {
         switch (type) {
             case toggleNewReleaseAlbum().type:

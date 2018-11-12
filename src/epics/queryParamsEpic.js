@@ -5,7 +5,8 @@ import {
     addGenreColors,
     toggleTagFromQuery,
     addTagToQuery,
-    removeTagFromQuery
+    removeTagFromQuery,
+    reorderQueryTags
 } from "../redux/actions";
 import { push } from "react-router-redux";
 import queryString from "query-string";
@@ -17,6 +18,7 @@ import {
 } from "../selectors";
 import lzString from "lz-string";
 import { difference, map, includes, thru, filter, concat } from "lodash";
+import { arrayMove } from "react-sortable-hoc";
 
 const onAddGenreEpic = (action$, state$, { spotifyApi }) =>
     action$.pipe(
@@ -47,7 +49,7 @@ const onAddGenreEpic = (action$, state$, { spotifyApi }) =>
         )
     );
 
-const toggleTag = (action$, state$, { spotifyApi }) =>
+const toggleTagEpic = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(toggleTagFromQuery().type),
         mergeMap(({ payload }) => {
@@ -73,5 +75,31 @@ const toggleTag = (action$, state$, { spotifyApi }) =>
         })
     );
 
+const reorderQueryTagsEpic = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(reorderQueryTags().type),
+        mergeMap(({ payload: { oldIndex, newIndex } }) => {
+            if (oldIndex === newIndex) {
+                return EMPTY;
+            }
+            const queryParams = queryParamsSelector(state$.value);
+            const queryParamsTags = queryParamsTagsSelector(state$.value);
+            return of(
+                push({
+                    search:
+                        "?" +
+                        queryString.stringify({
+                            ...queryParams,
+                            tags: encodeURI(
+                                JSON.stringify(arrayMove(queryParamsTags, oldIndex, newIndex))
+                            )
+                        })
+                })
+            );
+        })
+    );
+
 export default (...args) =>
-    merge(onAddGenreEpic(...args), toggleTag(...args)).pipe(catchError(e => console.error(e)));
+    merge(onAddGenreEpic(...args), toggleTagEpic(...args), reorderQueryTagsEpic(...args)).pipe(
+        catchError(e => console.error(e))
+    );

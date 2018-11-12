@@ -819,3 +819,17 @@ export function toggleTagFromQuery(tag) {
         payload: tag
     };
 }
+
+export function reorderQueryTags(oldIndex, newIndex) {
+    return {
+        type: "queryParams|REORDER_TAGS_FROM_QUERY",
+        payload: { oldIndex, newIndex }
+    };
+}
+
+export function reorderTags(oldIndex, newIndex) {
+    return {
+        type: "REORDER_TAGS",
+        payload: { oldIndex, newIndex }
+    };
+}
