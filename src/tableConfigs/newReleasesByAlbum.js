@@ -37,7 +37,7 @@ export default [
     {
         label: <CalendarTodayIcon />,
         dataKey: "releaseDate",
-        getter: "newReleaseMeta.release_date",
+        getter: "meta.release_date",
         width: 80
     },
     {

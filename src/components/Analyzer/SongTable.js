@@ -4,7 +4,8 @@ import styled from "styled-components";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { Column, Table as _Table, SortIndicator } from "react-virtualized";
-import { analyzerSortSelector, librarySongListSelector } from "../../selectors";
+import { analyzerSortSelector } from "../../selectors";
+import { myLibraryDataSelector } from "../../selectors/tables";
 import { analyzerUpdateSort } from "../../redux/actions";
 import createMultiSort from "./createMultiSort";
 import { map, filter, get, mapKeys } from "lodash";
@@ -92,7 +93,7 @@ class SongTable extends Component {
 
 const mapStateToProps = createStructuredSelector({
     analyzerSort: analyzerSortSelector,
-    librarySongList: librarySongListSelector,
+    librarySongList: myLibraryDataSelector,
     analyzerSearchTerm: analyzerSearchTermSelector
 });
 

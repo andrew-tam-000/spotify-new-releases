@@ -19,6 +19,7 @@ import {
 } from "lodash";
 import { createSelector } from "reselect";
 import {
+    librarySongsSelector,
     newReleasesSelector,
     artistDataSelector,
     albumsSelector,
@@ -115,10 +116,14 @@ const createHydratedData = ({
                           genres: uniq(
                               flatMap(item.artists, artist => artistData[artist.id].genres)
                           ),
-                          newRelease: item
+                          id: item.id,
+                          meta: {
+                              release_date: item.release_date
+                          }
                       }
                     : type === "album"
                         ? {
+                              id: item.id,
                               album: item,
                               artists: map(item.artists, artist => artistData[artist.id]),
                               genres: uniq(
@@ -127,6 +132,7 @@ const createHydratedData = ({
                           }
                         : type === "track"
                             ? {
+                                  id: item.id,
                                   album: albums[get(item, "album.id")],
                                   artists: map(item.artists, artist => artistData[artist.id]),
                                   genres: uniq(
@@ -136,7 +142,7 @@ const createHydratedData = ({
                               }
                             : {},
                 rowData =>
-                    set(acc, get(rowData, `${type}.id`), {
+                    set(acc, rowData.id, {
                         rowData,
                         tableRow: formatRow({
                             rowData,
@@ -147,6 +153,55 @@ const createHydratedData = ({
             ),
         {}
     );
+
+export const myLibraryDataSelector = createSelector(
+    librarySongsSelector,
+    artistDataSelector,
+    albumsSelector,
+    genreColorsMapSelector,
+    songsSelector,
+    newReleasesTableOpenAlbumsSelector,
+    newReleasesTableShowColorsSelector,
+    newReleasesTableShowAllTracksSelector,
+    queryParamsSortSelector,
+    queryParamsTagsSelector,
+    queryParamsSearchSelector,
+    (
+        librarySongs,
+        artistData,
+        albums,
+        genreColorsMap,
+        songs,
+        newReleasesTableOpenAlbums,
+        newReleasesTableShowColors,
+        newReleasesTableShowAllTracks,
+        { sortBy, sortDirection },
+        tags,
+        search
+    ) =>
+        tableDataFilter({
+            tags,
+            search,
+            rows: orderBy(
+                map(
+                    values(
+                        createHydratedData({
+                            type: "librarySongs",
+                            list: librarySongs,
+                            showColors: newReleasesTableShowColors,
+                            songs,
+                            albums,
+                            artistData,
+                            genreColorsMap
+                        })
+                    ),
+                    ({ tableRow }) => tableRow
+                ),
+                sortBy,
+                map(sortBy, sort => toLower(sortDirection[sort]))
+            )
+        })
+);
 
 const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesSelector,
