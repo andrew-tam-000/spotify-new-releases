@@ -24,7 +24,6 @@ import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import PlayDash from "./PlayDash";
 import Search from "./Search";
 import NewReleases from "./NewReleases";
-import NewReleasesTracksTable from "./NewReleases/NewReleasesTracksTable";
 import NewReleasesAlbumsTable from "./NewReleases/NewReleasesAlbumsTable";
 import _Drawer from "@material-ui/core/Drawer";
 import { searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel } from "../redux/actions";
@@ -111,11 +110,6 @@ class RouteProvider extends Component {
                                     exact
                                     path="/new-releases/albums"
                                     component={NewReleasesAlbumsTable}
-                                />
-                                <Route
-                                    exact
-                                    path="/new-releases/tracks"
-                                    component={NewReleasesTracksTable}
                                 />
                                 <Route exact path="/discover" component={Discover} />
                                 <Route exact path="/analyzer" component={Analyzer} />

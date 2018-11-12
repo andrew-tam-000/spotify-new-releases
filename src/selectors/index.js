@@ -573,41 +573,6 @@ export const newReleasesByAlbumTableDataWithFiltersSelector = createSelector(
     })
 );
 
-export const newReleasesByTrackTableDataSelector = createSelector(
-    newReleasesSelector,
-    artistDataSelector,
-    albumsSelector,
-    songsSelector,
-    (newReleases, artistData, albums, songs) => ({
-        rows: flatMap(newReleases, newRelease =>
-            map(map(get(albums, [newRelease.id, "tracks", "items"]), "id"), trackId =>
-                thru(
-                    {
-                        album: albums[newRelease.id],
-                        artists: map(newRelease.artists, artist => artistData[artist.id]),
-                        newReleaseMeta: newRelease,
-                        track: songs[trackId]
-                    },
-                    row =>
-                        reduce(
-                            newReleasesByTrackConfig,
-                            (acc, { dataKey, getter, formatter }) => ({
-                                ...acc,
-                                [dataKey]: formatter
-                                    ? formatter(row)
-                                    : getter
-                                        ? get(row, getter)
-                                        : null
-                            }),
-                            {}
-                        )
-                )
-            )
-        ),
-        config: newReleasesByTrackConfig
-    })
-);
-
 export const tracksForAlbumForIdSelector = createSelector(
     albumsSelector,
     songsSelector,
