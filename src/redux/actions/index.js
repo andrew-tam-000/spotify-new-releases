@@ -761,9 +761,15 @@ export function toggleNewReleaseColors() {
     };
 }
 
-export function toggleShowAllNewReleaseTracks() {
+export function hideAllNewReleaseTracks() {
     return {
-        type: "newReleases|TOGGLE_SHOW_ALL_NEW_RELEASE_TRACKS"
+        type: "newReleases|HIDE_ALL_NEW_RELEASE_TRACKS"
+    };
+}
+
+export function showAllNewReleaseTracks() {
+    return {
+        type: "newReleases_SHOW_ALL_NEW_RELEASE_TRACKS"
     };
 }
 

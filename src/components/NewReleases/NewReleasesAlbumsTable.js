@@ -19,7 +19,8 @@ import {
     toggleNewReleaseAlbum,
     showSideBar,
     addGenreColors,
-    toggleShowAllNewReleaseTracks,
+    hideAllNewReleaseTracks,
+    showAllNewReleaseTracks,
     toggleNewReleaseColors,
     openNewReleaseModal
 } from "../../redux/actions";
@@ -154,6 +155,13 @@ class NewReleasesAlbumsTable extends Component {
     };
 
     openNewReleaseModal = () => this.props.openNewReleaseModal();
+    toggleShowAllNewReleaseTracks = (e, val) => {
+        if (val === "tracks") {
+            this.props.showAllNewReleaseTracks();
+        } else if (val === "albums") {
+            this.props.hideAllNewReleaseTracks();
+        }
+    };
 
     // TODO: Use html encode library, he to encode strings
     render() {
@@ -163,7 +171,6 @@ class NewReleasesAlbumsTable extends Component {
             queryParams,
             newReleasesTableShowColors,
             newReleasesTableShowAllTracks,
-            toggleShowAllNewReleaseTracks,
             toggleNewReleaseColors,
             playAllUris
         } = this.props;
@@ -221,7 +228,8 @@ class NewReleasesAlbumsTable extends Component {
                     />
                     <div>
                         <ToggleButtonGroup
-                            onChange={toggleShowAllNewReleaseTracks}
+                            exclusive={true}
+                            onChange={this.toggleShowAllNewReleaseTracks}
                             value={newReleasesTableShowAllTracks ? "tracks" : "albums"}
                         >
                             <ToggleButton value="tracks">
@@ -261,7 +269,8 @@ export default compose(
             showSideBar,
             addGenreColors,
             toggleNewReleaseAlbum,
-            toggleShowAllNewReleaseTracks,
+            showAllNewReleaseTracks,
+            hideAllNewReleaseTracks,
             toggleNewReleaseColors,
             openNewReleaseModal
         }
@@ -277,7 +286,7 @@ export default compose(
                           map(get(albums, `${id}.tracks.items`), "uri")
                       ),
                 0,
-                1000
+                500
             )
         })
     )

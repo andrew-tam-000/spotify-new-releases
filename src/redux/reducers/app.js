@@ -10,13 +10,14 @@ import {
     hideSideBar,
     setDiscover,
     toggleNewReleaseAlbum,
-    toggleShowAllNewReleaseTracks,
     toggleNewReleaseColors,
     openNewReleaseModal,
     closeNewReleaseModal,
     setNewReleaseModalGenre,
     setNewReleaseModalColor,
-    setNewReleaseModalError
+    setNewReleaseModalError,
+    hideAllNewReleaseTracks,
+    showAllNewReleaseTracks,
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -136,10 +137,15 @@ const appReducer = combineReducers({
                         [payload]: !state.openAlbums[payload]
                     }
                 };
-            case toggleShowAllNewReleaseTracks().type:
+            case hideAllNewReleaseTracks().type:
                 return {
                     ...state,
-                    showAllTracks: !state.showAllTracks
+                    showAllTracks: false
+                };
+            case showAllNewReleaseTracks().type:
+                return {
+                    ...state,
+                    showAllTracks: true
                 };
             case toggleNewReleaseColors().type:
                 return {
