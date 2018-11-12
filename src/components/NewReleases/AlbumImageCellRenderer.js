@@ -136,6 +136,19 @@ const AlbumImageCellRenderer = ({
                 <Typography noWrap={true} variant="caption">
                     {artist}
                 </Typography>
+                <Genres>
+                    {map(genres, genre => (
+                        <TagProvider id={genre}>
+                            {({ active, onClick, color }) => (
+                                <Tag color={color}>
+                                    <TypographyWithOpenModal genre={genre} variant="caption">
+                                        {genre}
+                                    </TypographyWithOpenModal>
+                                </Tag>
+                            )}
+                        </TagProvider>
+                    ))}
+                </Genres>
             </Description>
         </TrackBlurbCellRendererWrapper>
     ) : (
