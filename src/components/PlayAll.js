@@ -5,13 +5,7 @@ import Button from "@material-ui/core/Button";
 import { playSongStart } from "../redux/actions";
 
 const PlayAllButton = ({ playSongStart, uris }) => (
-    <Button
-        onClick={playSongStart}
-        fullWidth={true}
-        variant="contained"
-        color="primary"
-        aria-label="Add"
-    >
+    <Button onClick={playSongStart} variant="contained" color="primary" aria-label="Add">
         Play All
     </Button>
 );

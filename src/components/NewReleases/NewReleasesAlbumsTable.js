@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { defaultTableHeaderRowRenderer } from "react-virtualized";
-import { compose } from "recompose";
+import { compose, withPropsOnChange } from "recompact";
 import styled from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
@@ -10,6 +10,7 @@ import {
     newReleasesByAlbumTableDataWithFiltersSelector,
     genreColorsSelector,
     queryParamsSelector,
+    albumsSelector,
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector
 } from "../../selectors";
@@ -20,12 +21,24 @@ import {
     addGenreColors,
     toggleShowAllNewReleaseTracks,
     toggleNewReleaseColors,
-    openNewReleaseModal,
-    closeNewReleaseModal
+    openNewReleaseModal
 } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 import TagProvider from "../Table/TagProvider";
-import { noop, map, get, size, join, first, difference, find, compact } from "lodash";
+import {
+    noop,
+    flatMap,
+    map,
+    get,
+    size,
+    join,
+    first,
+    difference,
+    find,
+    compact,
+    filter,
+    slice
+} from "lodash";
 import SearchBar from "../Table/SearchBar";
 import { encodedStringifiedToObj } from "../../utils";
 import AddIcon from "@material-ui/icons/Add";
@@ -36,6 +49,7 @@ import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import PlayAll from "../PlayAll";
 import Switch from "@material-ui/core/Switch";
 
 const Tag = styled.span.attrs({
@@ -151,7 +165,7 @@ class NewReleasesAlbumsTable extends Component {
             newReleasesTableShowAllTracks,
             toggleShowAllNewReleaseTracks,
             toggleNewReleaseColors,
-            closeNewReleaseModal
+            playAllUris
         } = this.props;
         const active = compact(
             map(encodedStringifiedToObj(queryParams.tags, []), tagGenre =>
@@ -195,6 +209,7 @@ class NewReleasesAlbumsTable extends Component {
                     </Tags>
                 </TagsWithButton>
                 <Settings>
+                    <PlayAll uris={playAllUris} />
                     <FormControlLabel
                         control={
                             <Switch
@@ -234,7 +249,8 @@ const mapStateToProps = createStructuredSelector({
     genreColors: genreColorsSelector,
     queryParams: queryParamsSelector,
     newReleasesTableShowColors: newReleasesTableShowColorsSelector,
-    newReleasesTableShowAllTracks: newReleasesTableShowAllTracksSelector
+    newReleasesTableShowAllTracks: newReleasesTableShowAllTracksSelector,
+    albums: albumsSelector
 });
 
 export default compose(
@@ -247,8 +263,22 @@ export default compose(
             toggleNewReleaseAlbum,
             toggleShowAllNewReleaseTracks,
             toggleNewReleaseColors,
-            openNewReleaseModal,
-            closeNewReleaseModal
+            openNewReleaseModal
         }
+    ),
+    withPropsOnChange(
+        ["tableData", "newReleasesTableShowAllTracks", "albums"],
+        ({ tableData: { rows }, newReleasesTableShowAllTracks, albums }) => ({
+            // BUG - spotify doesn't accept arbitrarily large uri's
+            playAllUris: slice(
+                newReleasesTableShowAllTracks
+                    ? map(rows, "uri")
+                    : flatMap(filter(rows, ({ isTrack }) => !isTrack), ({ id }) =>
+                          map(get(albums, `${id}.tracks.items`), "uri")
+                      ),
+                0,
+                1000
+            )
+        })
     )
 )(NewReleasesAlbumsTable);
