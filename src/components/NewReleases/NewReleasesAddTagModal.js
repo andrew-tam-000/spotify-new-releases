@@ -42,7 +42,7 @@ class NewReleasesAddTagModal extends Component {
         const color = this.props.newReleasesTableModalColor;
         const genre = this.props.newReleasesTableModalGenre;
         if (color && genre) {
-            this.props.addGenreColors([{ color, genre }]);
+            this.props.addGenreColors([{ color, genre }], true);
             this.props.closeNewReleaseModal();
         } else {
             this.setState({ error: "Please select a genre and a color" });

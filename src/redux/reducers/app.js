@@ -17,7 +17,7 @@ import {
     setNewReleaseModalColor,
     setNewReleaseModalError,
     hideAllNewReleaseTracks,
-    showAllNewReleaseTracks,
+    showAllNewReleaseTracks
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -108,12 +108,14 @@ const appReducer = combineReducers({
                     ...map(
                         state,
                         existingGenre =>
-                            find(payload, newGenre => newGenre.genre === existingGenre.genre) ||
-                            existingGenre
+                            find(
+                                payload.genreColors,
+                                newGenre => newGenre.genre === existingGenre.genre
+                            ) || existingGenre
                     ),
                     // Filter the newly added genres
                     ...filter(
-                        payload,
+                        payload.genreColors,
                         newGenre =>
                             // If you can't find the new genre in the existing genre
                             // then we should filter it out

@@ -22,6 +22,7 @@ import spotifyApiTriggers from "./spotifyApiTriggers";
 import discoverTriggers from "./discoverTriggers";
 import setLocalStorageEpic from "./setLocalStorageEpic";
 import syncGenreToColorEpic from "./syncGenreToColorEpic";
+import queryParamsEpic from "./queryParamsEpic";
 
 export default (...args) =>
     merge(
@@ -46,6 +47,7 @@ export default (...args) =>
         getArtistData(...args),
         spotifyApiTriggers(...args),
         discoverTriggers(...args),
+        queryParamsEpic(...args),
         syncGenreToColorEpic(...args)
         //setLocalStorageEpic(...args)
     );

@@ -734,10 +734,10 @@ export function setLocalStorage(key, data) {
     };
 }
 
-export function addGenreColors(genreColors) {
+export function addGenreColors(genreColors, setActive) {
     return {
         type: "genreColors|ADD_GENRES_WITH_COLOR",
-        payload: genreColors
+        payload: { genreColors, setActive }
     };
 }
 
@@ -796,5 +796,26 @@ export function setNewReleaseModalGenre(genre) {
     return {
         type: "newReleases|SET_NEW_RELEASE_MODAL_GENRE",
         payload: genre
+    };
+}
+
+export function addTagToQuery(tag) {
+    return {
+        type: "queryParams|ADD_TAG_TO_QUERY",
+        payload: tag
+    };
+}
+
+export function removeTagFromQuery(tag) {
+    return {
+        type: "queryParams|REMOVE_TAG_FROM_QUERY",
+        payload: tag
+    };
+}
+
+export function toggleTagFromQuery(tag) {
+    return {
+        type: "queryParams|TOGGLE_TAG_FROM_QUERY",
+        payload: tag
     };
 }
