@@ -26,7 +26,7 @@ export default {
             showAllTracks: false,
             modal: false,
             modalGenre: "",
-            modalColor: "",
+            modalColor: ""
         },
         // has 'type' and 'data' as keys
         showSideBar: false,

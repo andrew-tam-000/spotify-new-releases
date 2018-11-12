@@ -88,9 +88,10 @@ const Genres = styled.div`
 const Tag = styled.span`
     background-color: ${props => props.color};
     padding: 0 2px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     margin-right: 2px;
     cursor: pointer;
+    opacity: ${props => (props.color ? 1 : ".4")};
 `;
 
 const withOpenModal = compose(

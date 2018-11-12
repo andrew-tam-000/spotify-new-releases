@@ -154,7 +154,9 @@ const appReducer = combineReducers({
             case closeNewReleaseModal().type:
                 return {
                     ...state,
-                    modal: false
+                    modal: false,
+                    modalGenre: "",
+                    modalColor: ""
                 };
 
             case setNewReleaseModalGenre().type:
