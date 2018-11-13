@@ -350,7 +350,7 @@ export const newReleaseGenresSelector = createSelector(
             map(
                 countBy(
                     flatMapDeep(newReleases, newRelease =>
-                        map(newRelease.artists, artist => artistData[artist.id].genres)
+                        map(newRelease.artists, artist => get(artistData[artist.id], "genres"))
                     )
                 ),
                 (count, genre) => ({ count, genre })

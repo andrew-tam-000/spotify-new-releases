@@ -15,9 +15,9 @@ export default function initializeOnNewRelease(action$, state$) {
         ofType(initializeOnNewReleasesStart().type),
         mergeMap(() =>
             concat(
-                of(createAccessTokenStart()),
+                //of(createAccessTokenStart()),
                 action$.pipe(
-                    ofType(createAccessTokenSuccess().type),
+                    //ofType(createAccessTokenSuccess().type),
                     mapTo(getNewReleasesStart()),
                     take(1)
                 )

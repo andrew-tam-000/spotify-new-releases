@@ -24,7 +24,6 @@ import {
     reorderTags,
     reorderQueryTags
 } from "../../redux/actions";
-import fetchNewReleases from "../../hoc/fetchNewReleases";
 import {
     noop,
     flatMap,
@@ -241,7 +240,6 @@ const mapStateToProps = createStructuredSelector({
 });
 
 export default compose(
-    fetchNewReleases,
     connect(
         mapStateToProps,
         {

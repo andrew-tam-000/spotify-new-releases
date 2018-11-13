@@ -115,7 +115,7 @@ const createHydratedData = ({
                           album: albums[get(item, "album.id")],
                           artists: map(item.artists, artist => artistData[artist.id]),
                           genres: uniq(
-                              flatMap(item.artists, artist => artistData[artist.id].genres)
+                              flatMap(item.artists, artist => get(artistData[artist.id], "genres"))
                           ),
                           track: item,
                           meta: { release_date: originalItem.added_at }
@@ -125,7 +125,9 @@ const createHydratedData = ({
                               album: albums[item.id],
                               artists: map(item.artists, artist => artistData[artist.id]),
                               genres: uniq(
-                                  flatMap(item.artists, artist => artistData[artist.id].genres)
+                                  flatMap(item.artists, artist =>
+                                      get(artistData[artist.id], "genres")
+                                  )
                               ),
                               id: item.id,
                               meta: {
@@ -138,7 +140,9 @@ const createHydratedData = ({
                                   album: item,
                                   artists: map(item.artists, artist => artistData[artist.id]),
                                   genres: uniq(
-                                      flatMap(item.artists, artist => artistData[artist.id].genres)
+                                      flatMap(item.artists, artist =>
+                                          get(artistData[artist.id], "genres")
+                                      )
                                   )
                               }
                             : type === "track"
@@ -147,9 +151,8 @@ const createHydratedData = ({
                                       album: albums[get(item, "album.id")],
                                       artists: map(item.artists, artist => artistData[artist.id]),
                                       genres: uniq(
-                                          flatMap(
-                                              item.artists,
-                                              artist => artistData[artist.id].genres
+                                          flatMap(item.artists, artist =>
+                                              get(artistData[artist.id], "genres")
                                           )
                                       ),
                                       track: item

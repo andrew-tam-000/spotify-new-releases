@@ -1,4 +1,5 @@
 import { ofType } from "redux-observable";
+import axios from "axios";
 import {
     chunk,
     keys,
@@ -415,6 +416,20 @@ const getNewReleasesCallback = (action$, state$, { spotifyApi }) =>
 const getNewReleases = (action$, state$, { spotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
+        mergeMap(action =>
+            from(
+                axios({
+                    url: "https://spotify-playlist-1e3fc.firebaseio.com/newReleaseData.json"
+                })
+            ).pipe(
+                mergeMap(({ data: { albums, artists, tracks, newReleases } }) => [
+                    getAlbumsSuccess(values(albums)),
+                    getArtistsSuccess(values(artists)),
+                    getTracksSuccess(values(tracks)),
+                    getNewReleasesSuccess(values(newReleases))
+                ])
+            )
+        )
         /*
         mapTo({ limit: 50, total: 1000, offset: 0, albums: [] }),
         expand(({ limit, total, offset, albums }) =>
@@ -444,6 +459,7 @@ const getNewReleases = (action$, state$, { spotifyApi }) =>
         ),
         catchError(e => console.error(e))
         */
+        /*
         mergeMap(action =>
             thru(
                 JSON.parse(lzString.decompressFromUTF16(localStorage.getItem("newReleases"))),
@@ -455,6 +471,7 @@ const getNewReleases = (action$, state$, { spotifyApi }) =>
                 ]
             )
         )
+            */
     );
 
 /*
