@@ -27,7 +27,6 @@ import {
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
 import qs from "qs";
-import { encodedStringifiedToObj } from "../utils";
 
 export const accessTokenSelector = createSelector(
     state => get(state, "app.firebase.token"),
@@ -322,19 +321,22 @@ export const artistImageForTrackIdSelector = createSelector(
 
 export const queryParamsSelector = createSelector(
     state => get(state, "router.location.search"),
-    query => qs.parse(query)
+    query => qs.parse(query.substring(1))
 );
 
-export const queryParamsTagsSelector = createSelector(queryParamsSelector, queryParams =>
-    encodedStringifiedToObj(get(queryParams, "tags"), [])
+export const queryParamsTagsSelector = createSelector(
+    queryParamsSelector,
+    queryParams => queryParams.tags || []
 );
 
-export const queryParamsSortSelector = createSelector(queryParamsSelector, queryParams =>
-    encodedStringifiedToObj(get(queryParams, "sort"))
+export const queryParamsSortSelector = createSelector(
+    queryParamsSelector,
+    queryParams => queryParams.sort || {}
 );
 
-export const queryParamsSearchSelector = createSelector(queryParamsSelector, queryParams =>
-    get(queryParams, "search")
+export const queryParamsSearchSelector = createSelector(
+    queryParamsSelector,
+    queryParams => queryParams.search || ""
 );
 
 export const newReleasesSelector = createSelector(

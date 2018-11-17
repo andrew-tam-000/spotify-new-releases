@@ -12,7 +12,6 @@ import "react-virtualized/styles.css";
 
 import createMultiSort from "./Analyzer/createMultiSort";
 import { queryParamsSelector } from "../selectors";
-import { encodedStringifiedToObj } from "../utils";
 
 const VirtualizedTable = styled(_VirtualizedTable)`
     .ReactVirtualized__Table__rowColumn:first-child {
@@ -37,11 +36,11 @@ class Table extends Component {
                     "?" +
                     qs.stringify({
                         ...this.props.queryParams,
-                        sort: encodeURI(JSON.stringify(sortParams))
+                        sort: sortParams
                     })
             }),
         mapKeys(
-            encodedStringifiedToObj(this.props.queryParams.sort),
+            qs.parse(this.props.queryParams.sort),
             (val, key) => (key === "sortBy" ? "defaultSortBy" : "defaultSortDirection")
         )
     );

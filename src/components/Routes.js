@@ -73,18 +73,12 @@ class RouteProvider extends Component {
             history.push("/analyzer");
         }
         if (val === 1) {
-            history.push("/123");
-        }
-        if (val === 2) {
             history.push("/discover");
         }
-        if (val === 3) {
+        if (val === 2) {
             history.push("/new-releases");
         }
-        if (val === 4) {
-            this.props.analyzerOpenSearchPanel();
-        }
-        if (val === 5) {
+        if (val === 3) {
             this.props.searchOpenPanel();
         }
     };
@@ -135,10 +129,8 @@ class RouteProvider extends Component {
                     </MainContent>
                     <BottomNavigation value="0" onChange={this.handleChange} showLabels>
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
-                        <BottomNavigationAction label="Playlist" icon={<QueueMusicIcon />} />
                         <BottomNavigationAction label="Discover" icon={<NewReleasesIcon />} />
                         <BottomNavigationAction label="New Releases" icon={<NewReleasesIcon />} />
-                        <BottomNavigationAction label="SimilarSongs" icon={<ImageSearchIcon />} />
                         <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
                 </AppWrapper>

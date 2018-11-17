@@ -7,19 +7,6 @@ export function getAccessTokenFromUrl(win) {
     return qs.parse(hash.substr(hash.indexOf("access_token"))).access_token;
 }
 
-export const encodedStringifiedToObj = (encodedStringified, defaultVal = {}) => {
-    if (!encodedStringified) {
-        return defaultVal;
-    }
-
-    try {
-        return JSON.parse(decodeURI(encodedStringified)) || defaultVal;
-    } catch (e) {
-        console.error(e);
-        return defaultVal;
-    }
-};
-
 const decompressData = compressedData => {
     try {
         return JSON.parse(lzString.decompressFromUTF16(compressedData));

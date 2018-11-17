@@ -41,7 +41,6 @@ import {
     slice
 } from "lodash";
 import SearchBar from "./SearchBar";
-import { encodedStringifiedToObj } from "../../utils";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
@@ -192,7 +191,7 @@ class NewReleasesAlbumsTable extends Component {
             playAllUris
         } = this.props;
         const active = map(
-            encodedStringifiedToObj(queryParams.tags, []),
+            queryParams.tags,
             tagGenre =>
                 find(genreColors, ({ genre }) => genre === tagGenre) || {
                     genre: tagGenre

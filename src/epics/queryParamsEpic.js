@@ -32,15 +32,8 @@ const onAddGenreEpic = (action$, state$, { spotifyApi }) =>
                                   "?" +
                                   qs.stringify({
                                       ...queryParamsSelector(state$.value),
-                                      tags: encodeURI(
-                                          JSON.stringify(
-                                              thru(queryParamsTagsSelector(state$.value), tags =>
-                                                  concat(
-                                                      tags,
-                                                      difference(map(genreColors, "genre"), tags)
-                                                  )
-                                              )
-                                          )
+                                      tags: thru(queryParamsTagsSelector(state$.value), tags =>
+                                          concat(tags, difference(map(genreColors, "genre"), tags))
                                       )
                                   })
                           })
@@ -62,13 +55,9 @@ const toggleTagEpic = (action$, state$, { spotifyApi }) =>
                         "?" +
                         qs.stringify({
                             ...queryParams,
-                            tags: encodeURI(
-                                JSON.stringify(
-                                    active
-                                        ? filter(queryParamsTags, tag => tag !== payload)
-                                        : concat(queryParamsTags, payload)
-                                )
-                            )
+                            tags: active
+                                ? filter(queryParamsTags, tag => tag !== payload)
+                                : concat(queryParamsTags, payload)
                         })
                 })
             );
@@ -90,9 +79,7 @@ const reorderQueryTagsEpic = (action$, state$, { spotifyApi }) =>
                         "?" +
                         qs.stringify({
                             ...queryParams,
-                            tags: encodeURI(
-                                JSON.stringify(arrayMove(queryParamsTags, oldIndex, newIndex))
-                            )
+                            tags: arrayMove(queryParamsTags, oldIndex, newIndex)
                         })
                 })
             );
