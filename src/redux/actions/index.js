@@ -721,10 +721,10 @@ export function setUserUrl(url) {
     };
 }
 
-export function setLocalStorage(key, data) {
+export function setLocalStorage(key, data, expiration) {
     return {
         type: "localStorage|SET_DATA",
-        payload: { key, data }
+        payload: { key, data, expiration }
     };
 }
 

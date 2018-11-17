@@ -46,6 +46,6 @@ export default (...args) =>
         spotifyApiTriggers(...args),
         discoverTriggers(...args),
         queryParamsEpic(...args),
-        syncGenreToColorEpic(...args)
-        //setLocalStorageEpic(...args)
+        syncGenreToColorEpic(...args),
+        setLocalStorageEpic(...args)
     );

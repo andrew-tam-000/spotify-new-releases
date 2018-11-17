@@ -8,8 +8,11 @@ window.lzstring = lzString;
 export default function setLocalStorageEpic(action$, state$, { spotifyApi }) {
     return action$.pipe(
         ofType(setLocalStorage().type),
-        mergeMap(({ key, data }) => {
-            localStorage.setItem(key, lzString.compressToUTF16(JSON.stringify(data)));
+        mergeMap(({ payload: { key, data, expiration } }) => {
+            localStorage.setItem(
+                key,
+                lzString.compressToUTF16(JSON.stringify({ value: data, expiration }))
+            );
             return EMPTY;
         }),
         catchError(e => of({ type: "error", payload: e }))

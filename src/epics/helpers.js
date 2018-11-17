@@ -79,6 +79,6 @@ export const basicSpotifyApiWrapper = (basicSpotifyApi, requestFunction) =>
                             .catch(reject);
                     }
                 });
-            }, 50);
+            }, 0);
         }
     });
