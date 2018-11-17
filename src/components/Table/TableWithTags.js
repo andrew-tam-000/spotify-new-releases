@@ -65,9 +65,10 @@ const NewReleasesAlbumsTableWrapper = styled.div`
 `;
 
 const Tags = styled.div`
+    -webkit-overflow-scrolling: touch;
+    overflow: scroll;
     display: flex;
     flex-wrap: nowrap;
-    overflow: auto;
     flex: 1;
 `;
 
