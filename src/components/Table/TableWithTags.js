@@ -6,6 +6,8 @@ import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import {
     genreColorsSelector,
     queryParamsSelector,
@@ -73,6 +75,7 @@ const Tags = styled.div`
 const TagsWithButton = styled.div`
     display: flex;
     overflow: hidden;
+    align-items: center;
 `;
 
 const ActiveDivider = styled.div`
@@ -88,7 +91,7 @@ const HeaderCell = styled.div`
 
 const Settings = styled.div`
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
 `;
 
@@ -114,7 +117,7 @@ const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
 const RowRenderer = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-evenly;
 `;
 
 class NewReleasesAlbumsTable extends Component {
@@ -152,6 +155,10 @@ class NewReleasesAlbumsTable extends Component {
         }
     };
 
+    state = {
+        showSettings: false
+    };
+
     columnConfig = {
         cellRenderer: ColumnCellRenderer,
         headerRenderer: HeaderCellRenderer
@@ -164,9 +171,14 @@ class NewReleasesAlbumsTable extends Component {
             this.props.hideAllNewReleaseTracks();
         }
     };
+
     handleQueryTagSort = ({ oldIndex, newIndex }) =>
         this.props.reorderQueryTags(oldIndex, newIndex);
+
     handleTagSort = ({ oldIndex, newIndex }) => this.props.reorderTags(oldIndex, newIndex);
+
+    showSettings = () => this.setState({ showSettings: true });
+    hideSettings = () => this.setState({ showSettings: false });
 
     // TODO: Use html encode library, he to encode strings
     render() {
@@ -206,33 +218,40 @@ class NewReleasesAlbumsTable extends Component {
                             onSortEnd={this.handleTagSort}
                         />
                     </Tags>
+                    {this.state.showSettings ? (
+                        <ExpandMoreIcon onClick={this.hideSettings} />
+                    ) : (
+                        <ExpandLessIcon onClick={this.showSettings} />
+                    )}
                 </TagsWithButton>
-                <Settings>
-                    <PlayAll uris={playAllUris} />
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={newReleasesTableShowColors}
-                                onChange={toggleNewReleaseColors}
-                            />
-                        }
-                        label="Colors?"
-                    />
-                    <div>
-                        <ToggleButtonGroup
-                            exclusive={true}
-                            onChange={this.toggleShowAllNewReleaseTracks}
-                            value={newReleasesTableShowAllTracks ? "tracks" : "albums"}
-                        >
-                            <ToggleButton value="tracks">
-                                <AudiotrackIcon />
-                            </ToggleButton>
-                            <ToggleButton value="albums">
-                                <LibraryMusicIcon />
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </div>
-                </Settings>
+                {this.state.showSettings && (
+                    <Settings>
+                        <PlayAll uris={playAllUris} />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={newReleasesTableShowColors}
+                                    onChange={toggleNewReleaseColors}
+                                />
+                            }
+                            label="Colors?"
+                        />
+                        <div>
+                            <ToggleButtonGroup
+                                exclusive={true}
+                                onChange={this.toggleShowAllNewReleaseTracks}
+                                value={newReleasesTableShowAllTracks ? "tracks" : "albums"}
+                            >
+                                <ToggleButton value="tracks">
+                                    <AudiotrackIcon />
+                                </ToggleButton>
+                                <ToggleButton value="albums">
+                                    <LibraryMusicIcon />
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+                        </div>
+                    </Settings>
+                )}
                 <Table
                     itemRenderer={({ style, ...props }) => {
                         console.log(props);
