@@ -44,8 +44,8 @@ const ItemTagList = ({ className, genres }) => (
         {map(genres, genre => (
             <TagProvider id={genre}>
                 {({ active, onClick, color }) => (
-                    <TagWithOpenModal color={active ? color || "transparent" : undefined}>
-                        <Typography genre={genre} variant="caption">
+                    <TagWithOpenModal genre={genre} color={active ? color || "transparent" : undefined}>
+                        <Typography variant="caption">
                             {genre}
                         </Typography>
                     </TagWithOpenModal>
