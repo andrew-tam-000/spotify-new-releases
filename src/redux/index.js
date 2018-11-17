@@ -7,13 +7,14 @@ import rootEpic from "../epics";
 import history from "../history";
 import { routerMiddleware } from "react-router-redux";
 import firebaseApp from "../firebase";
-import spotifyApi from "../spotifyApi";
+import spotifyApi, { basicSpotifyApi } from "../spotifyApi";
 import initialState from "./state";
 
 const epicMiddleware = createEpicMiddleware({
     dependencies: {
         firebaseApp,
-        spotifyApi
+        spotifyApi,
+        basicSpotifyApi
     }
 });
 

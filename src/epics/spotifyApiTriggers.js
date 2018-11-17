@@ -17,7 +17,8 @@ import {
     size,
     compact,
     orderBy,
-    values
+    values,
+    range
 } from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, concat, from, timer, of, interval, forkJoin } from "rxjs";
@@ -83,7 +84,7 @@ import {
     setLocalStorage,
     addGenreColors
 } from "../redux/actions";
-import { apiObservable } from "./helpers";
+import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
 import lzString from "lz-string";
 
 const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
@@ -112,7 +113,7 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
         )
     );
 
-const getTracks = (action$, state$, { spotifyApi }) =>
+const getTracks = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getTracksStart().type),
         mergeMap(action => {
@@ -129,7 +130,9 @@ const getTracks = (action$, state$, { spotifyApi }) =>
                       ...map(chunk(idsToFetch, 50), (idSet, idx) =>
                           timer(200 * idx).pipe(
                               mergeMap(val =>
-                                  apiObservable(spotifyApi.getTracks, [idSet], resp => of(resp))
+                                  apiObservable(basicSpotifyApi.getTracks, [idSet], resp =>
+                                      of(resp)
+                                  )
                               )
                           )
                       )
@@ -142,7 +145,7 @@ const getTracks = (action$, state$, { spotifyApi }) =>
         })
     );
 
-const getArtists = (action$, state$, { spotifyApi }) =>
+const getArtists = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getArtistsStart().type),
         // Get relevant ids
@@ -157,7 +160,7 @@ const getArtists = (action$, state$, { spotifyApi }) =>
             return size(idsToFetch)
                 ? forkJoin(
                       ...map(chunk(idsToFetch, 20), idSet =>
-                          apiObservable(spotifyApi.getArtists, [idSet], resp => of(resp))
+                          apiObservable(basicSpotifyApi.getArtists, [idSet], resp => of(resp))
                       )
                   ).pipe(
                       mergeMap(nestedArtistsArray =>
@@ -172,7 +175,7 @@ const getArtists = (action$, state$, { spotifyApi }) =>
         })
     );
 
-const getSongData = (action$, state$, { spotifyApi }) =>
+const getSongData = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getSongDataStart().type),
         // Get relevant ids
@@ -187,7 +190,7 @@ const getSongData = (action$, state$, { spotifyApi }) =>
             return size(idsToFetch)
                 ? forkJoin(
                       ...map(chunk(idsToFetch, 100), idSet =>
-                          apiObservable(spotifyApi.getAudioFeaturesForTracks, [idSet], resp =>
+                          apiObservable(basicSpotifyApi.getAudioFeaturesForTracks, [idSet], resp =>
                               of(resp)
                           )
                       )
@@ -205,14 +208,14 @@ const getSongData = (action$, state$, { spotifyApi }) =>
     );
 
 // Let's also expand artists here
-const getSearchResults = (action$, state$, { spotifyApi }) =>
+const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType("SET_SEARCH_TEXT"),
         debounce(() => timer(400)),
         switchMap(
             ({ payload: searchText }) =>
                 searchText
-                    ? from(spotifyApi.search(searchText, ["artist", "track", "album"])).pipe(
+                    ? from(basicSpotifyApi.search(searchText, ["artist", "track", "album"])).pipe(
                           mergeMap(resp =>
                               concat(
                                   of(
@@ -258,11 +261,11 @@ const playSong = (action$, state$, { firebaseApp, spotifyApi }) =>
         )
     );
 
-const getRelatedArtists = (action$, state$, { spotifyApi }) =>
+const getRelatedArtists = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getRelatedArtistsStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getArtistRelatedArtists, [action.payload], resp =>
+            apiObservable(basicSpotifyApi.getArtistRelatedArtists, [action.payload], resp =>
                 of(
                     getRelatedArtistsSuccess(
                         action.payload,
@@ -273,11 +276,11 @@ const getRelatedArtists = (action$, state$, { spotifyApi }) =>
         )
     );
 
-const getArtistTopTracks = (action$, state$, { spotifyApi }) =>
+const getArtistTopTracks = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getArtistTopTracksStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getArtistTopTracks, [action.payload, "US"], resp =>
+            apiObservable(basicSpotifyApi.getArtistTopTracks, [action.payload, "US"], resp =>
                 of(getArtistTopTracksSuccess(action.payload, resp.tracks))
             )
         )
@@ -316,11 +319,11 @@ const seek = (action$, state$, { spotifyApi }) =>
         )
     );
 
-const getRecommendations = (action$, state$, { spotifyApi }) =>
+const getRecommendations = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getRecommendationsStart().type),
         mergeMap(action =>
-            apiObservable(spotifyApi.getRecommendations, action.payload, resp =>
+            apiObservable(basicSpotifyApi.getRecommendations, action.payload, resp =>
                 concat(
                     of(
                         getArtistsStart(
@@ -342,7 +345,7 @@ const getRecommendations = (action$, state$, { spotifyApi }) =>
         )
     );
 
-const getAdvancedSearchResults = (action$, state$, { spotifyApi }) =>
+const getAdvancedSearchResults = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(advancedSearchGetResultsStart().type),
         debounce(() => timer(400)),
@@ -360,7 +363,7 @@ const getAdvancedSearchResults = (action$, state$, { spotifyApi }) =>
                       )
                   );
             return apiObservable(
-                spotifyApi.getRecommendations,
+                basicSpotifyApi.getRecommendations,
                 [
                     omitBy(
                         {
@@ -413,27 +416,48 @@ const getNewReleasesCallback = (action$, state$, { spotifyApi }) =>
 
 // Each actino should be dispatched with a constant
 // and then the success shoudl also return it
-const getNewReleases = (action$, state$, { spotifyApi }) =>
+const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
         mergeMap(action =>
             from(
-                axios({
-                    url: "https://spotify-playlist-1e3fc.firebaseio.com/newReleaseData.json"
-                })
-            ).pipe(
-                mergeMap(({ data: { albums, artists, tracks, newReleases } }) => [
-                    getAlbumsSuccess(values(albums)),
-                    getArtistsSuccess(values(artists)),
-                    getTracksSuccess(values(tracks)),
-                    getNewReleasesSuccess(values(newReleases))
-                ])
+                Promise.resolve(
+                    // Get counts
+                    basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
+                        basicSpotifyApi.getNewReleases({ country: "US", limit: 20, offset: 0 })
+                    )
+                        .then(({ albums: { total } }) => total)
+                        .then(count =>
+                            Promise.all(
+                                map(chunk(range(count), 20), (items, idx) =>
+                                    basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
+                                        basicSpotifyApi.getNewReleases({
+                                            country: "US",
+                                            limit: items.length,
+                                            offset: idx * 20
+                                        })
+                                    )
+                                )
+                            )
+                        )
+                        .then(results => flatMap(results, "albums.items"))
+                )
+            )
+        ),
+        mergeMap(albums =>
+            concat(
+                of(getAlbumsStart(map(albums, "id"))),
+                action$.pipe(
+                    ofType(getAlbumsSuccess().type),
+                    take(1),
+                    mapTo(getNewReleasesSuccess(albums))
+                )
             )
         )
         /*
         mapTo({ limit: 50, total: 1000, offset: 0, albums: [] }),
         expand(({ limit, total, offset, albums }) =>
-            from(spotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
+            from(basicSpotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
                 mergeMap(resp =>
                     of({
                         offset: offset + limit,
@@ -480,7 +504,7 @@ const newReleases = { newReleases: store.getState().app.spotify.newReleases, art
 localStorage.setItem('newReleases', lzstring.compressToUTF16(JSON.stringify(newReleases)))
 */
 
-const getAlbums = (action$, state$, { spotifyApi }) =>
+const getAlbums = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getAlbumsStart().type),
         mergeMap(action => {
@@ -494,7 +518,7 @@ const getAlbums = (action$, state$, { spotifyApi }) =>
             return size(idsToFetch)
                 ? forkJoin(
                       ...map(chunk(idsToFetch, 20), idSet =>
-                          apiObservable(spotifyApi.getAlbums, [idSet], resp => of(resp))
+                          apiObservable(basicSpotifyApi.getAlbums, [idSet], resp => of(resp))
                       )
                   ).pipe(
                       mergeMap(nestedAlbumsArray =>
