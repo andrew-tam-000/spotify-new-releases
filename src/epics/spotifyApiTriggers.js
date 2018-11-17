@@ -86,6 +86,7 @@ import {
     addGenreColors
 } from "../redux/actions";
 import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
+import { getKeyFromLocalStorage } from "../utils";
 import lzString from "lz-string";
 
 const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
@@ -411,17 +412,17 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
         mapTo(
-            JSON.parse(lzString.decompressFromUTF16(localStorage.getItem("newReleaseData")))
-                .expiration > new Date().getTime()
+            thru(
+                get(getKeyFromLocalStorage("newReleaseData"), "expiration"),
+                expiration => expiration && expiration > new Date().getTime()
+            )
         ),
         mergeMap(
             useLocalStorage =>
                 useLocalStorage
                     ? thru(
-                          JSON.parse(
-                              lzString.decompressFromUTF16(localStorage.getItem("newReleaseData"))
-                          ),
-                          ({ value: { newReleases, albums, artists, songs } }) => [
+                          getKeyFromLocalStorage("newReleaseData") || {},
+                          ({ value: { newReleases, albums, artists, songs } = {} }) => [
                               getAlbumsSuccess(values(albums)),
                               getArtistsSuccess(values(artists)),
                               getTracksSuccess(values(songs)),

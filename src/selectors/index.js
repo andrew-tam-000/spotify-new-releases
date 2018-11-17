@@ -26,7 +26,7 @@ import {
 } from "lodash";
 import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
-import queryString from "query-string";
+import qs from "qs";
 import { encodedStringifiedToObj } from "../utils";
 
 export const accessTokenSelector = createSelector(
@@ -322,7 +322,7 @@ export const artistImageForTrackIdSelector = createSelector(
 
 export const queryParamsSelector = createSelector(
     state => get(state, "router.location.search"),
-    query => queryString.parse(query)
+    query => qs.parse(query)
 );
 
 export const queryParamsTagsSelector = createSelector(queryParamsSelector, queryParams =>

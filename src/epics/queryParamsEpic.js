@@ -9,7 +9,7 @@ import {
     reorderQueryTags
 } from "../redux/actions";
 import { push } from "react-router-redux";
-import queryString from "query-string";
+import qs from "qs";
 import {
     queryParamsTagsSelector,
     queryParamsSearchSelector,
@@ -30,7 +30,7 @@ const onAddGenreEpic = (action$, state$, { spotifyApi }) =>
                           push({
                               search:
                                   "?" +
-                                  queryString.stringify({
+                                  qs.stringify({
                                       ...queryParamsSelector(state$.value),
                                       tags: encodeURI(
                                           JSON.stringify(
@@ -60,7 +60,7 @@ const toggleTagEpic = (action$, state$, { spotifyApi }) =>
                 push({
                     search:
                         "?" +
-                        queryString.stringify({
+                        qs.stringify({
                             ...queryParams,
                             tags: encodeURI(
                                 JSON.stringify(
@@ -88,7 +88,7 @@ const reorderQueryTagsEpic = (action$, state$, { spotifyApi }) =>
                 push({
                     search:
                         "?" +
-                        queryString.stringify({
+                        qs.stringify({
                             ...queryParams,
                             tags: encodeURI(
                                 JSON.stringify(arrayMove(queryParamsTags, oldIndex, newIndex))

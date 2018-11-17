@@ -3,7 +3,7 @@ import { compose, withHandlers } from "recompose";
 import { createStructuredSelector } from "reselect";
 import { push } from "react-router-redux";
 import { connect } from "react-redux";
-import queryString from "query-string";
+import qs from "qs";
 import { queryParamsSelector } from "../../selectors";
 import TextField from "@material-ui/core/TextField";
 
@@ -22,7 +22,7 @@ export default compose(
             push({
                 search:
                     "?" +
-                    queryString.stringify({
+                    qs.stringify({
                         ...queryParams,
                         search: e.target.value
                     })

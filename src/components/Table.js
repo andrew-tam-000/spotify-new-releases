@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { AutoSizer, Column, Table as _VirtualizedTable, SortIndicator } from "react-virtualized";
 import { map, filter, get, mapKeys } from "lodash";
 import { push } from "react-router-redux";
-import queryString from "query-string";
+import qs from "qs";
 
 import "react-virtualized/styles.css";
 
@@ -35,7 +35,7 @@ class Table extends Component {
             this.props.push({
                 search:
                     "?" +
-                    queryString.stringify({
+                    qs.stringify({
                         ...this.props.queryParams,
                         sort: encodeURI(JSON.stringify(sortParams))
                     })
