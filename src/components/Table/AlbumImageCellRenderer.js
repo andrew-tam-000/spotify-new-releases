@@ -1,13 +1,9 @@
 import React from "react";
-import { connect } from "react-redux";
-import { compose, withProps } from "recompact";
-import { openNewReleaseModal, setNewReleaseModalGenre } from "../../redux/actions";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
-import TagProvider from "../Table/TagProvider";
-import { map } from "lodash";
+import ItemTagList from "../Table/ItemTagList";
 
 import materialStyled from "../../materialStyled";
 import PlayButtonProvider from "../core/PlayButtonProvider";
@@ -21,7 +17,8 @@ const AlbumImageCellRendererWrapper = styled.div`
 const TrackBlurbCellRendererWrapper = styled(AlbumImageCellRendererWrapper)``;
 
 const AlbumImage = styled.img`
-    height: 40px;
+    min-width: 40px;
+    width: 40px;
     display: block;
 `;
 
@@ -78,38 +75,6 @@ const NewReleasesTrackPlayButton = props => (
     </PlayButtonProvider>
 );
 
-const Genres = styled.div`
-    display: flex;
-    flex-wrap: nowrap;
-    overflow: auto;
-    margin-top: 2px;
-`;
-
-const Tag = styled.span`
-    background-color: ${props => props.color};
-    padding: 0 2px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    margin-right: 2px;
-    cursor: pointer;
-    opacity: ${props => (props.color ? 1 : ".4")};
-`;
-
-const withOpenModal = compose(
-    connect(
-        null,
-        { openNewReleaseModal, setNewReleaseModalGenre }
-    ),
-    withProps(({ openNewReleaseModal, genre, setNewReleaseModalGenre }) => ({
-        onClick: e => {
-            e.stopPropagation();
-            openNewReleaseModal();
-            setNewReleaseModalGenre(genre);
-        }
-    }))
-);
-
-const TypographyWithOpenModal = withOpenModal(Typography);
-
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
 // <StartTreeButton uri={uri} />
@@ -136,19 +101,6 @@ const AlbumImageCellRenderer = ({
                 <Typography noWrap={true} variant="caption">
                     {artist}
                 </Typography>
-                <Genres>
-                    {map(genres, genre => (
-                        <TagProvider id={genre}>
-                            {({ active, onClick, color }) => (
-                                <Tag color={color}>
-                                    <TypographyWithOpenModal genre={genre} variant="caption">
-                                        {genre}
-                                    </TypographyWithOpenModal>
-                                </Tag>
-                            )}
-                        </TagProvider>
-                    ))}
-                </Genres>
             </Description>
         </TrackBlurbCellRendererWrapper>
     ) : (
@@ -162,19 +114,6 @@ const AlbumImageCellRenderer = ({
                 <AlbumTitle noWrap={true} variant="caption">
                     {artist}
                 </AlbumTitle>
-                <Genres>
-                    {map(genres, genre => (
-                        <TagProvider id={genre}>
-                            {({ active, onClick, color }) => (
-                                <Tag color={color}>
-                                    <TypographyWithOpenModal genre={genre} variant="caption">
-                                        {genre}
-                                    </TypographyWithOpenModal>
-                                </Tag>
-                            )}
-                        </TagProvider>
-                    ))}
-                </Genres>
             </Description>
         </AlbumImageCellRendererWrapper>
     );

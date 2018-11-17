@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { initializeOnNewReleasesStart } from "../redux/actions";
+import { getNewReleasesStart } from "../redux/actions";
 import { connect } from "react-redux";
 
 export default function fetchNewReleases(ComponentToWrap) {
     class FetchNewReleases extends Component {
         componentDidMount() {
-            this.props.initializeOnNewReleasesStart();
+            this.props.getNewReleasesStart();
         }
         render() {
             return <ComponentToWrap {...this.props} />;
@@ -14,6 +14,6 @@ export default function fetchNewReleases(ComponentToWrap) {
 
     return connect(
         null,
-        { initializeOnNewReleasesStart }
+        { getNewReleasesStart }
     )(FetchNewReleases);
 }

@@ -311,12 +311,6 @@ export function initializeOnDiscoverStart() {
     };
 }
 
-export function initializeOnNewReleasesStart() {
-    return {
-        type: "INITIALIZE_ON_NEW_RELEASES_START"
-    };
-}
-
 ///////////////////////////////////////////////
 //
 // GET_SONGS

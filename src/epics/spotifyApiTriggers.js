@@ -381,44 +381,12 @@ const getAdvancedSearchResults = (action$, state$, { basicSpotifyApi }) =>
         })
     );
 
-const getNewReleasesCallback = (action$, state$, { spotifyApi }) =>
-    action$.pipe(
-        ofType(getNewReleasesSuccess().type),
-        mergeMap(action =>
-            thru(
-                [
-                    "#d32f2f",
-                    "#c2185b",
-                    "#7b1fa2",
-                    "#512da8",
-                    "#303f9f",
-                    "#1976d2",
-                    "#0288d1",
-                    "#0097a7",
-                    "#00796b",
-                    "#388e3c"
-                ],
-                backgroundColor =>
-                    of(
-                        addGenreColors(
-                            map(
-                                slice(newReleaseGenresSelector(state$.value), 0, 10),
-                                (genre, idx) => ({
-                                    ...genre,
-                                    color: backgroundColor[idx]
-                                })
-                            )
-                        )
-                    )
-            )
-        )
-    );
-
 // Each actino should be dispatched with a constant
 // and then the success shoudl also return it
 const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
+        /*
         mergeMap(action =>
             from(
                 Promise.resolve(
@@ -454,36 +422,8 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
                 )
             )
         )
-        /*
-        mapTo({ limit: 50, total: 1000, offset: 0, albums: [] }),
-        expand(({ limit, total, offset, albums }) =>
-            from(basicSpotifyApi.getNewReleases({ country: "US", limit, offset })).pipe(
-                mergeMap(resp =>
-                    of({
-                        offset: offset + limit,
-                        limit,
-                        albums: [...albums, ...resp.albums.items],
-                        total: resp.albums.total
-                    })
-                ),
-                catchError(e => console.error(e))
-            )
-        ),
-        takeWhile(({ offset, total, limit }) => offset < total + limit),
-        last(),
-        mergeMap(({ albums }) =>
-            concat(
-                of(getAlbumsStart(map(albums, "id"))),
-                action$.pipe(
-                    ofType(getAlbumsSuccess().type),
-                    take(1),
-                    mapTo(getNewReleasesSuccess(albums))
-                )
-            )
-        ),
-        catchError(e => console.error(e))
         */
-        /*
+        ///*
         mergeMap(action =>
             thru(
                 JSON.parse(lzString.decompressFromUTF16(localStorage.getItem("newReleases"))),
@@ -495,7 +435,7 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
                 ]
             )
         )
-            */
+        //*/
     );
 
 /*
@@ -575,6 +515,5 @@ export default (...args) =>
         seek(...args),
         getNewReleases(...args),
         getAlbums(...args),
-        getSongData(...args),
-        getNewReleasesCallback(...args)
+        getSongData(...args)
     ).pipe(catchError(e => console.error(e)));

@@ -35,7 +35,7 @@ export default [
         getter: "track.name"
     },
     {
-        label: <CalendarTodayIcon />,
+        label: <CalendarTodayIcon fontSize="small" />,
         dataKey: "releaseDate",
         formatter: row => {
             const date = new Date(get(row, "meta.release_date"));
@@ -44,7 +44,7 @@ export default [
             const day = ("0" + date.getDate()).slice(-2);
             return `${year}-${month}-${day}`;
         },
-        width: 80
+        width: 70
     },
     {
         label: "Artist",
@@ -53,17 +53,17 @@ export default [
         getter: "artists.0.name"
     },
     {
-        label: <Stars />,
+        label: <Stars fontSize="small" />,
         dataKey: "albumPopularity",
         formatter: row =>
             !get(row, "track") ? get(row, "album.popularity") : get(row, "track.popularity"),
-        width: 40
+        width: 35
     },
     {
-        label: <PersonIcon />,
+        label: <PersonIcon fontSize="small" />,
         dataKey: "artistPopularity",
         getter: "artists.0.popularity",
-        width: 40
+        width: 35
     },
     {
         label: "Genres",

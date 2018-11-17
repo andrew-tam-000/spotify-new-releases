@@ -6,7 +6,48 @@ export default {
         // genre,
         // color
         // }
-        genreColors: [],
+        genreColors: [
+            {
+                genre: "pop",
+                color: "#d32f2f"
+            },
+            {
+                genre: "dance pop",
+                color: "#c2185b"
+            },
+            {
+                genre: "rap",
+                color: "#7b1fa2"
+            },
+            {
+                genre: "pop rap",
+                color: "#512da8"
+            },
+            {
+                genre: "trap music",
+                color: "#303f9f"
+            },
+            {
+                genre: "hip hop",
+                color: "#1976d2"
+            },
+            {
+                genre: "indie r&b",
+                color: "#0288d1"
+            },
+            {
+                genre: "modern rock",
+                color: "#0097a7"
+            },
+            {
+                genre: "edm",
+                color: "#00796b"
+            },
+            {
+                genre: "southern hip hop",
+                color: "#388e3c"
+            }
+        ],
         spotify: {
             albums: {},
             nowPlaying: {},

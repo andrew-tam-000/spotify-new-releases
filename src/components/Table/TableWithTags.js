@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { defaultTableRowRenderer } from "react-virtualized";
 import { compose, withPropsOnChange } from "recompact";
 import styled from "styled-components";
 import Typography from "@material-ui/core/Typography";
@@ -20,7 +21,6 @@ import {
     hideAllNewReleaseTracks,
     showAllNewReleaseTracks,
     toggleNewReleaseColors,
-    openNewReleaseModal,
     reorderTags,
     reorderQueryTags
 } from "../../redux/actions";
@@ -40,8 +40,6 @@ import {
 } from "lodash";
 import SearchBar from "./SearchBar";
 import { encodedStringifiedToObj } from "../../utils";
-import AddIcon from "@material-ui/icons/Add";
-import Button from "@material-ui/core/Button";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
@@ -51,6 +49,11 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import PlayAll from "../PlayAll";
 import Switch from "@material-ui/core/Switch";
 import TagList from "./TagList";
+import _ItemTagList from "./ItemTagList";
+
+const ItemTagList = styled(_ItemTagList)`
+    margin: 0 2px;
+`;
 
 const NewReleasesAlbumsTableWrapper = styled.div`
     display: flex;
@@ -85,7 +88,7 @@ const HeaderCell = styled.div`
 
 const Settings = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
 `;
 
@@ -93,20 +96,26 @@ const prefixColumnsProps = [
     {
         cellRenderer: AlbumImageCellRenderer,
         key: "album",
-        width: 140,
+        width: 160,
         headerRenderer: () => <SearchBar />,
         disableSort: true,
         flexGrow: 5
     }
 ];
 
-const ColumnCellRenderer = ({ cellData }) => <Typography>{cellData}</Typography>;
+const ColumnCellRenderer = ({ cellData }) => <Typography variant="caption">{cellData}</Typography>;
 const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
     <HeaderCell>
         <Typography title={label}>{label}</Typography>
         <Typography>{sortIndicator && sortIndicator}</Typography>
     </HeaderCell>
 );
+
+const RowRenderer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+`;
 
 class NewReleasesAlbumsTable extends Component {
     virtualizedConfig = {
@@ -127,8 +136,20 @@ class NewReleasesAlbumsTable extends Component {
                 }
             );
         },
-        rowHeight: 60,
-        headerHeight: 32
+        rowHeight: 80,
+        headerHeight: 32,
+        rowRenderer: ({ style, onRowClick, ...props }) => {
+            const { index, rowData } = props;
+            const {
+                meta: { genres }
+            } = rowData;
+            return (
+                <RowRenderer onClick={event => onRowClick({ event, index, rowData })} style={style}>
+                    {defaultTableRowRenderer(props)}
+                    <ItemTagList genres={genres} />
+                </RowRenderer>
+            );
+        }
     };
 
     columnConfig = {
@@ -136,7 +157,6 @@ class NewReleasesAlbumsTable extends Component {
         headerRenderer: HeaderCellRenderer
     };
 
-    openNewReleaseModal = () => this.props.openNewReleaseModal();
     toggleShowAllNewReleaseTracks = (e, val) => {
         if (val === "tracks") {
             this.props.showAllNewReleaseTracks();
@@ -159,24 +179,17 @@ class NewReleasesAlbumsTable extends Component {
             toggleNewReleaseColors,
             playAllUris
         } = this.props;
-        const active = compact(
-            map(encodedStringifiedToObj(queryParams.tags, []), tagGenre =>
-                find(genreColors, ({ genre }) => genre === tagGenre)
-            )
+        const active = map(
+            encodedStringifiedToObj(queryParams.tags, []),
+            tagGenre =>
+                find(genreColors, ({ genre }) => genre === tagGenre) || {
+                    genre: tagGenre
+                }
         );
         const inactive = difference(genreColors, active);
         return (
             <NewReleasesAlbumsTableWrapper>
                 <TagsWithButton>
-                    <Button
-                        mini
-                        variant="fab"
-                        color="primary"
-                        aria-label="Add"
-                        onClick={this.openNewReleaseModal}
-                    >
-                        <AddIcon />
-                    </Button>
                     <NewReleasesAddTagModal />
                     <Tags>
                         <TagList
@@ -221,6 +234,10 @@ class NewReleasesAlbumsTable extends Component {
                     </div>
                 </Settings>
                 <Table
+                    itemRenderer={({ style, ...props }) => {
+                        console.log(props);
+                        return <div style={style}>"hi"</div>;
+                    }}
                     tableData={tableData}
                     prefixColumnsProps={prefixColumnsProps}
                     virtualizedConfig={this.virtualizedConfig}
@@ -249,7 +266,6 @@ export default compose(
             showAllNewReleaseTracks,
             hideAllNewReleaseTracks,
             toggleNewReleaseColors,
-            openNewReleaseModal,
             reorderTags,
             reorderQueryTags
         }
