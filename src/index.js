@@ -9,6 +9,8 @@ import store from "./redux";
 import { getAccessTokenFromUrl } from "./utils";
 import history from "./history";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import FastClick from "fastclick";
+FastClick.attach(document.body);
 
 const theme = createMuiTheme({
     palette: {
