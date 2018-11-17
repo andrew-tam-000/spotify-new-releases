@@ -82,8 +82,7 @@ import {
     getNewReleasesSuccess,
     getSongDataStart,
     getSongDataSuccess,
-    setLocalStorage,
-    addGenreColors
+    setLocalStorage
 } from "../redux/actions";
 import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
 import { getKeyFromLocalStorage } from "../utils";

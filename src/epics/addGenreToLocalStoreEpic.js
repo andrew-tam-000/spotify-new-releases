@@ -5,6 +5,7 @@ import {
     take,
     takeUntil,
     mergeMap,
+    map as map$,
     switchMap,
     mapTo,
     delay,
@@ -20,16 +21,12 @@ import { push } from "react-router-redux";
 import Promise from "bluebird";
 import spotifyApi from "../spotifyApi";
 import { getAccessTokenFromUrl } from "../utils";
-import { deletePlaylistSuccess } from "../redux/actions";
-import { playlistIdSelector } from "../selectors";
+import { addGenreColors, setLocalStorage } from "../redux/actions";
+import { genreColorsSelector } from "../selectors";
 
-export default function initializeConnections(action$, state$, { firebaseApp }) {
+export default function addGenreToLocalStoreEpic(action$, state$, { firebaseApp }) {
     return action$.pipe(
-        ofType("DELETE_PLAYLIST_START"),
-        mergeMap(action =>
-            from(spotifyApi.unfollowPlaylist(action.payload)).pipe(
-                mergeMap(req => of(deletePlaylistSuccess()))
-            )
-        )
+        ofType(addGenreColors().type),
+        map$(action => setLocalStorage("genreColors", genreColorsSelector(state$.value)))
     );
 }

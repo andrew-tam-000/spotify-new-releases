@@ -27,10 +27,10 @@ import NewReleases from "./NewReleases";
 import NewReleasesAlbumsTable from "./NewReleases/NewReleasesAlbumsTable";
 import _Drawer from "@material-ui/core/Drawer";
 import {
-    createAccessTokenStart,
     searchOpenPanel,
     searchClosePanel,
-    analyzerOpenSearchPanel
+    analyzerOpenSearchPanel,
+    initializeAppStart
 } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";
 import { createStructuredSelector } from "reselect";
@@ -84,7 +84,7 @@ class RouteProvider extends Component {
     };
 
     componentDidMount() {
-        this.props.createAccessTokenStart();
+        this.props.initializeAppStart();
     }
 
     render() {
@@ -143,5 +143,5 @@ export default connect(
     createStructuredSelector({
         searchPanel: searchPanelSelector
     }),
-    { createAccessTokenStart, searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel }
+    { initializeAppStart, searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel }
 )(RouteProvider);

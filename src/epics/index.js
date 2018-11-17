@@ -22,6 +22,7 @@ import discoverTriggers from "./discoverTriggers";
 import setLocalStorageEpic from "./setLocalStorageEpic";
 import syncGenreToColorEpic from "./syncGenreToColorEpic";
 import queryParamsEpic from "./queryParamsEpic";
+import addGenreToLocalStoreEpic from "./addGenreToLocalStoreEpic";
 
 export default (...args) =>
     merge(
@@ -47,5 +48,6 @@ export default (...args) =>
         discoverTriggers(...args),
         queryParamsEpic(...args),
         syncGenreToColorEpic(...args),
-        setLocalStorageEpic(...args)
+        setLocalStorageEpic(...args),
+        addGenreToLocalStoreEpic(...args)
     );
