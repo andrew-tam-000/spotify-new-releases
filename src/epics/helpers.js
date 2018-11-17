@@ -66,7 +66,6 @@ export const basicSpotifyApiWrapper = (basicSpotifyApi, requestFunction) =>
                 hasToken = true;
                 basicSpotifyApi.setAccessToken(access_token);
             });
-            // BUG  - request function gets scoped and never re-checked
             setIntervalId = setInterval(() => {
                 fetchTokenPromise.then(() => {
                     // Also, since no loop has been created, lets fetch out access token
