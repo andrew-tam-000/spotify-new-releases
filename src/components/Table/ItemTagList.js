@@ -37,18 +37,18 @@ const withOpenModal = compose(
     }))
 );
 
-const TypographyWithOpenModal = withOpenModal(Typography);
+const TagWithOpenModal = withOpenModal(Tag);
 
 const ItemTagList = ({ className, genres }) => (
     <Genres className={className}>
         {map(genres, genre => (
             <TagProvider id={genre}>
                 {({ active, onClick, color }) => (
-                    <Tag color={active ? color || "transparent" : undefined}>
-                        <TypographyWithOpenModal genre={genre} variant="caption">
+                    <TagWithOpenModal color={active ? color || "transparent" : undefined}>
+                        <Typography genre={genre} variant="caption">
                             {genre}
-                        </TypographyWithOpenModal>
-                    </Tag>
+                        </Typography>
+                    </TagWithOpenModal>
                 )}
             </TagProvider>
         ))}
