@@ -95,8 +95,12 @@ class GenresWithScroll extends Component {
                         </TagProvider>
                     ))}
                 </Genres>
-                <ChevronLeft color="action" onClick={this.scrollLeft} />
-                <ChevronRight color="action" onClick={this.scrollRight} />
+                {genres.length ? (
+                    <React.Fragment>
+                        <ChevronLeft color="action" onClick={this.scrollLeft} />
+                        <ChevronRight color="action" onClick={this.scrollRight} />
+                    </React.Fragment>
+                ) : null}
             </React.Fragment>
         );
     }

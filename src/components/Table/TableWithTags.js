@@ -7,7 +7,8 @@ import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import _SettingsIcon from "@material-ui/icons/Settings";
+import materialStyled from "../../materialStyled";
 import {
     genreColorsSelector,
     queryParamsSelector,
@@ -51,6 +52,10 @@ import PlayAll from "../PlayAll";
 import Switch from "@material-ui/core/Switch";
 import TagList from "./TagList";
 import _ItemTagList from "./ItemTagList";
+
+const SettingsIcon = materialStyled(_SettingsIcon)({
+    width: 40
+});
 
 const ItemTagList = styled(_ItemTagList)`
     margin: 0 2px;
@@ -218,11 +223,10 @@ class NewReleasesAlbumsTable extends Component {
                             onSortEnd={this.handleTagSort}
                         />
                     </Tags>
-                    {this.state.showSettings ? (
-                        <ExpandMoreIcon onClick={this.hideSettings} />
-                    ) : (
-                        <ExpandLessIcon onClick={this.showSettings} />
-                    )}
+                    <SettingsIcon
+                        color="action"
+                        onClick={this.state.showSettings ? this.hideSettings : this.showSettings}
+                    />
                 </TagsWithButton>
                 {this.state.showSettings && (
                     <Settings>
