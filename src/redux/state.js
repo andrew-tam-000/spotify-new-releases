@@ -82,7 +82,9 @@ export default {
             albums: [],
             text: ""
         },
-        user: {},
+        user: {
+            accessToken: null
+        },
         analyzer: {
             openSearchPanel: false,
             searchTerm: "",

@@ -17,6 +17,7 @@ import {
     setNewReleaseModalError,
     hideAllNewReleaseTracks,
     showAllNewReleaseTracks,
+    createAccessTokenSuccess,
     reorderTags
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
@@ -86,7 +87,17 @@ const appReducer = combineReducers({
                 return state;
         }
     },
-    user: (state = {}) => state,
+    user: (state = {}, { type, payload }) => {
+        switch (type) {
+            case createAccessTokenSuccess().type:
+                return {
+                    ...state,
+                    accessToken: payload
+                };
+            default:
+                return state;
+        }
+    },
     showSideBar: (state = {}, { type, payload }) => {
         switch (type) {
             case showSideBar().type:

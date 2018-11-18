@@ -24,13 +24,15 @@ export default function initializeApp(action$, state$) {
         ofType(initializeAppStart().type),
         mergeMap(() =>
             concat(
-                of(createAccessTokenStart()),
+                //of(createAccessTokenStart()),
                 of(addGenreColors(get(getKeyFromLocalStorage("genreColors"), "value"))),
+                of(initializeAppSuccess())
                 //of(getSpotifyUserStart()),
                 //of(createPlaylistStart()),
                 //of(createFirebaseUserStart()),
+                /*
                 zip(
-                    action$.pipe(ofType(createAccessTokenSuccess().type))
+                    //action$.pipe(ofType(createAccessTokenSuccess().type))
                     //action$.pipe(ofType(getSpotifyUserSuccess().type)),
                     //action$.pipe(ofType(createPlaylistSuccess().type)),
                     //action$.pipe(ofType(createFirebaseUserSuccess().type))
@@ -40,6 +42,7 @@ export default function initializeApp(action$, state$) {
                         //push(firebaseUserIdSelector(state$.value))
                     ])
                 )
+                */
             )
         ),
         catchError(e => ({ type: "errorp", payload: e.message }))

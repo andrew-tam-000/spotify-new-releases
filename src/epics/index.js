@@ -1,5 +1,4 @@
 import { merge } from "rxjs/observable/merge";
-import createAccessToken from "./createAccessToken";
 import createFirebaseUser from "./createFirebaseUser";
 import getSpotifyUserData from "./getSpotifyUserData";
 import createSharedPlayilst from "./createSharedPlaylist";
@@ -27,7 +26,6 @@ import addGenreToLocalStoreEpic from "./addGenreToLocalStoreEpic";
 export default (...args) =>
     merge(
         createFirebaseUser(...args),
-        createAccessToken(...args),
         getSpotifyUserData(...args),
         createSharedPlayilst(...args),
         addTracksToPlaylist(...args),

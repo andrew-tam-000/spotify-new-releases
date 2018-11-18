@@ -28,8 +28,9 @@ import { createSelector } from "reselect";
 import tableConfig from "../tableConfig";
 import qs from "qs";
 
+// TODO: See if i still want to support FB
 export const accessTokenSelector = createSelector(
-    state => get(state, "app.firebase.token"),
+    state => get(state, "app.user.accessToken"),
     accessToken => accessToken
 );
 

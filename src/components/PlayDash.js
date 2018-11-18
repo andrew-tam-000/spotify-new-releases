@@ -1,17 +1,19 @@
 import React from "react";
-import { first, last, split } from "lodash";
+import { get, first, last, split } from "lodash";
 import { compose, mapProps } from "recompose";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import SkipToNextButton from "./PlayDash/SkipToNextButton";
 import SkipToPreviousButton from "./PlayDash/SkipToPreviousButton";
 import PlayButton from "./Analyzer/PlayButton";
-import { nowPlayingSongUriSelector, songsSelector } from "../selectors";
+import { accessTokenSelector, nowPlayingSongUriSelector, songsSelector } from "../selectors";
+import Login from "./Login";
 import Typography from "@material-ui/core/Typography";
 import StartTreeButton from "./Discover/StartTreeButton";
 import Seek from "./PlayDash/Seek";
 import styled from "styled-components";
 import materialStyled from "../materialStyled";
+import { getKeyFromLocalStorage } from "../utils";
 
 const typographyStyles = {
     whiteSpace: "nowrap",
@@ -57,7 +59,7 @@ const PlayDash = ({ uri, track }) => (
     </PlayDashWrapper>
 );
 
-export default compose(
+const PlayDashWithData = compose(
     connect(
         createStructuredSelector({
             uri: nowPlayingSongUriSelector,
@@ -69,3 +71,11 @@ export default compose(
         track: songs[last(split(uri, ":"))] || { artists: [{}] }
     }))
 )(PlayDash);
+
+const PlayDashOrLogin = ({ accessToken }) => (accessToken ? <PlayDashWithData /> : <Login />);
+
+export default connect(
+    createStructuredSelector({
+        accessToken: accessTokenSelector
+    })
+)(PlayDashOrLogin);
