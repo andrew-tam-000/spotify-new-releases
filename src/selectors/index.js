@@ -425,3 +425,23 @@ export const tracksForAlbumForIdSelector = createSelector(
         };
     }
 );
+
+export const loadingAnalyzerTableSelector = createSelector(
+    state => get(state, "app.analyzer.loading"),
+    loading => loading
+);
+
+export const loadingNewReleasesTableSelector = createSelector(
+    state => get(state, "app.newReleases.loading"),
+    loading => loading
+);
+
+export const errorMessageSelector = createSelector(
+    state => get(state, "app.error.message"),
+    errorMessage => errorMessage
+);
+
+export const errorShowSelector = createSelector(
+    state => get(state, "app.error.show"),
+    errorShow => errorShow
+);

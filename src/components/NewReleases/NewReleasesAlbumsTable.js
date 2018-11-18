@@ -2,6 +2,7 @@ import { compose, withPropsOnChange } from "recompact";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { newReleasesByAlbumTableDataWithFiltersSelector } from "../../selectors/tables";
+import { loadingNewReleasesTableSelector } from "../../selectors/";
 import {
     toggleNewReleaseAlbum,
     showSideBar,
@@ -19,7 +20,8 @@ import { flatMap, map, get, filter, slice } from "lodash";
 import TableWithTags from "../Table/TableWithTags";
 
 const mapStateToProps = createStructuredSelector({
-    tableData: newReleasesByAlbumTableDataWithFiltersSelector
+    tableData: newReleasesByAlbumTableDataWithFiltersSelector,
+    loading: loadingNewReleasesTableSelector
 });
 
 export default compose(
@@ -39,8 +41,8 @@ export default compose(
         }
     ),
     withPropsOnChange(
-        ["tableData", "newReleasesTableShowAllTracks", "albums"],
-        ({ tableData: { rows }, newReleasesTableShowAllTracks, albums }) => ({
+        ["tableData", "newReleasesTableShowAllTracks", "albums", "loading"],
+        ({ tableData: { rows }, newReleasesTableShowAllTracks, albums, loading }) => ({
             // BUG - spotify doesn't accept arbitrarily large uri's
             playAllUris: slice(
                 newReleasesTableShowAllTracks

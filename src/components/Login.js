@@ -55,6 +55,9 @@ class Login extends Component {
             setIntervalId: setIntervalId
         });
     };
+    componentWillUnmount() {
+        clearInterval(this.state.setIntervalId);
+    }
 
     render() {
         return (

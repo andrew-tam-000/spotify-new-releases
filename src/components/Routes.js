@@ -73,14 +73,19 @@ class RouteProvider extends Component {
             history.push("/analyzer");
         }
         if (val === 1) {
-            history.push("/discover");
-        }
-        if (val === 2) {
             history.push("/new-releases");
         }
-        if (val === 3) {
+        if (val === 2) {
             this.props.searchOpenPanel();
         }
+        /*
+        if (val === 3) {
+            history.push("/discover");
+                                <Route exact path="/discover" component={Discover} />
+                        <BottomNavigationAction label="Discover" icon={<NewReleasesIcon />} />
+                        <BottomNavigationAction label="Search" icon={<SearchIcon />} />
+        }
+        */
     };
 
     componentDidMount() {
@@ -109,15 +114,8 @@ class RouteProvider extends Component {
                                     path="/new-releases"
                                     component={NewReleasesAlbumsTable}
                                 />
-                                <Route
-                                    exact
-                                    path="/new-releases/albums"
-                                    component={NewReleasesAlbumsTable}
-                                />
-                                <Route exact path="/discover" component={Discover} />
                                 <Route exact path="/analyzer" component={Analyzer} />
-                                <Route exact path="/:id([\d-]*)" component={Spotify} />
-                                <Route exact path="/" component={App} />
+                                <Route exact path="/" component={NewReleasesAlbumsTable} />
                             </Switch>
                         </Scrollable>
                         <Drawer anchor="right" open={searchPanel} onClose={searchClosePanel}>
@@ -129,9 +127,7 @@ class RouteProvider extends Component {
                     </MainContent>
                     <BottomNavigation value="0" onChange={this.handleChange} showLabels>
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
-                        <BottomNavigationAction label="Discover" icon={<NewReleasesIcon />} />
                         <BottomNavigationAction label="New Releases" icon={<NewReleasesIcon />} />
-                        <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
                 </AppWrapper>
             </Router>

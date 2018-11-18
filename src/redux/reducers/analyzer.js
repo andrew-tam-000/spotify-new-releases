@@ -1,8 +1,18 @@
-import { getSongsSuccess, getSongDataSuccess, getArtistDataSuccess } from "../actions/";
+import {
+    initializeOnAnalyzerStart,
+    getSongsSuccess,
+    getSongDataSuccess,
+    getArtistDataSuccess
+} from "../actions/";
 import { slice, map, get } from "lodash";
 
 export default (state = {}, { type, payload }) => {
     switch (type) {
+        case initializeOnAnalyzerStart().type:
+            return {
+                ...state,
+                loading: true
+            };
         case getSongsSuccess().type:
             return {
                 ...state,

@@ -63,11 +63,12 @@ export default {
         },
         newReleases: {
             openAlbums: {},
-            showColors: true,
+            showColors: false,
             showAllTracks: false,
             modal: false,
             modalGenre: "",
-            modalColor: ""
+            modalColor: "",
+            loading: false
         },
         // has 'type' and 'data' as keys
         showSideBar: false,
@@ -105,7 +106,12 @@ export default {
             // This will just be id's that are populated
             // from the spotify core data
             artistData: [],
-            songs: []
+            songs: [],
+            loading: false
+        },
+        error: {
+            message: "",
+            show: false
         }
     }
 };

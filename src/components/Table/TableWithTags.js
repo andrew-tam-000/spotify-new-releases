@@ -7,6 +7,7 @@ import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import _SettingsIcon from "@material-ui/icons/Settings";
 import materialStyled from "../../materialStyled";
 import {
@@ -54,7 +55,8 @@ import TagList from "./TagList";
 import _ItemTagList from "./ItemTagList";
 
 const SettingsIcon = materialStyled(_SettingsIcon)({
-    width: 40
+    width: 40,
+    cursor: "pointer"
 });
 
 const ItemTagList = styled(_ItemTagList)`
@@ -125,6 +127,12 @@ const RowRenderer = styled.div`
     justify-content: space-evenly;
 `;
 
+const Loader = styled.div`
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+`;
 class NewReleasesAlbumsTable extends Component {
     virtualizedConfig = {
         onRowClick: ({ event, index, rowData: { uri, id, isTrack } }) =>
@@ -194,7 +202,8 @@ class NewReleasesAlbumsTable extends Component {
             newReleasesTableShowColors,
             newReleasesTableShowAllTracks,
             toggleNewReleaseColors,
-            playAllUris
+            playAllUris,
+            loading
         } = this.props;
         const active = map(
             queryParams.tags,
@@ -256,16 +265,22 @@ class NewReleasesAlbumsTable extends Component {
                         </div>
                     </Settings>
                 )}
-                <Table
-                    itemRenderer={({ style, ...props }) => {
-                        console.log(props);
-                        return <div style={style}>"hi"</div>;
-                    }}
-                    tableData={tableData}
-                    prefixColumnsProps={prefixColumnsProps}
-                    virtualizedConfig={this.virtualizedConfig}
-                    columnConfig={this.columnConfig}
-                />
+                {loading ? (
+                    <Loader>
+                        <CircularProgress size={80} color="primary" />
+                    </Loader>
+                ) : (
+                    <Table
+                        itemRenderer={({ style, ...props }) => {
+                            console.log(props);
+                            return <div style={style}>"hi"</div>;
+                        }}
+                        tableData={tableData}
+                        prefixColumnsProps={prefixColumnsProps}
+                        virtualizedConfig={this.virtualizedConfig}
+                        columnConfig={this.columnConfig}
+                    />
+                )}
             </NewReleasesAlbumsTableWrapper>
         );
     }

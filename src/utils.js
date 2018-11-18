@@ -26,3 +26,6 @@ export const getKeyFromLocalStorage = key =>
 
 export const setKeyInLocalStorage = (key, data, expiration) =>
     localStorage.setItem(key, compressData({ value: data, expiration }));
+
+window.getKeyFromLocalStorage = getKeyFromLocalStorage;
+window.setKeyInLocalStorage = setKeyInLocalStorage;

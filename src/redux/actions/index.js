@@ -827,3 +827,22 @@ export function reorderTags(oldIndex, newIndex) {
         payload: { oldIndex, newIndex }
     };
 }
+
+export function showErrorModal() {
+    return {
+        type: "error|SHOW_ERROR_MODAL"
+    };
+}
+
+export function hideErrorModal() {
+    return {
+        type: "error|HIDE_ERROR_MODAL"
+    };
+}
+
+export function setErrorMessage(message) {
+    return {
+        type: "error|SET_ERROR_MESSAGE",
+        payload: message
+    };
+}

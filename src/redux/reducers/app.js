@@ -18,7 +18,12 @@ import {
     hideAllNewReleaseTracks,
     showAllNewReleaseTracks,
     createAccessTokenSuccess,
-    reorderTags
+    getNewReleasesStart,
+    getNewReleasesSuccess,
+    reorderTags,
+    showErrorModal,
+    hideErrorModal,
+    setErrorMessage
 } from "../actions/";
 import { filter, map, omit, find } from "lodash";
 
@@ -111,6 +116,27 @@ const appReducer = combineReducers({
                 return state;
         }
     },
+    error: (state = {}, { type, payload }) => {
+        switch (type) {
+            case setErrorMessage().type:
+                return {
+                    ...state,
+                    message: payload
+                };
+            case showErrorModal().type:
+                return {
+                    ...state,
+                    show: true
+                };
+            case hideErrorModal().type:
+                return {
+                    ...state,
+                    show: true
+                };
+            default:
+                return state;
+        }
+    },
     discover,
     genreColors,
     newReleases: (state = {}, { type, payload }) => {
@@ -160,6 +186,16 @@ const appReducer = combineReducers({
                 return {
                     ...state,
                     modalColor: payload
+                };
+            case getNewReleasesStart().type:
+                return {
+                    ...state,
+                    loading: true
+                };
+            case getNewReleasesSuccess().type:
+                return {
+                    ...state,
+                    loading: false
                 };
             default:
                 return state;

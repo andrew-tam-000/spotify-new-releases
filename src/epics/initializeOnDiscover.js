@@ -4,7 +4,7 @@ import { of, zip, concat } from "rxjs";
 import { push } from "react-router-redux";
 import {
     createAccessTokenStart,
-    initializeOnAnalyzerStart,
+    initializeOnDiscoverStart,
     createAccessTokenSuccess,
     initializeOnAnalyzerSuccess,
     getSongsStart,
@@ -18,7 +18,7 @@ import { firebaseUserIdSelector } from "../selectors";
 
 export default function initializeOnAnalyzer(action$, state$) {
     return action$.pipe(
-        ofType(initializeOnAnalyzerStart().type),
+        ofType(initializeOnDiscoverStart().type),
         mergeMap(() =>
             concat(
                 true &&
