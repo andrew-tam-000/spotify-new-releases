@@ -68,7 +68,17 @@ const AppBar = styled(_AppBar)`
 `;
 
 class RouteProvider extends Component {
+    state = {
+        value: 0
+    };
+
+    handleChange = (event, value) => {
+        this.setState({ value });
+    };
     handleChange = (e, val) => {
+        this.setState({
+            value: val
+        });
         if (val === 0) {
             history.push({ pathname: "/analyzer", search: history.location.search });
         }
@@ -125,7 +135,11 @@ class RouteProvider extends Component {
                             <AlbumList />
                         </Sidebar>
                     </MainContent>
-                    <BottomNavigation value="0" onChange={this.handleChange} showLabels>
+                    <BottomNavigation
+                        value={this.state.value}
+                        onChange={this.handleChange}
+                        showLabels
+                    >
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
                         <BottomNavigationAction label="New Releases" icon={<NewReleasesIcon />} />
                     </BottomNavigation>
