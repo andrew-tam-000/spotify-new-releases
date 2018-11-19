@@ -18,9 +18,11 @@ class Devices extends Component {
         this.setState({ anchorEl: event.currentTarget });
     };
 
+    handleClose = () => this.setState({ anchorEl: null });
+
     render() {
         const { anchorEl } = this.state;
-        const { spotifyDevices, transferPlaybackStart } = this.props;
+        const { spotifyDevices } = this.props;
 
         return (
             <React.Fragment>
@@ -36,11 +38,12 @@ class Devices extends Component {
                     id="simple-menu"
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
-                    onClose={() => this.setState({ anchorEl: null })}
+                    onClose={this.handleClose}
                 >
                     {map(spotifyDevices, spotifyDevice => (
                         <MenuItem
                             onClick={() => {
+                                this.handleClose();
                                 this.props.transferPlaybackStart(spotifyDevice.id);
                             }}
                         >

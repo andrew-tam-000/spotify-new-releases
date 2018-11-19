@@ -92,9 +92,6 @@ import {
 import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
 import { getKeyFromLocalStorage } from "../utils";
 
-const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
-    interval(5000).pipe(mergeMap(() => of(getCurrentlyPlayingTrackStart())));
-
 // Need to also grab this track from the api
 const getNowPlaying = (action$, state$, { spotifyApi }) =>
     action$.pipe(
@@ -567,7 +564,6 @@ export default (...args) =>
         getArtistTopTracks(...args),
         getRelatedArtists(...args),
         getNowPlaying(...args),
-        getNowPlayingPing(...args),
         getAdvancedSearchResults(...args),
         playSong(...args),
         getSearchResults(...args),
