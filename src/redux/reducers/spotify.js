@@ -62,22 +62,9 @@ export default (state = {}, { type, payload = {} }) => {
         case getSongsSuccess().type:
             return {
                 ...state,
-                songs: {
-                    ...state.songs,
-                    ...keyBy(
-                        filter(
-                            // Duck type response
-                            // for checking library songs or not
-                            compact(
-                                get(first(payload), "added_at")
-                                    ? map(payload, song => get(song, "track"))
-                                    : payload
-                            ),
-                            ({ id }) => !state.songs[id]
-                        ),
-                        "id"
-                    )
-                }
+                library: payload.songs,
+                artistData: mergeNewItems(state.artistData, payload.artists, "id"),
+                songs: mergeNewItems(state.songs, map(payload.songs, "track"), "id")
             };
         case getSongDataSuccess().type:
             return {

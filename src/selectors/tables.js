@@ -110,7 +110,7 @@ const createHydratedData = ({
         (acc, item) =>
             thru(
                 type === "librarySongs"
-                    ? thru([item, songs[item.track]], ([originalItem, item]) => ({
+                    ? thru([item, item.track], ([originalItem, item]) => ({
                           id: item.id,
                           album: albums[get(item, "album.id")],
                           artists: map(item.artists, artist => artistData[artist.id]),

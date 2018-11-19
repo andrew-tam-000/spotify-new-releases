@@ -70,10 +70,10 @@ const AppBar = styled(_AppBar)`
 class RouteProvider extends Component {
     handleChange = (e, val) => {
         if (val === 0) {
-            history.push("/analyzer");
+            history.push({ pathname: "/analyzer", search: history.location.search });
         }
         if (val === 1) {
-            history.push("/new-releases");
+            history.push({ pathname: "/new-releases", search: history.location.search });
         }
         if (val === 2) {
             this.props.searchOpenPanel();

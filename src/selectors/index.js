@@ -168,7 +168,7 @@ export const analyzerOpenSearchPanelSelector = createSelector(
 );
 
 export const librarySongsSelector = createSelector(
-    state => get(state, "app.analyzer.songs"),
+    state => get(state, "app.spotify.library"),
     songs => songs
 );
 

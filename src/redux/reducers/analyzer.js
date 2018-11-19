@@ -1,5 +1,6 @@
 import {
     initializeOnAnalyzerStart,
+    initializeOnAnalyzerSuccess,
     getSongsSuccess,
     getSongDataSuccess,
     getArtistDataSuccess
@@ -12,6 +13,11 @@ export default (state = {}, { type, payload }) => {
             return {
                 ...state,
                 loading: true
+            };
+        case initializeOnAnalyzerSuccess().type:
+            return {
+                ...state,
+                loading: false
             };
         case getSongsSuccess().type:
             return {

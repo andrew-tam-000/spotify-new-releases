@@ -11,12 +11,9 @@ import {
 } from "rxjs/operators";
 import { of, concat } from "rxjs";
 import {
-    createAccessTokenStart,
     initializeOnAnalyzerStart,
     getSongsStart,
     getSongsSuccess,
-    getArtistDataStart,
-    getArtistDataSuccess,
     initializeOnAnalyzerSuccess
 } from "../redux/actions";
 import { accessTokenSelector } from "../selectors";
@@ -29,16 +26,11 @@ export default function initializeOnAnalyzer(action$, state$) {
                 map$(state => accessTokenSelector(state)),
                 filter$(state => state),
                 distinctUntilChanged(),
-                mergeMap(() =>
+                mergeMap(action =>
                     concat(
                         of(getSongsStart()),
                         action$.pipe(
                             ofType(getSongsSuccess().type),
-                            mapTo(getArtistDataStart()),
-                            take(1)
-                        ),
-                        action$.pipe(
-                            ofType(getArtistDataSuccess().type),
                             mapTo(initializeOnAnalyzerSuccess()),
                             take(1)
                         )

@@ -321,10 +321,10 @@ export function getSongsStart() {
         type: "spotify|GET_SONGS_START"
     };
 }
-export function getSongsSuccess(songs) {
+export function getSongsSuccess(songs, artists) {
     return {
         type: "spotify|GET_SONGS_SUCCESS",
-        payload: songs
+        payload: { songs, artists }
     };
 }
 

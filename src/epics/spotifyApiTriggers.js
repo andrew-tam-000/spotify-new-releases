@@ -410,15 +410,12 @@ const getAdvancedSearchResults = (action$, state$, { basicSpotifyApi }) =>
 const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getNewReleasesStart().type),
-        mapTo(
-            thru(
-                get(getKeyFromLocalStorage("newReleaseData"), "expiration"),
-                expiration => expiration && expiration > new Date().getTime()
-            )
-        ),
         mergeMap(
-            useLocalStorage =>
-                useLocalStorage
+            action =>
+                thru(
+                    get(getKeyFromLocalStorage("newReleaseData"), "expiration"),
+                    expiration => expiration && expiration > new Date().getTime()
+                )
                     ? thru(
                           getKeyFromLocalStorage("newReleaseData") || {},
                           ({ value: { newReleases, albums, artists, songs } = {} }) => [

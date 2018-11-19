@@ -56,7 +56,8 @@ export default {
             artistTopTracks: {},
             relatedArtists: {},
             songData: [],
-            songs: []
+            songs: [],
+            library: []
         },
         discover: {
             nodes: {}
