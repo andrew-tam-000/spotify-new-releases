@@ -68,7 +68,6 @@ const NewReleasesAlbumsTableWrapper = styled.div`
     height: 100%;
     flex: 1;
     flex-direction: column;
-    background-color: #757575;
 `;
 
 const Tags = styled.div`
