@@ -17,10 +17,11 @@ export function hasLocalStorageKey(keyName) {
     return of(hasValue);
 }
 
-export function apiObservable(apiCall, apiArgs, onSuccess) {
+const defaultError = e => of({ type: "error", payload: e.message });
+export function apiObservable(apiCall, apiArgs, onSuccess, onError) {
     return from(apiCall.apply(null, castArray(apiArgs))).pipe(
         mergeMap(onSuccess),
-        catchError(e => of({ type: "error", payload: e.message }))
+        catchError(onError || defaultError)
     );
 }
 

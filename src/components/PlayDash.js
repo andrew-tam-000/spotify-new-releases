@@ -1,12 +1,18 @@
-import React from "react";
+import React, { Component } from "react";
 import { get, first, last, split } from "lodash";
 import { compose, mapProps } from "recompose";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import SkipToNextButton from "./PlayDash/SkipToNextButton";
 import SkipToPreviousButton from "./PlayDash/SkipToPreviousButton";
+import Button from "@material-ui/core/Button";
 import PlayButton from "./Analyzer/PlayButton";
-import { accessTokenSelector, nowPlayingSongUriSelector, songsSelector } from "../selectors";
+import {
+    accessTokenSelector,
+    nowPlayingSongUriSelector,
+    songsSelector,
+    spotifyDevicesSelector
+} from "../selectors";
 import Login from "./Login";
 import Typography from "@material-ui/core/Typography";
 import StartTreeButton from "./Discover/StartTreeButton";
@@ -14,6 +20,7 @@ import Seek from "./PlayDash/Seek";
 import styled from "styled-components";
 import materialStyled from "../materialStyled";
 import { getKeyFromLocalStorage } from "../utils";
+import Devices from "./PlayDash/Devices";
 
 const typographyStyles = {
     whiteSpace: "nowrap",
@@ -49,6 +56,7 @@ const PlayDash = ({ uri, track }) => (
         </div>
         <Controls>
             <Buttons>
+                <Devices />
                 <StartTreeButton uri={uri} />
                 <SkipToPreviousButton />
                 <PlayButton uri={uri} />

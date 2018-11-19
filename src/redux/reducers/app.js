@@ -21,6 +21,7 @@ import {
     getNewReleasesStart,
     getNewReleasesSuccess,
     reorderTags,
+    disableAccessToken,
     showErrorModal,
     hideErrorModal,
     setErrorMessage
@@ -94,6 +95,11 @@ const appReducer = combineReducers({
     },
     user: (state = {}, { type, payload }) => {
         switch (type) {
+            case disableAccessToken().type:
+                return {
+                    ...state,
+                    accessToken: null
+                };
             case createAccessTokenSuccess().type:
                 return {
                     ...state,

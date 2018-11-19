@@ -445,3 +445,8 @@ export const errorShowSelector = createSelector(
     state => get(state, "app.error.show"),
     errorShow => errorShow
 );
+
+export const spotifyDevicesSelector = createSelector(
+    state => get(state, "app.spotify.devices"),
+    devices => devices
+);

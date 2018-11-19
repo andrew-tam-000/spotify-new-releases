@@ -10,7 +10,8 @@ import {
     setSearchResults,
     getTracksSuccess,
     getNewReleasesSuccess,
-    getAlbumsSuccess
+    getAlbumsSuccess,
+    getDevicesSuccess
 } from "../actions/";
 import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
@@ -131,6 +132,11 @@ export default (state = {}, { type, payload = {} }) => {
             return {
                 ...state,
                 albums: mergeNewItems(state.albums, payload, "id")
+            };
+        case getDevicesSuccess().type:
+            return {
+                ...state,
+                devices: payload
             };
         default:
             return state;

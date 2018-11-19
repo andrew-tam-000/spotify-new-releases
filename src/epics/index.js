@@ -22,6 +22,7 @@ import setLocalStorageEpic from "./setLocalStorageEpic";
 import syncGenreToColorEpic from "./syncGenreToColorEpic";
 import queryParamsEpic from "./queryParamsEpic";
 import addGenreToLocalStoreEpic from "./addGenreToLocalStoreEpic";
+import onLoginEpic from "./onLoginEpic";
 
 export default (...args) =>
     merge(
@@ -47,5 +48,6 @@ export default (...args) =>
         queryParamsEpic(...args),
         syncGenreToColorEpic(...args),
         setLocalStorageEpic(...args),
-        addGenreToLocalStoreEpic(...args)
+        addGenreToLocalStoreEpic(...args),
+        onLoginEpic(...args)
     );

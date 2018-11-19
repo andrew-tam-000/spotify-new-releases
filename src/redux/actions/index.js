@@ -196,6 +196,12 @@ export function createAccessTokenSuccess(token) {
     };
 }
 
+export function disableAccessToken() {
+    return {
+        type: "DISABLE_ACCESS_TOKEN"
+    };
+}
+
 ///////////////////////////////////////////////
 //
 // GET_SPOTIFY_USER
@@ -844,5 +850,31 @@ export function setErrorMessage(message) {
     return {
         type: "error|SET_ERROR_MESSAGE",
         payload: message
+    };
+}
+
+export function getDevicesStart() {
+    return {
+        type: "spotify|GET_DEVICES_START"
+    };
+}
+
+export function getDevicesSuccess(devices) {
+    return {
+        type: "spotify|GET_DEVICES_SUCCESS",
+        payload: devices
+    };
+}
+
+export function transferPlaybackStart(device) {
+    return {
+        type: "spotify|TRANSFER_PLAYBACK_START",
+        payload: device
+    };
+}
+
+export function transferPlaybackSuccess() {
+    return {
+        type: "spotify|TRANSFER_PLAYBACK_SUCCESS"
     };
 }

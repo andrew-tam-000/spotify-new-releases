@@ -82,11 +82,15 @@ import {
     getNewReleasesSuccess,
     getSongDataStart,
     getSongDataSuccess,
-    setLocalStorage
+    setLocalStorage,
+    disableAccessToken,
+    getDevicesStart,
+    getDevicesSuccess,
+    transferPlaybackStart,
+    transferPlaybackSuccess
 } from "../redux/actions";
 import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
 import { getKeyFromLocalStorage } from "../utils";
-import lzString from "lz-string";
 
 const getNowPlayingPing = (action$, state$, { spotifyApi }) =>
     interval(5000).pipe(mergeMap(() => of(getCurrentlyPlayingTrackStart())));
@@ -109,7 +113,8 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
                                   take(1),
                                   mapTo(getCurrentlyPlayingTrackSuccess(resp))
                               )
-                          )
+                          ),
+                resp => of(disableAccessToken())
             )
         )
     );
@@ -538,18 +543,23 @@ const getAlbums = (action$, state$, { basicSpotifyApi }) =>
                 : of(getAlbumsSuccess([]));
         })
     );
-const cacheNewReleaseData = (action$, state$, { spotifyApi }) =>
+
+const getDevices = (action$, state$, { spotifyApi }) =>
     action$.pipe(
-        ofType(getNewReleasesSuccess().type),
-        mergeMap(action => {
-            const state = state$.value;
-            const newReleases = newReleasesSelector(state);
-            const artists = albumsSelector(state);
-            const tracks = songsSelector(state);
-            const albums = albumsSelector(state);
-            const newReleaseData = { newReleases, artists, tracks, albums };
-            return of(setLocalStorage("newReleaseData", newReleaseData));
-        })
+        ofType(getDevicesStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.getMyDevices, [], resp => of(getDevicesSuccess(resp.devices)))
+        )
+    );
+
+const transferPlayback = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(transferPlaybackStart().type),
+        mergeMap(action =>
+            apiObservable(spotifyApi.transferMyPlayback, [[action.payload], { play: true }], resp =>
+                of(transferPlaybackSuccess())
+            )
+        )
     );
 
 export default (...args) =>
@@ -570,5 +580,7 @@ export default (...args) =>
         seek(...args),
         getNewReleases(...args),
         getAlbums(...args),
-        getSongData(...args)
+        getSongData(...args),
+        getDevices(...args),
+        transferPlayback(...args)
     ).pipe(catchError(e => console.error(e)));
