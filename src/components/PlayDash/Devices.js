@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { map } from "lodash";
 import { createStructuredSelector } from "reselect";
 import Button from "@material-ui/core/Button";
-import { transferPlaybackStart } from "../../redux/actions/";
+import { transferPlaybackStart, getDevicesStart } from "../../redux/actions/";
 import { spotifyDevicesSelector } from "../../selectors";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -14,17 +14,18 @@ class Devices extends Component {
     };
 
     handleClick = event => {
+        this.props.getDevicesStart();
         this.setState({ anchorEl: event.currentTarget });
     };
 
     render() {
         const { anchorEl } = this.state;
-        const { spotifyDevices } = this.props;
+        const { spotifyDevices, transferPlaybackStart } = this.props;
 
         return (
             <React.Fragment>
                 <Button
-                    variant="primary"
+                    color="primary"
                     aria-owns={anchorEl ? "simple-menu" : undefined}
                     aria-haspopup="true"
                     onClick={this.handleClick}
@@ -56,5 +57,5 @@ export default connect(
     createStructuredSelector({
         spotifyDevices: spotifyDevicesSelector
     }),
-    { transferPlaybackStart }
+    { getDevicesStart, transferPlaybackStart }
 )(Devices);
