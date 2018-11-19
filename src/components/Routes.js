@@ -69,11 +69,7 @@ const AppBar = styled(_AppBar)`
 
 class RouteProvider extends Component {
     state = {
-        value: 0
-    };
-
-    handleChange = (event, value) => {
-        this.setState({ value });
+        value: null
     };
     handleChange = (e, val) => {
         this.setState({
