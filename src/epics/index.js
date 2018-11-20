@@ -9,7 +9,6 @@ import initializeOnPlaylist from "./initializeOnPlaylist";
 import getFirebaseUser from "./getFirebaseUser";
 import updateFirebaseUser from "./updateFirebaseUser";
 import deletePlaylist from "./deletePlaylist";
-import setSpotifyApiToken from "./setSpotifyApiToken";
 import firebaseListener from "./firebaseListener";
 import initializeOnAnalyzer from "./initializeOnAnalyzer";
 import initializeOnDiscover from "./initializeOnDiscover";
@@ -35,7 +34,6 @@ export default (...args) =>
         initializeOnPlaylist(...args),
         getFirebaseUser(...args),
         deletePlaylist(...args),
-        setSpotifyApiToken(...args),
         updateFirebaseUser(...args),
         firebaseListener(...args),
         initializeOnAnalyzer(...args),
