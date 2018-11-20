@@ -878,3 +878,16 @@ export function transferPlaybackSuccess() {
         type: "spotify|TRANSFER_PLAYBACK_SUCCESS"
     };
 }
+
+export function addToMySavedTracksStart(ids) {
+    return {
+        type: "spotify|ADD_TO_MY_SAVED_TRACKS_START",
+        payload: ids
+    };
+}
+
+export function addToMySavedTracksSuccess(ids) {
+    return {
+        type: "spotify|ADD_TO_MY_SAVED_TRACKS_SUCCESS"
+    };
+}

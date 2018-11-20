@@ -1,9 +1,15 @@
 import React from "react";
+import { connect } from "react-redux";
+import { compose, withProps } from "recompact";
+import { createStructuredSelector } from "reselect";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
+import AddIcon from "@material-ui/icons/Add";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
 import ItemTagList from "../Table/ItemTagList";
+import { addToMySavedTracksStart } from "../../redux/actions";
+import { accessTokenSelector } from "../../selectors";
 
 import materialStyled from "../../materialStyled";
 import PlayButtonProvider from "../core/PlayButtonProvider";
@@ -46,8 +52,14 @@ const ButtonWrapper = styled.div`
     align-items: center;
 `;
 
+const TitleWithAdd = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+`;
+
 const buttonStyles = {
-    fontSize: 20,
     color: "white",
     cursor: "pointer"
 };
@@ -57,7 +69,7 @@ const NewReleasesAlbumPlayButton = props => (
     <PlayButtonProvider {...props}>
         {({ isPlaying, pauseSongStart, playSongStart }) => (
             <ButtonWrapper onClick={isPlaying ? pauseSongStart : playSongStart}>
-                {isPlaying ? <PauseButton /> : <PlayButton />}
+                {isPlaying ? <PauseButton fontSize="small" /> : <PlayButton fontSize="small" />}
             </ButtonWrapper>
         )}
     </PlayButtonProvider>
@@ -67,13 +79,27 @@ const NewReleasesTrackPlayButton = props => (
     <PlayButtonProvider {...props}>
         {({ isPlaying, pauseSongStart, playSongStart }) =>
             isPlaying ? (
-                <PauseButton onClick={pauseSongStart} />
+                <PauseButton fontSize="small" onClick={pauseSongStart} />
             ) : (
-                <PlayButton onClick={playSongStart} />
+                <PlayButton fontSize="small" onClick={playSongStart} />
             )
         }
     </PlayButtonProvider>
 );
+
+const AddToLibrary = compose(
+    connect(
+        createStructuredSelector({
+            accessToken: accessTokenSelector
+        }),
+        { addToMySavedTracksStart }
+    ),
+    withProps(({ addToMySavedTracksStart, id }) => ({
+        onClick: () => addToMySavedTracksStart([id])
+    }))
+)(function _AddIcon({ accessToken, ...props }) {
+    return accessToken && <AddIcon {...props} />;
+});
 
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
@@ -88,7 +114,8 @@ const AlbumImageCellRenderer = ({
         type,
         album,
         isTrack,
-        meta: { genres }
+        meta: { genres },
+        id
     },
     modalOpen,
     setModalOpen
@@ -97,7 +124,10 @@ const AlbumImageCellRenderer = ({
         <TrackBlurbCellRendererWrapper>
             <NewReleasesTrackPlayButton uri={uri} />
             <Description>
-                <Typography noWrap={true}>{track}</Typography>
+                <TitleWithAdd>
+                    <Typography noWrap={true}>{track}</Typography>
+                    <AddToLibrary id={id} fontSize="small" color="action" />
+                </TitleWithAdd>
                 <Typography noWrap={true} variant="caption">
                     {artist}
                 </Typography>

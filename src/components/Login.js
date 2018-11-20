@@ -9,7 +9,8 @@ const scopes = [
     "user-modify-playback-state",
     "user-read-currently-playing",
     "user-read-playback-state",
-    "user-library-read"
+    "user-library-read",
+    "user-library-modify"
     //"user-read-recently-played",
     //"user-top-read",
     //"playlist-read-private",
