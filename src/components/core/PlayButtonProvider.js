@@ -2,7 +2,11 @@ import { compose, withPropsOnChange } from "recompact";
 import { isUndefined, omitBy } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
-import { nowPlayingContextUriSelector, nowPlayingSongUriSelector } from "../../selectors";
+import {
+    nowPlayingContextUriSelector,
+    nowPlayingSongUriSelector,
+    nowPlayingIsPlayingSelector
+} from "../../selectors";
 
 import { playSongStart, pauseSongStart } from "../../redux/actions";
 
@@ -30,16 +34,22 @@ export default compose(
     connect(
         createStructuredSelector({
             nowPlayingSongUri: nowPlayingSongUriSelector,
-            nowPlayingContextUri: nowPlayingContextUriSelector
+            nowPlayingContextUri: nowPlayingContextUriSelector,
+            nowPlayingIsPlaying: nowPlayingIsPlayingSelector
         }),
         mapDispatchToProps
     ),
     withPropsOnChange(
-        ["uri", "nowPlayingSongUri", "context_uri", "nowPlayingContextUri"],
-        ({ uri, nowPlayingSongUri, context_uri, nowPlayingContextUri }) => ({
+        ["uri", "nowPlayingSongUri", "context_uri", "nowPlayingContextUri", "nowPlayingIsPlaying"],
+        ({ uri, nowPlayingSongUri, context_uri, nowPlayingContextUri, nowPlayingIsPlaying }) => ({
             isPlaying:
-                (uri && uri === nowPlayingSongUri) ||
-                (context_uri && context_uri === nowPlayingContextUri)
+                // If id is supplied then check against the supplied id
+                // Otherwise, just pause and play
+                uri || context_uri
+                    ? nowPlayingIsPlaying &&
+                      ((uri && uri === nowPlayingSongUri) ||
+                          (context_uri && context_uri === nowPlayingContextUri))
+                    : nowPlayingIsPlaying
         })
     )
 )(PlayButtonProvider);

@@ -273,16 +273,18 @@ export const nowPlayingSongProgressSelector = createSelector(
 );
 
 export const nowPlayingSongUriSelector = createSelector(
-    state =>
-        get(state, "app.spotify.nowPlaying.is_playing") &&
-        get(state, "app.spotify.nowPlaying.item.uri"),
+    state => get(state, "app.spotify.nowPlaying.item.uri"),
     songId => songId
 );
+
 export const nowPlayingContextUriSelector = createSelector(
-    state =>
-        get(state, "app.spotify.nowPlaying.is_playing") &&
-        get(state, "app.spotify.nowPlaying.context.uri"),
+    state => get(state, "app.spotify.nowPlaying.context.uri"),
     songId => songId
+);
+
+export const nowPlayingIsPlayingSelector = createSelector(
+    state => get(state, "app.spotify.nowPlaying.is_playing"),
+    isPlaying => isPlaying
 );
 
 export const showSideBarSelector = createSelector(

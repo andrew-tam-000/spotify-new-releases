@@ -51,15 +51,15 @@ const Buttons = styled.div`
 const PlayDash = ({ uri, track }) => (
     <PlayDashWrapper>
         <div>
-            <Title variant="h5">{track.name}</Title>
-            <Artist variant="h6">{first(track.artists).name}</Artist>
+            <Title variant="body1">{track.name}</Title>
+            <Artist variant="caption">{first(track.artists).name}</Artist>
         </div>
         <Controls>
             <Buttons>
                 <Devices />
                 <StartTreeButton uri={uri} />
                 <SkipToPreviousButton />
-                <PlayButton uri={uri} />
+                <PlayButton />
                 <SkipToNextButton />
             </Buttons>
             <Seek />
