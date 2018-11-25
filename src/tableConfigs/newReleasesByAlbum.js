@@ -38,7 +38,13 @@ export default [
         label: <CalendarTodayIcon fontSize="small" />,
         dataKey: "releaseDate",
         formatter: row => {
-            const date = new Date(get(row, "meta.release_date"));
+            const releaseDate = get(row, "meta.release_date");
+
+            if (!releaseDate) {
+                return "";
+            }
+
+            const date = new Date(releaseDate);
             const year = date.getFullYear();
             const month = ("0" + (date.getMonth() + 1)).slice(-2);
             const day = ("0" + date.getDate()).slice(-2);
