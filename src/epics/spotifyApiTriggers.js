@@ -103,17 +103,28 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
                 spotifyApi.getMyCurrentPlayingTrack,
                 [],
                 resp =>
-                    songsSelector(state$.value)[resp.item.id]
-                        ? from(Promise.resolve()).pipe(mapTo(getCurrentlyPlayingTrackSuccess(resp)))
-                        : concat(
-                              of(getTracksStart([resp.item.id])),
-                              action$.pipe(
-                                  ofType(getTracksSuccess().type),
-                                  take(1),
-                                  mapTo(getCurrentlyPlayingTrackSuccess(resp))
-                              )
-                          ),
-                resp => of(disableAccessToken())
+                    thru(
+                        get(resp, "item.id"),
+                        songId =>
+                            songId
+                                ? songsSelector(state$.value)[songId]
+                                    ? from(Promise.resolve()).pipe(
+                                          mapTo(getCurrentlyPlayingTrackSuccess(resp))
+                                      )
+                                    : concat(
+                                          of(getTracksStart([songId])),
+                                          action$.pipe(
+                                              ofType(getTracksSuccess().type),
+                                              take(1),
+                                              mapTo(getCurrentlyPlayingTrackSuccess(resp))
+                                          )
+                                      )
+                                : of(getCurrentlyPlayingTrackSuccess())
+                    ),
+                resp => {
+                    console.log(resp);
+                    return of(disableAccessToken());
+                }
             )
         )
     );
