@@ -2,11 +2,15 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { map } from "lodash";
 import { createStructuredSelector } from "reselect";
-import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 import { transferPlaybackStart, getDevicesStart } from "../../redux/actions/";
-import { spotifyDevicesSelector } from "../../selectors";
+import { spotifyDevicesSelector, nowPlayingDeviceIdSelector } from "../../selectors";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import SkipToNextButton from "./SkipToNextButton";
+import SkipToPreviousButton from "./SkipToPreviousButton";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import IconButton from "@material-ui/core/IconButton";
 
 class Devices extends Component {
     state = {
@@ -22,24 +26,27 @@ class Devices extends Component {
 
     render() {
         const { anchorEl } = this.state;
-        const { spotifyDevices } = this.props;
+        const { spotifyDevices, nowPlayingDeviceId } = this.props;
 
         return (
             <React.Fragment>
-                <Button
-                    color="primary"
-                    aria-owns={anchorEl ? "simple-menu" : undefined}
-                    aria-haspopup="true"
-                    onClick={this.handleClick}
-                >
-                    Devices
-                </Button>
+                <IconButton color="action">
+                    <MoreVertIcon
+                        color="action"
+                        aria-owns={anchorEl ? "simple-menu" : undefined}
+                        aria-haspopup="true"
+                        onClick={this.handleClick}
+                        fontSize="small"
+                    />
+                </IconButton>
                 <Menu
                     id="simple-menu"
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={this.handleClose}
                 >
+                    <SkipToPreviousButton />
+                    <SkipToNextButton />
                     {map(spotifyDevices, spotifyDevice => (
                         <MenuItem
                             onClick={() => {
@@ -47,7 +54,15 @@ class Devices extends Component {
                                 this.props.transferPlaybackStart(spotifyDevice.id);
                             }}
                         >
-                            {`${spotifyDevice.name} | ${spotifyDevice.type}`}
+                            <Typography
+                                color={
+                                    nowPlayingDeviceId === spotifyDevice.id
+                                        ? "secondary"
+                                        : undefined
+                                }
+                            >
+                                {`${spotifyDevice.name} | ${spotifyDevice.type}`}
+                            </Typography>
                         </MenuItem>
                     ))}
                 </Menu>
@@ -58,7 +73,8 @@ class Devices extends Component {
 
 export default connect(
     createStructuredSelector({
-        spotifyDevices: spotifyDevicesSelector
+        spotifyDevices: spotifyDevicesSelector,
+        nowPlayingDeviceId: nowPlayingDeviceIdSelector
     }),
     { getDevicesStart, transferPlaybackStart }
 )(Devices);

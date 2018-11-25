@@ -100,7 +100,7 @@ const getNowPlaying = (action$, state$, { spotifyApi }) =>
         ofType(getCurrentlyPlayingTrackStart().type),
         mergeMap(action =>
             apiObservable(
-                spotifyApi.getMyCurrentPlayingTrack,
+                spotifyApi.getMyCurrentPlaybackState,
                 [],
                 resp =>
                     thru(

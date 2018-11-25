@@ -287,6 +287,11 @@ export const nowPlayingIsPlayingSelector = createSelector(
     isPlaying => isPlaying
 );
 
+export const nowPlayingDeviceIdSelector = createSelector(
+    state => get(state, "app.spotify.nowPlaying.device.id"),
+    deviceId => deviceId
+);
+
 export const showSideBarSelector = createSelector(
     state => get(state, "app.showSideBar"),
     showSideBar => showSideBar

@@ -1,8 +1,11 @@
 import React from "react";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
-import Button from "@material-ui/core/Button";
+import _Button from "@material-ui/core/Button";
 import PlayButtonProvider from "../../components/core/PlayButtonProvider";
+import materialStyled from "../../materialStyled";
+
+const Button = materialStyled(_Button)({ flexShrink: 0 });
 
 const PlayButton = props => (
     <PlayButtonProvider {...props}>
