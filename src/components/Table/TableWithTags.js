@@ -6,10 +6,9 @@ import Typography from "@material-ui/core/Typography";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { genreColorsSelector, queryParamsSelector, albumsSelector } from "../../selectors";
 import Table from "../Table";
 import { toggleNewReleaseAlbum, reorderTags, reorderQueryTags } from "../../redux/actions";
-import { noop, map, get, size, join, first, difference, find } from "lodash";
+import { noop, get, size, join, first } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import _ItemTagList from "./ItemTagList";
@@ -106,15 +105,7 @@ class NewReleasesAlbumsTable extends Component {
 
     // TODO: Use html encode library, he to encode strings
     render() {
-        const { tableData, genreColors, queryParams, loading } = this.props;
-        const active = map(
-            queryParams.tags,
-            tagGenre =>
-                find(genreColors, ({ genre }) => genre === tagGenre) || {
-                    genre: tagGenre
-                }
-        );
-        const inactive = difference(genreColors, active);
+        const { tableData, loading } = this.props;
         return (
             <NewReleasesAlbumsTableWrapper>
                 {loading ? (
@@ -149,15 +140,9 @@ class NewReleasesAlbumsTable extends Component {
     }
 }
 
-const mapStateToProps = createStructuredSelector({
-    genreColors: genreColorsSelector,
-    queryParams: queryParamsSelector,
-    albums: albumsSelector
-});
-
 export default compose(
     connect(
-        mapStateToProps,
+        null,
         {
             toggleNewReleaseAlbum,
             reorderTags,
