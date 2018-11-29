@@ -1,13 +1,12 @@
 import styled from "styled-components";
 import TagProvider from "../Table/TagProvider";
-import React, { Component } from "react";
+import React from "react";
 import Typography from "@material-ui/core/Typography";
-import { map, keys } from "lodash";
+import { map } from "lodash";
 import { connect } from "react-redux";
 import { compose, withProps } from "recompact";
 import { openNewReleaseModal, setNewReleaseModalGenre } from "../../redux/actions";
-import _ChevronLeft from "@material-ui/icons/ChevronLeft";
-import _ChevronRight from "@material-ui/icons/ChevronRight";
+import Scrollbar from "react-smooth-scrollbar";
 
 const Tag = styled.span`
     background-color: ${props => props.color};
@@ -22,9 +21,15 @@ const Tag = styled.span`
 const Genres = styled.div`
     display: flex;
     flex-wrap: nowrap;
-    overflow: auto;
-    margin-left: 20px;
-    margin-right: 20px;
+
+    // Hack to get margin/padding working in beginning
+    &:after,
+    &:before {
+        content: "";
+        display: block;
+        margin-left: 6px;
+        border: 1px solid transparent;
+    }
 `;
 
 const withOpenModal = compose(
@@ -42,73 +47,31 @@ const withOpenModal = compose(
 );
 
 const TagWithOpenModal = withOpenModal(Tag);
-const ChevronRight = styled(_ChevronRight)`
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-`;
-
-const ChevronLeft = styled(_ChevronLeft)`
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-`;
-
 const ItemTagListWrapper = styled.div`
     position: relative;
-`;
-
-class GenresWithScroll extends Component {
-    scrollLeft = e => {
-        e.stopPropagation();
-        const currentTarget = e.currentTarget;
-        const parent = currentTarget.parentElement.firstElementChild;
-        const scroll = parent.scrollLeft;
-        parent.scrollLeft -= 200;
-    };
-
-    scrollRight = e => {
-        e.stopPropagation();
-        const currentTarget = e.currentTarget;
-        const parent = currentTarget.parentElement.firstElementChild;
-        const scroll = parent.scrollLeft;
-        parent.scrollLeft += 200;
-    };
-
-    render() {
-        const { genres } = this.props;
-        return (
-            <React.Fragment>
-                <Genres>
-                    {map(genres, genre => (
-                        <TagProvider id={genre}>
-                            {({ active, onClick, color }) => (
-                                <TagWithOpenModal
-                                    genre={genre}
-                                    color={active ? color || "transparent" : undefined}
-                                >
-                                    <Typography variant="caption">{genre}</Typography>
-                                </TagWithOpenModal>
-                            )}
-                        </TagProvider>
-                    ))}
-                </Genres>
-                {genres.length ? (
-                    <React.Fragment>
-                        <ChevronLeft fontSize="small" color="action" onClick={this.scrollLeft} />
-                        <ChevronRight fontSize="small" color="action" onClick={this.scrollRight} />
-                    </React.Fragment>
-                ) : null}
-            </React.Fragment>
-        );
+    & .scrollbar-track {
+        display: none !important;
     }
-}
+`;
 
 const ItemTagList = ({ className, genres }) => (
     <ItemTagListWrapper className={className}>
-        <GenresWithScroll genres={genres} />
+        <Scrollbar>
+            <Genres>
+                {map(genres, genre => (
+                    <TagProvider id={genre}>
+                        {({ active, onClick, color }) => (
+                            <TagWithOpenModal
+                                genre={genre}
+                                color={active ? color || "transparent" : undefined}
+                            >
+                                <Typography variant="caption">{genre}</Typography>
+                            </TagWithOpenModal>
+                        )}
+                    </TagProvider>
+                ))}
+            </Genres>
+        </Scrollbar>
     </ItemTagListWrapper>
 );
 
