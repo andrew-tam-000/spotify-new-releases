@@ -100,7 +100,6 @@ class NewReleasesAddTagModal extends Component {
                             ({ genre }) => ({ value: genre, label: genre })
                         )}
                     />
-                    <Typography>Pick a color</Typography>
                     <ChromePicker
                         color={newReleasesTableModalColor}
                         onChangeComplete={this.handleChangeColor}
