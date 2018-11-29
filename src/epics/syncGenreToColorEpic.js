@@ -1,16 +1,19 @@
 import { ofType } from "redux-observable";
-import { mergeMap, catchError } from "rxjs/operators";
-import { of, EMPTY } from "rxjs";
+import { mergeMap } from "rxjs/operators";
+import { of } from "rxjs";
 import { setNewReleaseModalGenre, setNewReleaseModalColor } from "../redux/actions";
 import { genreColorsMapSelector } from "../selectors";
-import lzString from "lz-string";
+
+const generateRandomColor = () => "#" + Math.floor(Math.random() * 16777215).toString(16);
 
 export default function syncGenreToColor(action$, state$, { spotifyApi }) {
     return action$.pipe(
         ofType(setNewReleaseModalGenre().type),
         mergeMap(({ payload }) => {
             const existingColor = genreColorsMapSelector(state$.value)[payload];
-            return existingColor ? of(setNewReleaseModalColor(existingColor)) : EMPTY;
+            return of(
+                setNewReleaseModalColor(existingColor ? existingColor : generateRandomColor())
+            );
         })
     );
 }

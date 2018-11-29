@@ -59,7 +59,7 @@ const ItemTagList = ({ className, genres }) => (
         <Scrollbar>
             <Genres>
                 {map(genres, genre => (
-                    <TagProvider id={genre}>
+                    <TagProvider key={genre} id={genre}>
                         {({ active, onClick, color }) => (
                             <TagWithOpenModal
                                 genre={genre}

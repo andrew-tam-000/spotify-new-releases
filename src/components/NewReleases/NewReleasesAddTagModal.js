@@ -6,22 +6,24 @@ import Typography from "@material-ui/core/Typography";
 import _Paper from "@material-ui/core/Paper";
 import materialStyled from "../../materialStyled";
 import Autocomplete from "../Table/Autocomplete";
-import { get, map, filter, find } from "lodash";
+import { map, filter, find, includes } from "lodash";
 import { ChromePicker } from "react-color";
 import Button from "@material-ui/core/Button";
 import {
     addGenreColors,
     closeNewReleaseModal,
     setNewReleaseModalColor,
+    toggleTagFromQuery,
     setNewReleaseModalGenre
 } from "../../redux/actions";
 
 import {
     newReleasesTableModalSelector,
     availableGenresSelector,
-    genreColorsSelector,
+    genreColorsMapSelector,
     newReleasesTableModalGenreSelector,
-    newReleasesTableModalColorSelector
+    newReleasesTableModalColorSelector,
+    queryParamsTagsSelector
 } from "../../selectors";
 
 const Paper = materialStyled(_Paper)({
@@ -49,17 +51,32 @@ class NewReleasesAddTagModal extends Component {
         }
     };
 
-    handleChangeColor = ({ hex }) => this.props.setNewReleaseModalColor(hex);
+    updateGenreColors = () => {
+        const color = this.props.newReleasesTableModalColor;
+        const genre = this.props.newReleasesTableModalGenre;
+        if (color && genre && this.props.genreColorsMap[genre]) {
+            this.props.addGenreColors([{ color, genre }], false);
+        }
+    };
+
+    handleChangeColor = ({ hex }) =>
+        this.props.setNewReleaseModalColor(hex) && this.updateGenreColors();
     handleSelectGenre = ({ value }) => this.props.setNewReleaseModalGenre(value);
+
+    removeTag = () => {
+        this.props.toggleTagFromQuery(this.props.newReleasesTableModalGenre);
+        this.props.closeNewReleaseModal();
+    };
 
     render() {
         const {
             availableGenres,
-            genreColors,
+            genreColorsMap,
             newReleasesTableModal,
             closeNewReleaseModal,
             newReleasesTableModalGenre,
-            newReleasesTableModalColor
+            newReleasesTableModalColor,
+            queryParamsTags
         } = this.props;
         return (
             <Modal open={newReleasesTableModal} onClose={closeNewReleaseModal}>
@@ -78,11 +95,7 @@ class NewReleasesAddTagModal extends Component {
                         options={map(
                             filter(
                                 availableGenres,
-                                availableGenre =>
-                                    !find(
-                                        genreColors,
-                                        topGenre => topGenre.genre === availableGenre.genre
-                                    )
+                                availableGenre => !genreColorsMap[availableGenre.genre]
                             ),
                             ({ genre }) => ({ value: genre, label: genre })
                         )}
@@ -92,9 +105,15 @@ class NewReleasesAddTagModal extends Component {
                         color={newReleasesTableModalColor}
                         onChangeComplete={this.handleChangeColor}
                     />
-                    <Button variant="contained" color="primary" onClick={this.addGenreColors}>
-                        Add genre
-                    </Button>
+                    {includes(queryParamsTags, newReleasesTableModalGenre) ? (
+                        <Button variant="contained" color="primary" onClick={this.removeTag}>
+                            Delete genre
+                        </Button>
+                    ) : (
+                        <Button variant="contained" color="primary" onClick={this.addGenreColors}>
+                            Add genre
+                        </Button>
+                    )}
                     <Button variant="contained" color="secondary" onClick={closeNewReleaseModal}>
                         Cancel
                     </Button>
@@ -110,7 +129,14 @@ export default connect(
         newReleasesTableModalColor: newReleasesTableModalColorSelector,
         newReleasesTableModal: newReleasesTableModalSelector,
         availableGenres: availableGenresSelector,
-        genreColors: genreColorsSelector
+        queryParamsTags: queryParamsTagsSelector,
+        genreColorsMap: genreColorsMapSelector
     }),
-    { addGenreColors, closeNewReleaseModal, setNewReleaseModalColor, setNewReleaseModalGenre }
+    {
+        toggleTagFromQuery,
+        addGenreColors,
+        closeNewReleaseModal,
+        setNewReleaseModalColor,
+        setNewReleaseModalGenre
+    }
 )(NewReleasesAddTagModal);
