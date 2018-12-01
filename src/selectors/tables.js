@@ -81,78 +81,51 @@ const formatRow = ({ rowData, genreColorsMap, showColors }) =>
         }
     );
 
-const createHydratedRow = ({ type, item, showColors, songs, albums, artistData, genreColorsMap }) =>
+const createHydratedRow = ({
+    type,
+    item,
+    showColors,
+    songs,
+    albums,
+    artistData,
+    genreColorsMap,
+    meta
+}) =>
     thru(
         {
             id: item.id,
-            album: albums[get(item, "album.id")],
             artists: compact(map(item.artists, artist => artistData[artist.id])),
             genres: uniq(
                 compact(flatMap(item.artists, artist => get(artistData[artist.id], "genres")))
-            )
+            ),
+            meta
         },
         defaultFormatter =>
             thru(
                 type === "librarySong"
                     ? thru([item, item.track], ([originalItem, item]) => ({
-                          id: item.id,
+                          ...defaultFormatter,
                           album: albums[get(item, "album.id")],
-                          artists: compact(map(item.artists, artist => artistData[artist.id])),
-                          genres: uniq(
-                              compact(
-                                  flatMap(item.artists, artist =>
-                                      get(artistData[artist.id], "genres")
-                                  )
-                              )
-                          ),
                           track: item,
                           meta: { release_date: originalItem.added_at }
                       }))
                     : type === "newRelease"
                         ? {
+                              ...defaultFormatter,
                               album: albums[item.id],
-                              artists: compact(map(item.artists, artist => artistData[artist.id])),
-                              genres: uniq(
-                                  compact(
-                                      flatMap(item.artists, artist =>
-                                          get(artistData[artist.id], "genres")
-                                      )
-                                  )
-                              ),
-                              id: item.id,
                               meta: {
                                   release_date: item.release_date
                               }
                           }
                         : type === "album"
                             ? {
-                                  id: item.id,
-                                  album: item,
-                                  artists: compact(
-                                      map(item.artists, artist => artistData[artist.id])
-                                  ),
-                                  genres: uniq(
-                                      compact(
-                                          flatMap(item.artists, artist =>
-                                              get(artistData[artist.id], "genres")
-                                          )
-                                      )
-                                  )
+                                  ...defaultFormatter,
+                                  album: item
                               }
                             : type === "track"
                                 ? {
-                                      id: item.id,
+                                      ...defaultFormatter,
                                       album: albums[get(item, "album.id")],
-                                      artists: compact(
-                                          map(item.artists, artist => artistData[artist.id])
-                                      ),
-                                      genres: uniq(
-                                          compact(
-                                              flatMap(item.artists, artist =>
-                                                  get(artistData[artist.id], "genres")
-                                              )
-                                          )
-                                      ),
                                       track: item
                                   }
                                 : {},
@@ -280,7 +253,13 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                                       songs,
                                                       albums,
                                                       artistData,
-                                                      genreColorsMap
+                                                      genreColorsMap,
+                                                      meta: {
+                                                          release_date: get(
+                                                              albums[albumRow.id],
+                                                              "release_date"
+                                                          )
+                                                      }
                                                   }).tableRow
                                           )
                                         : [])
