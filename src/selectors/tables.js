@@ -268,7 +268,7 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                     ...(newReleasesTableShowAllTracks ||
                                     newReleasesTableOpenAlbums[albumRow.id]
                                         ? formatTrackRows({
-                                              rowData: { ...rowData, meta: {} },
+                                              rowData,
                                               songs,
                                               genreColorsMap,
                                               showColors: newReleasesTableShowColors
