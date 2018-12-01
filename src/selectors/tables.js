@@ -30,7 +30,8 @@ import {
     queryParamsTagsSelector,
     queryParamsSortSelector,
     queryParamsSearchSelector,
-    newReleasesTableOpenAlbumsSelector
+    newReleasesTableOpenAlbumsSelector,
+    newReleasesTableOpenSongsSelector
 } from "./";
 
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
@@ -80,42 +81,29 @@ const formatRow = ({ rowData, genreColorsMap, showColors }) =>
         }
     );
 
-const formatTrackRows = ({ rowData, songs, genreColorsMap, showColors }) =>
-    map(get(rowData, "album.tracks.items"), track =>
-        thru(
-            {
-                ...rowData,
-                track: songs[track.id]
-            },
-            rowData =>
-                formatRow({
-                    rowData,
-                    genreColorsMap,
-                    showColors
-                })
-        )
-    );
-
-const createHydratedData = ({
-    type,
-    list,
-    showColors,
-    songs,
-    albums,
-    artistData,
-    genreColorsMap
-}) =>
-    reduce(
-        list,
-        (acc, item) =>
+const createHydratedRow = ({ type, item, showColors, songs, albums, artistData, genreColorsMap }) =>
+    thru(
+        {
+            id: item.id,
+            album: albums[get(item, "album.id")],
+            artists: compact(map(item.artists, artist => artistData[artist.id])),
+            genres: uniq(
+                compact(flatMap(item.artists, artist => get(artistData[artist.id], "genres")))
+            )
+        },
+        defaultFormatter =>
             thru(
-                type === "librarySongs"
+                type === "librarySong"
                     ? thru([item, item.track], ([originalItem, item]) => ({
                           id: item.id,
                           album: albums[get(item, "album.id")],
-                          artists: map(item.artists, artist => artistData[artist.id]),
+                          artists: compact(map(item.artists, artist => artistData[artist.id])),
                           genres: uniq(
-                              flatMap(item.artists, artist => get(artistData[artist.id], "genres"))
+                              compact(
+                                  flatMap(item.artists, artist =>
+                                      get(artistData[artist.id], "genres")
+                                  )
+                              )
                           ),
                           track: item,
                           meta: { release_date: originalItem.added_at }
@@ -123,10 +111,12 @@ const createHydratedData = ({
                     : type === "newRelease"
                         ? {
                               album: albums[item.id],
-                              artists: map(item.artists, artist => artistData[artist.id]),
+                              artists: compact(map(item.artists, artist => artistData[artist.id])),
                               genres: uniq(
-                                  flatMap(item.artists, artist =>
-                                      get(artistData[artist.id], "genres")
+                                  compact(
+                                      flatMap(item.artists, artist =>
+                                          get(artistData[artist.id], "genres")
+                                      )
                                   )
                               ),
                               id: item.id,
@@ -138,10 +128,14 @@ const createHydratedData = ({
                             ? {
                                   id: item.id,
                                   album: item,
-                                  artists: map(item.artists, artist => artistData[artist.id]),
+                                  artists: compact(
+                                      map(item.artists, artist => artistData[artist.id])
+                                  ),
                                   genres: uniq(
-                                      flatMap(item.artists, artist =>
-                                          get(artistData[artist.id], "genres")
+                                      compact(
+                                          flatMap(item.artists, artist =>
+                                              get(artistData[artist.id], "genres")
+                                          )
                                       )
                                   )
                               }
@@ -149,26 +143,28 @@ const createHydratedData = ({
                                 ? {
                                       id: item.id,
                                       album: albums[get(item, "album.id")],
-                                      artists: map(item.artists, artist => artistData[artist.id]),
+                                      artists: compact(
+                                          map(item.artists, artist => artistData[artist.id])
+                                      ),
                                       genres: uniq(
-                                          flatMap(item.artists, artist =>
-                                              get(artistData[artist.id], "genres")
+                                          compact(
+                                              flatMap(item.artists, artist =>
+                                                  get(artistData[artist.id], "genres")
+                                              )
                                           )
                                       ),
                                       track: item
                                   }
                                 : {},
-                rowData =>
-                    set(acc, rowData.id, {
+                rowData => ({
+                    rowData,
+                    tableRow: formatRow({
                         rowData,
-                        tableRow: formatRow({
-                            rowData,
-                            genreColorsMap,
-                            showColors
-                        })
+                        genreColorsMap,
+                        showColors
                     })
-            ),
-        {}
+                })
+            )
     );
 
 export const myLibraryDataSelector = createSelector(
@@ -201,18 +197,17 @@ export const myLibraryDataSelector = createSelector(
             search,
             rows: orderBy(
                 map(
-                    values(
-                        createHydratedData({
-                            type: "librarySongs",
-                            list: librarySongs,
+                    librarySongs,
+                    track =>
+                        createHydratedRow({
+                            type: "librarySong",
+                            item: track,
                             showColors: newReleasesTableShowColors,
                             songs,
                             albums,
                             artistData,
                             genreColorsMap
-                        })
-                    ),
-                    ({ tableRow }) => tableRow
+                        }).tableRow
                 ),
                 sortBy,
                 map(sortBy, sort => toLower(sortDirection[sort]))
@@ -244,15 +239,23 @@ const newReleasesByAlbumTableDataSelector = createSelector(
         { sortBy, sortDirection }
     ) =>
         thru(
-            createHydratedData({
-                type: "newRelease",
-                list: newReleases,
-                showColors: newReleasesTableShowColors,
-                songs,
-                albums,
-                artistData,
-                genreColorsMap
-            }),
+            reduce(
+                newReleases,
+                (acc, item) =>
+                    thru(
+                        createHydratedRow({
+                            type: "newRelease",
+                            item,
+                            showColors: newReleasesTableShowColors,
+                            songs,
+                            albums,
+                            artistData,
+                            genreColorsMap
+                        }),
+                        hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
+                    ),
+                {}
+            ),
             albumListData =>
                 thru(
                     orderBy(
@@ -267,12 +270,19 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                     ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
                                     ...(newReleasesTableShowAllTracks ||
                                     newReleasesTableOpenAlbums[albumRow.id]
-                                        ? formatTrackRows({
-                                              rowData,
-                                              songs,
-                                              genreColorsMap,
-                                              showColors: newReleasesTableShowColors
-                                          })
+                                        ? map(
+                                              get(albums[albumRow.id], "tracks.items"),
+                                              ({ id }) =>
+                                                  createHydratedRow({
+                                                      type: "track",
+                                                      item: songs[id],
+                                                      showColors: newReleasesTableShowColors,
+                                                      songs,
+                                                      albums,
+                                                      artistData,
+                                                      genreColorsMap
+                                                  }).tableRow
+                                          )
                                         : [])
                                 ])
                             ),

@@ -7,7 +7,12 @@ import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Table from "../Table";
-import { toggleNewReleaseAlbum, reorderTags, reorderQueryTags } from "../../redux/actions";
+import {
+    toggleNewReleaseAlbum,
+    toggleNewReleaseSong,
+    reorderTags,
+    reorderQueryTags
+} from "../../redux/actions";
 import { noop, get, size, join, first } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
@@ -61,7 +66,7 @@ const Loader = styled.div`
 class NewReleasesAlbumsTable extends Component {
     virtualizedConfig = {
         onRowClick: ({ event, index, rowData: { uri, id, isTrack } }) =>
-            !isTrack ? this.props.toggleNewReleaseAlbum(id) : noop,
+            !isTrack ? this.props.toggleNewReleaseAlbum(id) : this.props.toggleNewReleaseSong(id),
         rowStyle: ({ index }) => {
             const {
                 tableData: { rows }
@@ -145,6 +150,7 @@ export default compose(
         null,
         {
             toggleNewReleaseAlbum,
+            toggleNewReleaseSong,
             reorderTags,
             reorderQueryTags
         }

@@ -9,6 +9,7 @@ import {
     hideSideBar,
     setDiscover,
     toggleNewReleaseAlbum,
+    toggleNewReleaseSong,
     toggleNewReleaseColors,
     openNewReleaseModal,
     closeNewReleaseModal,
@@ -153,6 +154,14 @@ const appReducer = combineReducers({
                     openAlbums: {
                         ...state.openAlbums,
                         [payload]: !state.openAlbums[payload]
+                    }
+                };
+            case toggleNewReleaseSong().type:
+                return {
+                    ...state,
+                    openSongs: {
+                        ...state.openSongs,
+                        [payload]: !state.openSongs[payload]
                     }
                 };
             case hideAllNewReleaseTracks().type:

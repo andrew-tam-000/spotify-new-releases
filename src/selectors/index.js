@@ -421,6 +421,11 @@ export const newReleasesTableOpenAlbumsSelector = createSelector(
     newReleasesTable => get(newReleasesTable, "openAlbums")
 );
 
+export const newReleasesTableOpenSongsSelector = createSelector(
+    newReleasesTableSelector,
+    newReleasesTable => get(newReleasesTable, "openSongs")
+);
+
 export const tracksForAlbumForIdSelector = createSelector(
     albumsSelector,
     songsSelector,

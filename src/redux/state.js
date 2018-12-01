@@ -64,6 +64,7 @@ export default {
         },
         newReleases: {
             openAlbums: {},
+            openSongs: {},
             showColors: false,
             showAllTracks: false,
             modal: false,

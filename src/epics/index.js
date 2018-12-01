@@ -21,6 +21,7 @@ import setLocalStorageEpic from "./setLocalStorageEpic";
 import syncGenreToColorEpic from "./syncGenreToColorEpic";
 import queryParamsEpic from "./queryParamsEpic";
 import addGenreToLocalStoreEpic from "./addGenreToLocalStoreEpic";
+import getRelatedSongsOnRowClickEpic from "./getRelatedSongsOnRowClickEpic";
 import onLoginEpic from "./onLoginEpic";
 
 export default (...args) =>
@@ -47,5 +48,6 @@ export default (...args) =>
         syncGenreToColorEpic(...args),
         setLocalStorageEpic(...args),
         addGenreToLocalStoreEpic(...args),
-        onLoginEpic(...args)
+        onLoginEpic(...args),
+        getRelatedSongsOnRowClickEpic(...args)
     );

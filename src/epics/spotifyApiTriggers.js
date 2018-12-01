@@ -351,8 +351,10 @@ const getRecommendations = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType(getRecommendationsStart().type),
         mergeMap(action =>
-            basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
-                basicSpotifyApi.getRecommendations(action.payload)
+            from(
+                basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
+                    basicSpotifyApi.getRecommendations(action.payload)
+                )
             ).pipe(
                 mergeMap(resp =>
                     concat(
@@ -523,6 +525,7 @@ const getAlbums = (action$, state$, { basicSpotifyApi }) =>
                     albumId => !albums[albumId]
                 )
             );
+            // TODO: Bug here - we should fetch the artists after we fetch all the tracks
             return size(idsToFetch)
                 ? forkJoin(
                       ...map(chunk(idsToFetch, 20), idSet =>

@@ -755,6 +755,13 @@ export function toggleNewReleaseAlbum(albumId) {
     };
 }
 
+export function toggleNewReleaseSong(songId) {
+    return {
+        type: "newReleases|TOGGLE_NEW_RELEASE_SONG",
+        payload: songId
+    };
+}
+
 export function toggleNewReleaseColors() {
     return {
         type: "newReleases|TOGGLE_NEW_RELEASE_COLORS"
