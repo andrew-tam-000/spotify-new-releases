@@ -360,22 +360,17 @@ const getRecommendations = (action$, state$, { basicSpotifyApi }) =>
             ).pipe(
                 mergeMap(resp =>
                     concat(
-                        of(
-                            getArtistsStart(
-                                map(
-                                    flatMap(resp.tracks, track => track.artists),
-                                    artist => artist.id
-                                )
-                            )
-                        ),
+                        of(getAlbumsStart(map(resp.tracks, "album.id"))),
                         action$.pipe(
-                            ofType(getArtistsSuccess().type),
+                            ofType(getAlbumsSuccess().type),
                             take(1),
-                            mapTo(
-                                getRecommendationsSuccess({
-                                    ...resp,
-                                    tracks: orderBy(resp.tracks, "popularity", "desc")
-                                })
+                            mergeMap(() =>
+                                of(
+                                    getRecommendationsSuccess({
+                                        ...resp,
+                                        tracks: orderBy(resp.tracks, "popularity", "desc")
+                                    })
+                                )
                             )
                         )
                     )

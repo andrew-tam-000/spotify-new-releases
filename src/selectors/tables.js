@@ -145,23 +145,22 @@ const createHydratedRowFromParamsSelector = createSelector(
 
 const createFlatRecursiveSongRowsSelector = createSelector(
     newReleasesTableOpenSongsSelector,
-    songsSelector,
     createHydratedRowFromParamsSelector,
     albumsSelector,
     relatedTracksForIdSelector,
-    (newReleasesTableOpenSongs, songs, createHydratedRowFromParams, albums, relatedTracksForId) => {
+    (newReleasesTableOpenSongs, createHydratedRowFromParams, albums, relatedTracksForId) => {
         const recursiveSongRows = ({ list, parents = [], tracksInTree = {} }) =>
-            flatMap(list, ({ id }) => [
+            flatMap(list, track => [
                 createHydratedRowFromParams({
                     parents,
                     type: "track",
-                    item: songs[id]
+                    item: track
                 }).tableRow,
-                ...(newReleasesTableOpenSongs[id]
-                    ? thru(relatedTracksForId(id), relatedTracks =>
+                ...(newReleasesTableOpenSongs[track.id]
+                    ? thru(relatedTracksForId(track.id), relatedTracks =>
                           recursiveSongRows({
                               list: filter(relatedTracks, ({ id }) => !tracksInTree[id]),
-                              parents: [...parents, id],
+                              parents: [...parents, track.id],
                               tracksInTree: reduce(
                                   relatedTracks,
                                   (acc, track) => set(acc, track.id, true),
@@ -284,7 +283,10 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                     ...(newReleasesTableShowAllTracks ||
                                     newReleasesTableOpenAlbums[albumRow.id]
                                         ? createFlatRecursiveSongRows({
-                                              list: get(albums[albumRow.id], "tracks.items"),
+                                              list: map(
+                                                  get(albums[albumRow.id], "tracks.items"),
+                                                  ({ id }) => songs[id]
+                                              ),
                                               parents: [albumRow.id]
                                           })
                                         : [])
