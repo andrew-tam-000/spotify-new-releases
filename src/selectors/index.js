@@ -113,6 +113,12 @@ export const songDataSelector = createSelector(
     songData => songData
 );
 
+export const relatedTracksForIdSelector = createSelector(
+    state => get(state, "app.spotify.relatedTracks"),
+    songsSelector,
+    (relatedTracks, songs) => id => map(relatedTracks[id], id => songs[id])
+);
+
 export const relatedArtistsSelector = createSelector(
     state => get(state, "app.spotify.relatedArtists") || [],
     relatedArtists => relatedArtists

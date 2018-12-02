@@ -11,7 +11,8 @@ import {
     getTracksSuccess,
     getNewReleasesSuccess,
     getAlbumsSuccess,
-    getDevicesSuccess
+    getDevicesSuccess,
+    getRelatedTracksSuccess
 } from "../actions/";
 import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
@@ -137,6 +138,14 @@ export default (state = {}, { type, payload = {} }) => {
             return {
                 ...state,
                 devices: payload
+            };
+        case getRelatedTracksSuccess().type:
+            return {
+                ...state,
+                relatedTracks: {
+                    ...state.relatedTracks,
+                    [first(payload.seeds).id]: map(payload.tracks, "id")
+                }
             };
         default:
             return state;

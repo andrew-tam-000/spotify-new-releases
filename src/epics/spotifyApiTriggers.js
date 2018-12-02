@@ -89,7 +89,9 @@ import {
     transferPlaybackStart,
     transferPlaybackSuccess,
     addToMySavedTracksStart,
-    addToMySavedTracksSuccess
+    addToMySavedTracksSuccess,
+    getRelatedTracksStart,
+    getRelatedTracksSuccess
 } from "../redux/actions";
 import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
 import { getKeyFromLocalStorage } from "../utils";
@@ -585,6 +587,21 @@ const addToMySavedTracks = (action$, state$, { spotifyApi }) =>
         )
     );
 
+const getRelatedTracks = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(getRelatedTracksStart().type),
+        mergeMap(({ payload }) =>
+            concat(
+                of(getRecommendationsStart({ seed_tracks: [payload] })),
+                action$.pipe(
+                    ofType(getRecommendationsSuccess().type),
+                    take(1),
+                    mergeMap(({ payload }) => of(getRelatedTracksSuccess(payload)))
+                )
+            )
+        )
+    );
+
 export default (...args) =>
     merge(
         getArtistTopTracks(...args),
@@ -605,5 +622,6 @@ export default (...args) =>
         getSongData(...args),
         getDevices(...args),
         transferPlayback(...args),
-        addToMySavedTracks(...args)
+        addToMySavedTracks(...args),
+        getRelatedTracks(...args)
     ).pipe(catchError(e => console.error(e)));

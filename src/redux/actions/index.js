@@ -898,3 +898,17 @@ export function addToMySavedTracksSuccess(ids) {
         type: "spotify|ADD_TO_MY_SAVED_TRACKS_SUCCESS"
     };
 }
+
+export function getRelatedTracksStart(id) {
+    return {
+        type: "spotify|GET_RELATED_TRACKS_START",
+        payload: id
+    };
+}
+
+export function getRelatedTracksSuccess(relatedTracks) {
+    return {
+        type: "spotify|GET_RELATED_TRACKS_SUCCESS",
+        payload: relatedTracks
+    };
+}

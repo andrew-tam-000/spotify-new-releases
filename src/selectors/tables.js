@@ -31,7 +31,8 @@ import {
     queryParamsSortSelector,
     queryParamsSearchSelector,
     newReleasesTableOpenAlbumsSelector,
-    newReleasesTableOpenSongsSelector
+    newReleasesTableOpenSongsSelector,
+    relatedTracksForIdSelector
 } from "./";
 
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
@@ -199,6 +200,8 @@ const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesTableOpenAlbumsSelector,
     newReleasesTableShowColorsSelector,
     newReleasesTableShowAllTracksSelector,
+    newReleasesTableOpenSongsSelector,
+    relatedTracksForIdSelector,
     queryParamsSortSelector,
     (
         newReleases,
@@ -209,6 +212,8 @@ const newReleasesByAlbumTableDataSelector = createSelector(
         newReleasesTableOpenAlbums,
         newReleasesTableShowColors,
         newReleasesTableShowAllTracks,
+        newReleasesTableOpenSongs,
+        relatedTracksForId,
         { sortBy, sortDirection }
     ) =>
         thru(
@@ -243,9 +248,9 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                     ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
                                     ...(newReleasesTableShowAllTracks ||
                                     newReleasesTableOpenAlbums[albumRow.id]
-                                        ? map(
+                                        ? flatMap(
                                               get(albums[albumRow.id], "tracks.items"),
-                                              ({ id }) =>
+                                              ({ id }) => [
                                                   createHydratedRow({
                                                       type: "track",
                                                       item: songs[id],
@@ -260,7 +265,29 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                                               "release_date"
                                                           )
                                                       }
-                                                  }).tableRow
+                                                  }).tableRow,
+                                                  ...(newReleasesTableOpenSongs[id]
+                                                      ? map(
+                                                            relatedTracksForId(id),
+                                                            track =>
+                                                                createHydratedRow({
+                                                                    type: "track",
+                                                                    item: track,
+                                                                    showColors: newReleasesTableShowColors,
+                                                                    songs,
+                                                                    albums,
+                                                                    artistData,
+                                                                    genreColorsMap,
+                                                                    meta: {
+                                                                        release_date: get(
+                                                                            albums[albumRow.id],
+                                                                            "release_date"
+                                                                        )
+                                                                    }
+                                                                }).tableRow
+                                                        )
+                                                      : [])
+                                              ]
                                           )
                                         : [])
                                 ])

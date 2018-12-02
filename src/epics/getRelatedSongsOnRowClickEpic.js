@@ -1,7 +1,7 @@
 import { ofType } from "redux-observable";
 import { EMPTY, of } from "rxjs";
 import { mergeMap } from "rxjs/operators";
-import { toggleNewReleaseSong, getRecommendationsStart } from "../redux/actions";
+import { toggleNewReleaseSong, getRelatedTracksStart } from "../redux/actions";
 import { newReleasesTableOpenSongsSelector } from "../selectors";
 
 export default function getRelatedSongsOnRowClickEpic(action$, state$, { firebaseApp }) {
@@ -10,7 +10,7 @@ export default function getRelatedSongsOnRowClickEpic(action$, state$, { firebas
         mergeMap(
             ({ payload }) =>
                 newReleasesTableOpenSongsSelector(state$.value)[payload]
-                    ? of(getRecommendationsStart({ seed_tracks: [payload] }))
+                    ? of(getRelatedTracksStart(payload))
                     : EMPTY
         )
     );
