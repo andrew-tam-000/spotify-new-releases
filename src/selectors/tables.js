@@ -1,5 +1,6 @@
 import {
     values,
+    keyBy,
     uniq,
     set,
     orderBy,
@@ -106,45 +107,31 @@ const createHydratedRowFromParamsSelector = createSelector(
             },
             defaultFormatter =>
                 thru(
-                    type === "librarySong"
-                        ? thru([item, item.track], ([originalItem, item]) => ({
+                    type === "newRelease"
+                        ? {
                               ...defaultFormatter,
-                              album: albums[get(item, "album.id")],
-                              artists: compact(map(item.artists, artist => artistData[artist.id])),
-                              genres: uniq(
-                                  compact(
-                                      flatMap(item.artists, artist =>
-                                          get(artistData[artist.id], "genres")
-                                      )
-                                  )
-                              ),
-                              track: item,
-                              meta: { release_date: originalItem.added_at }
-                          }))
-                        : type === "newRelease"
+                              album: albums[item.id],
+                              meta: {
+                                  release_date: item.release_date
+                              }
+                          }
+                        : type === "album"
                             ? {
                                   ...defaultFormatter,
-                                  album: albums[item.id],
-                                  meta: {
-                                      release_date: item.release_date
-                                  }
+                                  album: item
                               }
-                            : type === "album"
+                            : type === "track"
                                 ? {
                                       ...defaultFormatter,
-                                      album: item
-                                  }
-                                : type === "track"
-                                    ? {
-                                          ...defaultFormatter,
-                                          album: albums[get(item, "album.id")],
-                                          track: item,
-                                          meta: {
-                                              release_date: get(item, "album.release_date")
-                                          }
+                                      album: albums[get(item, "album.id")],
+                                      track: item,
+                                      meta: {
+                                          release_date: get(item, "album.release_date")
                                       }
-                                    : {},
+                                  }
+                                : {},
                     rowData => ({
+                        item,
                         rowData,
                         tableRow: formatRow({
                             rowData,
@@ -156,33 +143,6 @@ const createHydratedRowFromParamsSelector = createSelector(
         )
 );
 
-export const myLibraryDataSelector = createSelector(
-    librarySongsSelector,
-    queryParamsSortSelector,
-    queryParamsTagsSelector,
-    queryParamsSearchSelector,
-    createHydratedRowFromParamsSelector,
-    (librarySongs, { sortBy, sortDirection }, tags, search, createHydratedRowFromParams) => ({
-        rows: tableDataFilter({
-            tags,
-            search,
-            rows: orderBy(
-                map(
-                    librarySongs,
-                    track =>
-                        createHydratedRowFromParams({
-                            type: "librarySong",
-                            item: track
-                        }).tableRow
-                ),
-                sortBy,
-                map(sortBy, sort => toLower(sortDirection[sort]))
-            )
-        }),
-        config: newReleasesByAlbumConfig
-    })
-);
-
 const createFlatRecursiveSongRowsSelector = createSelector(
     newReleasesTableOpenSongsSelector,
     songsSelector,
@@ -190,7 +150,7 @@ const createFlatRecursiveSongRowsSelector = createSelector(
     albumsSelector,
     relatedTracksForIdSelector,
     (newReleasesTableOpenSongs, songs, createHydratedRowFromParams, albums, relatedTracksForId) => {
-        const recursiveSongRows = (list, parents, tracksInTree = {}) =>
+        const recursiveSongRows = ({ list, parents = [], tracksInTree = {} }) =>
             flatMap(list, ({ id }) => [
                 createHydratedRowFromParams({
                     parents,
@@ -199,19 +159,72 @@ const createFlatRecursiveSongRowsSelector = createSelector(
                 }).tableRow,
                 ...(newReleasesTableOpenSongs[id]
                     ? thru(relatedTracksForId(id), relatedTracks =>
-                          recursiveSongRows(
-                              filter(relatedTracks, ({ id }) => !tracksInTree[id]),
-                              [...parents, id],
-                              reduce(relatedTracks, (acc, track) => set(acc, track.id, true), {
-                                  ...tracksInTree
-                              })
-                          )
+                          recursiveSongRows({
+                              list: filter(relatedTracks, ({ id }) => !tracksInTree[id]),
+                              parents: [...parents, id],
+                              tracksInTree: reduce(
+                                  relatedTracks,
+                                  (acc, track) => set(acc, track.id, true),
+                                  {
+                                      ...tracksInTree
+                                  }
+                              )
+                          })
                       )
                     : [])
             ]);
 
         return recursiveSongRows;
     }
+);
+
+export const myLibraryDataSelector = createSelector(
+    librarySongsSelector,
+    queryParamsSortSelector,
+    queryParamsTagsSelector,
+    queryParamsSearchSelector,
+    createHydratedRowFromParamsSelector,
+    createFlatRecursiveSongRowsSelector,
+    (
+        librarySongs,
+        { sortBy, sortDirection },
+        tags,
+        search,
+        createHydratedRowFromParams,
+        createFlatRecursiveSongRows
+    ) =>
+        thru(
+            reduce(
+                librarySongs,
+                (acc, item) =>
+                    thru(
+                        createHydratedRowFromParams({
+                            type: "track",
+                            item: set(item.track, "album.release_date", item.added_at)
+                        }),
+                        hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
+                    ),
+                {}
+            ),
+            librarySongs =>
+                thru(
+                    orderBy(
+                        map(values(librarySongs), ({ tableRow }) => tableRow),
+                        sortBy,
+                        map(sortBy, sort => toLower(sortDirection[sort]))
+                    ),
+                    orderedLibrarySongs => ({
+                        rows: tableDataFilter({
+                            tags,
+                            search,
+                            rows: createFlatRecursiveSongRows({
+                                list: map(orderedLibrarySongs, track => librarySongs[track.id].item)
+                            })
+                        }),
+                        config: newReleasesByAlbumConfig
+                    })
+                )
+        )
 );
 
 const newReleasesByAlbumTableDataSelector = createSelector(
@@ -270,10 +283,10 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                     ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
                                     ...(newReleasesTableShowAllTracks ||
                                     newReleasesTableOpenAlbums[albumRow.id]
-                                        ? createFlatRecursiveSongRows(
-                                              get(albums[albumRow.id], "tracks.items"),
-                                              [albumRow.id]
-                                          )
+                                        ? createFlatRecursiveSongRows({
+                                              list: get(albums[albumRow.id], "tracks.items"),
+                                              parents: [albumRow.id]
+                                          })
                                         : [])
                                 ])
                             ),
