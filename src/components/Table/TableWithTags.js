@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { createStructuredSelector } from "reselect";
+import TagList from "./TagList";
 import { defaultTableRowRenderer } from "react-virtualized";
 import { compose } from "recompact";
 import styled from "styled-components";
@@ -10,14 +12,31 @@ import {
     toggleNewReleaseAlbum,
     toggleNewReleaseSong,
     reorderTags,
+    openNewReleaseModal,
     reorderQueryTags
 } from "../../redux/actions";
-import { get, size, join, first } from "lodash";
+import { get, size, join, first, map, find } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import _ItemTagList from "./ItemTagList";
 import Settings from "./Settings";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
+import { genreColorsSelector, queryParamsTagsSelector } from "../../selectors";
+import AddIcon from "@material-ui/icons/Add";
+
+const Tags = styled.div`
+    -webkit-overflow-scrolling: touch;
+    overflow: scroll;
+    display: flex;
+    flex-wrap: nowrap;
+    flex: 1;
+`;
+
+const TagsWithButton = styled.div`
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+`;
 
 const ItemTagList = styled(_ItemTagList)`
     margin: 0 2px;
@@ -111,9 +130,21 @@ class NewReleasesAlbumsTable extends Component {
 
     handleTagSort = ({ oldIndex, newIndex }) => this.props.reorderTags(oldIndex, newIndex);
 
-    // TODO: Use html encode library, he to encode strings
     render() {
-        const { tableData, loading } = this.props;
+        const {
+            openNewReleaseModal,
+            tableData,
+            loading,
+            genreColors,
+            queryParamsTags
+        } = this.props;
+        const active = map(
+            queryParamsTags,
+            tagGenre =>
+                find(genreColors, ({ genre }) => genre === tagGenre) || {
+                    genre: tagGenre
+                }
+        );
         return (
             <NewReleasesAlbumsTableWrapper>
                 {loading ? (
@@ -121,27 +152,44 @@ class NewReleasesAlbumsTable extends Component {
                         <CircularProgress size={80} color="primary" />
                     </Loader>
                 ) : (
-                    <Table
-                        tableData={tableData}
-                        prefixColumnsProps={[
-                            {
-                                cellRenderer: AlbumImageCellRenderer,
-                                key: "album",
-                                width: 160,
-                                headerRenderer: () => (
-                                    <SearchColumn>
-                                        <Settings tableData={tableData} />
-                                        <NewReleasesAddTagModal />
-                                        <SearchBar />
-                                    </SearchColumn>
-                                ),
-                                disableSort: true,
-                                flexGrow: 5
-                            }
-                        ]}
-                        virtualizedConfig={this.virtualizedConfig}
-                        columnConfig={this.columnConfig}
-                    />
+                    <React.Fragment>
+                        <TagsWithButton>
+                            <AddIcon
+                                onClick={openNewReleaseModal}
+                                fontSize="small"
+                                color="action"
+                            />
+                            <Tags>
+                                <TagList
+                                    axis="x"
+                                    distance={10}
+                                    tags={active}
+                                    onSortEnd={this.handleQueryTagSort}
+                                />
+                            </Tags>
+                        </TagsWithButton>
+                        <Table
+                            tableData={tableData}
+                            prefixColumnsProps={[
+                                {
+                                    cellRenderer: AlbumImageCellRenderer,
+                                    key: "album",
+                                    width: 160,
+                                    headerRenderer: () => (
+                                        <SearchColumn>
+                                            <Settings tableData={tableData} />
+                                            <NewReleasesAddTagModal />
+                                            <SearchBar />
+                                        </SearchColumn>
+                                    ),
+                                    disableSort: true,
+                                    flexGrow: 5
+                                }
+                            ]}
+                            virtualizedConfig={this.virtualizedConfig}
+                            columnConfig={this.columnConfig}
+                        />
+                    </React.Fragment>
                 )}
             </NewReleasesAlbumsTableWrapper>
         );
@@ -150,12 +198,16 @@ class NewReleasesAlbumsTable extends Component {
 
 export default compose(
     connect(
-        null,
+        createStructuredSelector({
+            genreColors: genreColorsSelector,
+            queryParamsTags: queryParamsTagsSelector
+        }),
         {
             toggleNewReleaseAlbum,
             toggleNewReleaseSong,
             reorderTags,
-            reorderQueryTags
+            reorderQueryTags,
+            openNewReleaseModal
         }
     )
 )(NewReleasesAlbumsTable);

@@ -9,7 +9,6 @@ import AddIcon from "@material-ui/icons/Add";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
-import ItemTagList from "../Table/ItemTagList";
 import { addToMySavedTracksStart } from "../../redux/actions";
 import { accessTokenSelector } from "../../selectors";
 
