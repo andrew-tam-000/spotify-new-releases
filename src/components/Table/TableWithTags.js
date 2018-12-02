@@ -3,7 +3,6 @@ import { defaultTableRowRenderer } from "react-virtualized";
 import { compose } from "recompact";
 import styled from "styled-components";
 import Typography from "@material-ui/core/Typography";
-import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Table from "../Table";
@@ -13,7 +12,7 @@ import {
     reorderTags,
     reorderQueryTags
 } from "../../redux/actions";
-import { noop, get, size, join, first } from "lodash";
+import { get, size, join, first } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import _ItemTagList from "./ItemTagList";
@@ -85,12 +84,16 @@ class NewReleasesAlbumsTable extends Component {
         rowHeight: 80,
         headerHeight: 32,
         rowRenderer: ({ style, onRowClick, ...props }) => {
-            const { index, rowData } = props;
+            const { index, rowData, key } = props;
             const {
                 meta: { genres }
             } = rowData;
             return (
-                <RowRenderer onClick={event => onRowClick({ event, index, rowData })} style={style}>
+                <RowRenderer
+                    key={key}
+                    onClick={event => onRowClick({ event, index, rowData })}
+                    style={style}
+                >
                     {defaultTableRowRenderer(props)}
                     <ItemTagList genres={genres} />
                 </RowRenderer>

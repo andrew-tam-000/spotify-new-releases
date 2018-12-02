@@ -124,8 +124,13 @@ const AlbumImageCellRenderer = ({
 }) =>
     isTrack ? (
         <TrackBlurbCellRendererWrapper>
-            {map(parents, parent => (
-                <ChevronRightIcon fontSize="small" color="action" key="parent" />
+            {map(parents, (parent, idx) => (
+                <ChevronRightIcon
+                    style={{ marginLeft: idx ? -15 : undefined }}
+                    fontSize="small"
+                    color="action"
+                    key={parent}
+                />
             ))}
             <NewReleasesTrackPlayButton uri={uri} />
             <Description>
