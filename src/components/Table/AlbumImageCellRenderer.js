@@ -1,10 +1,12 @@
 import React from "react";
+import { map } from "lodash";
 import { connect } from "react-redux";
 import { compose, withProps } from "recompact";
 import { createStructuredSelector } from "reselect";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import AddIcon from "@material-ui/icons/Add";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
 import ItemTagList from "../Table/ItemTagList";
@@ -114,7 +116,7 @@ const AlbumImageCellRenderer = ({
         type,
         album,
         isTrack,
-        meta: { genres },
+        meta: { genres, parents },
         id
     },
     modalOpen,
@@ -122,6 +124,9 @@ const AlbumImageCellRenderer = ({
 }) =>
     isTrack ? (
         <TrackBlurbCellRendererWrapper>
+            {map(parents, parent => (
+                <ChevronRightIcon fontSize="small" color="action" key="parent" />
+            ))}
             <NewReleasesTrackPlayButton uri={uri} />
             <Description>
                 <TitleWithAdd>

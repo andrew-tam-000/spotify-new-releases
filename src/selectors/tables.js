@@ -69,6 +69,8 @@ const formatRow = ({ rowData, genreColorsMap, showColors }) =>
         }),
         {
             meta: {
+                // Here to keep track of parents
+                parents: rowData.parents,
                 // Here for searchability
                 genres: rowData.genres,
                 ...(showColors
@@ -82,90 +84,85 @@ const formatRow = ({ rowData, genreColorsMap, showColors }) =>
         }
     );
 
-const createHydratedRow = ({
-    type,
-    item,
-    showColors,
-    songs,
-    albums,
-    artistData,
-    genreColorsMap,
-    meta
-}) =>
-    thru(
-        {
-            id: item.id,
-            artists: compact(map(item.artists, artist => artistData[artist.id])),
-            genres: uniq(
-                compact(flatMap(item.artists, artist => get(artistData[artist.id], "genres")))
-            ),
-            meta
-        },
-        defaultFormatter =>
-            thru(
-                type === "librarySong"
-                    ? thru([item, item.track], ([originalItem, item]) => ({
-                          ...defaultFormatter,
-                          album: albums[get(item, "album.id")],
-                          track: item,
-                          meta: { release_date: originalItem.added_at }
-                      }))
-                    : type === "newRelease"
-                        ? {
+const createHydratedRowFromParamsSelector = createSelector(
+    artistDataSelector,
+    genreColorsMapSelector,
+    songsSelector,
+    newReleasesTableShowColorsSelector,
+    albumsSelector,
+    (artistData, genreColorsMap, songs, newReleasesTableShowColors, albums) => ({
+        item,
+        type,
+        parents = []
+    }) =>
+        thru(
+            {
+                parents,
+                id: item.id,
+                artists: compact(map(item.artists, artist => artistData[artist.id])),
+                genres: uniq(
+                    compact(flatMap(item.artists, artist => get(artistData[artist.id], "genres")))
+                )
+            },
+            defaultFormatter =>
+                thru(
+                    type === "librarySong"
+                        ? thru([item, item.track], ([originalItem, item]) => ({
                               ...defaultFormatter,
-                              album: albums[item.id],
-                              meta: {
-                                  release_date: item.release_date
-                              }
-                          }
-                        : type === "album"
+                              album: albums[get(item, "album.id")],
+                              artists: compact(map(item.artists, artist => artistData[artist.id])),
+                              genres: uniq(
+                                  compact(
+                                      flatMap(item.artists, artist =>
+                                          get(artistData[artist.id], "genres")
+                                      )
+                                  )
+                              ),
+                              track: item,
+                              meta: { release_date: originalItem.added_at }
+                          }))
+                        : type === "newRelease"
                             ? {
                                   ...defaultFormatter,
-                                  album: item
+                                  album: albums[item.id],
+                                  meta: {
+                                      release_date: item.release_date
+                                  }
                               }
-                            : type === "track"
+                            : type === "album"
                                 ? {
                                       ...defaultFormatter,
-                                      album: albums[get(item, "album.id")],
-                                      track: item
+                                      album: item
                                   }
-                                : {},
-                rowData => ({
-                    rowData,
-                    tableRow: formatRow({
+                                : type === "track"
+                                    ? {
+                                          ...defaultFormatter,
+                                          album: albums[get(item, "album.id")],
+                                          track: item,
+                                          meta: {
+                                              release_date: get(item, "album.release_date")
+                                          }
+                                      }
+                                    : {},
+                    rowData => ({
                         rowData,
-                        genreColorsMap,
-                        showColors
+                        tableRow: formatRow({
+                            rowData,
+                            genreColorsMap,
+                            newReleasesTableShowColors
+                        })
                     })
-                })
-            )
-    );
+                )
+        )
+);
 
 export const myLibraryDataSelector = createSelector(
     librarySongsSelector,
-    artistDataSelector,
-    albumsSelector,
-    genreColorsMapSelector,
-    songsSelector,
-    newReleasesTableOpenAlbumsSelector,
-    newReleasesTableShowColorsSelector,
-    newReleasesTableShowAllTracksSelector,
     queryParamsSortSelector,
     queryParamsTagsSelector,
     queryParamsSearchSelector,
-    (
-        librarySongs,
-        artistData,
-        albums,
-        genreColorsMap,
-        songs,
-        newReleasesTableOpenAlbums,
-        newReleasesTableShowColors,
-        newReleasesTableShowAllTracks,
-        { sortBy, sortDirection },
-        tags,
-        search
-    ) => ({
+    createHydratedRowFromParamsSelector,
+    (librarySongs, { sortBy, sortDirection }, tags, search, createHydratedRowFromParams) => ({
         rows: tableDataFilter({
             tags,
             search,
@@ -173,14 +170,9 @@ export const myLibraryDataSelector = createSelector(
                 map(
                     librarySongs,
                     track =>
-                        createHydratedRow({
+                        createHydratedRowFromParams({
                             type: "librarySong",
-                            item: track,
-                            showColors: newReleasesTableShowColors,
-                            songs,
-                            albums,
-                            artistData,
-                            genreColorsMap
+                            item: track
                         }).tableRow
                 ),
                 sortBy,
@@ -189,6 +181,37 @@ export const myLibraryDataSelector = createSelector(
         }),
         config: newReleasesByAlbumConfig
     })
+);
+
+const createFlatRecursiveSongRowsSelector = createSelector(
+    newReleasesTableOpenSongsSelector,
+    songsSelector,
+    createHydratedRowFromParamsSelector,
+    albumsSelector,
+    relatedTracksForIdSelector,
+    (newReleasesTableOpenSongs, songs, createHydratedRowFromParams, albums, relatedTracksForId) => {
+        const recursiveSongRows = (list, parents, tracksInTree = {}) =>
+            flatMap(list, ({ id }) => [
+                createHydratedRowFromParams({
+                    parents,
+                    type: "track",
+                    item: songs[id]
+                }).tableRow,
+                ...(newReleasesTableOpenSongs[id]
+                    ? thru(relatedTracksForId(id), relatedTracks =>
+                          recursiveSongRows(
+                              filter(relatedTracks, ({ id }) => !tracksInTree[id]),
+                              [...parents, id],
+                              reduce(relatedTracks, (acc, track) => set(acc, track.id, true), {
+                                  ...tracksInTree
+                              })
+                          )
+                      )
+                    : [])
+            ]);
+
+        return recursiveSongRows;
+    }
 );
 
 const newReleasesByAlbumTableDataSelector = createSelector(
@@ -203,6 +226,8 @@ const newReleasesByAlbumTableDataSelector = createSelector(
     newReleasesTableOpenSongsSelector,
     relatedTracksForIdSelector,
     queryParamsSortSelector,
+    createHydratedRowFromParamsSelector,
+    createFlatRecursiveSongRowsSelector,
     (
         newReleases,
         artistData,
@@ -214,21 +239,18 @@ const newReleasesByAlbumTableDataSelector = createSelector(
         newReleasesTableShowAllTracks,
         newReleasesTableOpenSongs,
         relatedTracksForId,
-        { sortBy, sortDirection }
+        { sortBy, sortDirection },
+        createHydratedRowFromParams,
+        createFlatRecursiveSongRows
     ) =>
         thru(
             reduce(
                 newReleases,
                 (acc, item) =>
                     thru(
-                        createHydratedRow({
+                        createHydratedRowFromParams({
                             type: "newRelease",
-                            item,
-                            showColors: newReleasesTableShowColors,
-                            songs,
-                            albums,
-                            artistData,
-                            genreColorsMap
+                            item
                         }),
                         hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
                     ),
@@ -248,46 +270,9 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                     ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
                                     ...(newReleasesTableShowAllTracks ||
                                     newReleasesTableOpenAlbums[albumRow.id]
-                                        ? flatMap(
+                                        ? createFlatRecursiveSongRows(
                                               get(albums[albumRow.id], "tracks.items"),
-                                              ({ id }) => [
-                                                  createHydratedRow({
-                                                      type: "track",
-                                                      item: songs[id],
-                                                      showColors: newReleasesTableShowColors,
-                                                      songs,
-                                                      albums,
-                                                      artistData,
-                                                      genreColorsMap,
-                                                      meta: {
-                                                          release_date: get(
-                                                              albums[albumRow.id],
-                                                              "release_date"
-                                                          )
-                                                      }
-                                                  }).tableRow,
-                                                  ...(newReleasesTableOpenSongs[id]
-                                                      ? map(
-                                                            relatedTracksForId(id),
-                                                            track =>
-                                                                createHydratedRow({
-                                                                    type: "track",
-                                                                    item: track,
-                                                                    showColors: newReleasesTableShowColors,
-                                                                    songs,
-                                                                    albums,
-                                                                    artistData,
-                                                                    genreColorsMap,
-                                                                    meta: {
-                                                                        release_date: get(
-                                                                            albums[albumRow.id],
-                                                                            "release_date"
-                                                                        )
-                                                                    }
-                                                                }).tableRow
-                                                        )
-                                                      : [])
-                                              ]
+                                              [albumRow.id]
                                           )
                                         : [])
                                 ])
