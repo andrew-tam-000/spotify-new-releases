@@ -165,6 +165,7 @@ class NewReleasesAlbumsTable extends Component {
                                     distance={10}
                                     tags={active}
                                     onSortEnd={this.handleQueryTagSort}
+                                    useDragHandle={true}
                                 />
                             </Tags>
                         </TagsWithButton>

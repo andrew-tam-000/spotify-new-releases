@@ -1,25 +1,38 @@
 import React from "react";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { SortableContainer, SortableElement, SortableHandle } from "react-sortable-hoc";
 import styled from "styled-components";
 import TagProvider from "../Table/TagProvider";
 import { map } from "lodash";
+import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 
 import Typography from "@material-ui/core/Typography";
 
-const Tag = styled.span.attrs({
+const DragHandle = SortableHandle(() => <DragIndicatorIcon color='action' fontSize='small'/>); // This can be any component you want
+
+const StyledTag = styled.span.attrs({
     fontWeight: props => (props.active ? 600 : 400)
 })`
     background-color: ${props => props.backgroundColor};
-    padding: 10px;
+    padding: 5px;
     white-space: nowrap;
     text-align: center;
     cursor: pointer;
+    display: flex;
 `;
+
+const Tag = ({...props, children}) => (
+    <StyledTag {...props} >
+        <DragHandle />
+        {children}
+    </StyledTag>
+);
+
 const SortableTag = SortableElement(Tag);
 
 const TagListWrapper = styled.div`
     display: flex;
 `;
+
 const TagList = SortableContainer(({ tags, onClick, disabled }) => (
     <TagListWrapper>
         {map(tags, ({ genre, color }, index) => (
