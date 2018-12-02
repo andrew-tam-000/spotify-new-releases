@@ -22,7 +22,13 @@ import _ItemTagList from "./ItemTagList";
 import Settings from "./Settings";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
 import { genreColorsSelector, queryParamsTagsSelector } from "../../selectors";
+import materialStyled from "../../materialStyled";
+import _Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
+
+const Button = materialStyled(_Button)({
+    minWidth: 30
+});
 
 const Tags = styled.div`
     -webkit-overflow-scrolling: touch;
@@ -154,15 +160,14 @@ class NewReleasesAlbumsTable extends Component {
                 ) : (
                     <React.Fragment>
                         <TagsWithButton>
-                            <AddIcon
-                                onClick={openNewReleaseModal}
-                                fontSize="small"
-                                color="action"
-                            />
+                            <Button size="small" onClick={openNewReleaseModal}>
+                                <AddIcon fontSize="small" color="action" />
+                                {size(active) ? "" : "Add Genre"}
+                            </Button>
                             <Tags>
                                 <TagList
                                     axis="x"
-                                    distance={10}
+                                    lockAxis="x"
                                     tags={active}
                                     onSortEnd={this.handleQueryTagSort}
                                     useDragHandle={true}

@@ -46,7 +46,7 @@ const styles = theme => ({
     },
     paper: {
         position: "absolute",
-        zIndex: 1,
+        zIndex: 3,
         marginTop: theme.spacing.unit,
         left: 0,
         right: 0
@@ -169,12 +169,6 @@ class IntegrationReactSelect extends React.Component {
         multi: null
     };
 
-    handleChange = name => value => {
-        this.setState({
-            [name]: value
-        });
-    };
-
     render() {
         const { classes, theme } = this.props;
 
@@ -193,12 +187,11 @@ class IntegrationReactSelect extends React.Component {
                 isDisabled={this.props.isDisabled}
                 classes={classes}
                 styles={selectStyles}
-                options={slice(this.props.options, 0, 10)}
+                options={this.props.options}
                 components={components}
                 value={this.props.value}
                 //value={this.state.single}
                 onChange={this.props.onChange}
-                //onChange={this.handleChange("single")}
                 placeholder="Find a genre"
             />
         );

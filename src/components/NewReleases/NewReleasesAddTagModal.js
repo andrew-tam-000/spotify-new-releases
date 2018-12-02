@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import styled from "styled-components";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import Modal from "@material-ui/core/Modal";
@@ -6,8 +7,8 @@ import Typography from "@material-ui/core/Typography";
 import _Paper from "@material-ui/core/Paper";
 import materialStyled from "../../materialStyled";
 import Autocomplete from "../Table/Autocomplete";
-import { map, filter, find, includes } from "lodash";
-import { ChromePicker } from "react-color";
+import { map, filter, includes } from "lodash";
+import { ChromePicker as _ChromePicker } from "react-color";
 import Button from "@material-ui/core/Button";
 import {
     addGenreColors,
@@ -26,6 +27,10 @@ import {
     queryParamsTagsSelector
 } from "../../selectors";
 
+const ChromePicker = styled(_ChromePicker)`
+    margin-top: 10px;
+`;
+
 const Paper = materialStyled(_Paper)({
     padding: 20,
     position: "absolute",
@@ -34,6 +39,12 @@ const Paper = materialStyled(_Paper)({
     transform: "translate(-50%, -50%)",
     maxWidth: "90%"
 });
+
+const Buttons = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+`;
 
 class NewReleasesAddTagModal extends Component {
     state = {
@@ -104,18 +115,28 @@ class NewReleasesAddTagModal extends Component {
                         color={newReleasesTableModalColor}
                         onChangeComplete={this.handleChangeColor}
                     />
-                    {includes(queryParamsTags, newReleasesTableModalGenre) ? (
-                        <Button variant="contained" color="primary" onClick={this.removeTag}>
-                            Delete genre
+                    <Buttons>
+                        {includes(queryParamsTags, newReleasesTableModalGenre) ? (
+                            <Button variant="contained" color="primary" onClick={this.removeTag}>
+                                Delete genre
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={this.addGenreColors}
+                            >
+                                Add genre
+                            </Button>
+                        )}
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={closeNewReleaseModal}
+                        >
+                            Cancel
                         </Button>
-                    ) : (
-                        <Button variant="contained" color="primary" onClick={this.addGenreColors}>
-                            Add genre
-                        </Button>
-                    )}
-                    <Button variant="contained" color="secondary" onClick={closeNewReleaseModal}>
-                        Cancel
-                    </Button>
+                    </Buttons>
                 </Paper>
             </Modal>
         );

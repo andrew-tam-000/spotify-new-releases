@@ -31,6 +31,7 @@ const SortableTag = SortableElement(Tag);
 
 const TagListWrapper = styled.div`
     display: flex;
+    overflow: scroll;
 `;
 
 const TagList = SortableContainer(({ tags, onClick, disabled }) => (
