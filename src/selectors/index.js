@@ -283,7 +283,7 @@ export const nowPlayingSongUriSelector = createSelector(
     songId => songId
 );
 
-export const nowPlayingSongIdSelector = createSelector(
+export const nowPlayingTrackIdSelector = createSelector(
     state => get(state, "app.spotify.nowPlaying.item.id"),
     songId => songId
 );

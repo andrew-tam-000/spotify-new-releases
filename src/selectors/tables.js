@@ -33,8 +33,7 @@ import {
     queryParamsSearchSelector,
     newReleasesTableOpenAlbumsSelector,
     newReleasesTableOpenSongsSelector,
-    relatedTracksForIdSelector,
-    nowPlayingSongIdSelector
+    relatedTracksForIdSelector
 } from "./";
 
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
@@ -308,14 +307,13 @@ const newReleasesByAlbumTableDataSelector = createSelector(
         )
 );
 
-export const nowPlayingTableSelector = createSelector(
+export const nowPlayingTableForIdSelector = createSelector(
     songsSelector,
-    nowPlayingSongIdSelector,
     relatedTracksForIdSelector,
     createFlatRecursiveSongRowsSelector,
-    (songs, nowPlayingSongId, relatedTracksForId, createFlatRecursiveSongRows) => ({
+    (songs, relatedTracksForId, createFlatRecursiveSongRows) => id => ({
         rows: createFlatRecursiveSongRows({
-            list: relatedTracksForId(nowPlayingSongId)
+            list: relatedTracksForId(id)
         }),
         config: newReleasesByAlbumConfig
     })
