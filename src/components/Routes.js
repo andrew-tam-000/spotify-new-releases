@@ -14,8 +14,10 @@ import SongDetails from "./SongDetails";
 import Discover from "./Discover";
 import Sidebar from "./Sidebar";
 import AlbumList from "./NewReleases/AlbumList";
+import NowPlaying from "./NowPlaying";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import NewReleasesIcon from "@material-ui/icons/NewReleases";
 import ImageSearchIcon from "@material-ui/icons/ImageSearch";
 import SearchIcon from "@material-ui/icons/Search";
@@ -82,6 +84,9 @@ class RouteProvider extends Component {
             history.push({ pathname: "/new-releases", search: history.location.search });
         }
         if (val === 2) {
+            history.push({ pathname: "/now-playing", search: history.location.search });
+        }
+        if (val === 3) {
             this.props.searchOpenPanel();
         }
         /*
@@ -121,6 +126,7 @@ class RouteProvider extends Component {
                                     component={NewReleasesAlbumsTable}
                                 />
                                 <Route exact path="/analyzer" component={Analyzer} />
+                                <Route exact path="/now-playing" component={NowPlaying} />
                                 <Route exact path="/" component={NewReleasesAlbumsTable} />
                             </Switch>
                         </Scrollable>
@@ -138,6 +144,7 @@ class RouteProvider extends Component {
                     >
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
                         <BottomNavigationAction label="New Releases" icon={<NewReleasesIcon />} />
+                        <BottomNavigationAction label="Now Playing" icon={<PlayArrowIcon />} />
                     </BottomNavigation>
                 </AppWrapper>
             </Router>

@@ -23,6 +23,7 @@ import queryParamsEpic from "./queryParamsEpic";
 import addGenreToLocalStoreEpic from "./addGenreToLocalStoreEpic";
 import getRelatedSongsOnRowClickEpic from "./getRelatedSongsOnRowClickEpic";
 import onLoginEpic from "./onLoginEpic";
+import onNowPlayingChangeEpic from "./onNowPlayingChangeEpic";
 
 export default (...args) =>
     merge(
@@ -49,5 +50,6 @@ export default (...args) =>
         setLocalStorageEpic(...args),
         addGenreToLocalStoreEpic(...args),
         onLoginEpic(...args),
-        getRelatedSongsOnRowClickEpic(...args)
+        getRelatedSongsOnRowClickEpic(...args),
+        onNowPlayingChangeEpic(...args)
     );
