@@ -12,6 +12,7 @@ export default function onLoginEpic(action$, state$, { spotifyApi }) {
     return action$.pipe(
         ofType(createAccessTokenSuccess().type),
         switchMap(({ payload }) => {
+            // TODO: Refactor how we set teh access token
             spotifyApi.setAccessToken(payload);
             return concat(
                 of(getDevicesStart()),

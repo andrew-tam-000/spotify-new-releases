@@ -18,7 +18,7 @@ import {
 } from "../redux/actions";
 import { accessTokenSelector } from "../selectors";
 
-export default function initializeOnAnalyzer(action$, state$) {
+export default function initializeOnAnalyzer(action$, state$, { spotifyApi }) {
     return action$.pipe(
         ofType(initializeOnAnalyzerStart().type),
         switchMap(() =>
@@ -26,16 +26,17 @@ export default function initializeOnAnalyzer(action$, state$) {
                 map$(state => accessTokenSelector(state)),
                 filter$(state => state),
                 distinctUntilChanged(),
-                mergeMap(action =>
-                    concat(
+                mergeMap(accessToken => {
+                    spotifyApi.setAccessToken(accessToken);
+                    return concat(
                         of(getSongsStart()),
                         action$.pipe(
                             ofType(getSongsSuccess().type),
                             mapTo(initializeOnAnalyzerSuccess()),
                             take(1)
                         )
-                    )
-                )
+                    );
+                })
             )
         ),
 
