@@ -531,7 +531,7 @@ const getAlbums = (action$, state$, { basicSpotifyApi }) =>
                           )
                       )
                   ).pipe(
-                      mergeMap(nestedAlbumsArray =>
+                      switchMap(nestedAlbumsArray =>
                           thru(flatMap(nestedAlbumsArray, ({ albums }) => albums), albums =>
                               concat(
                                   of(getArtistsStart(flatMap(flatMap(albums, "artists"), "id"))),
