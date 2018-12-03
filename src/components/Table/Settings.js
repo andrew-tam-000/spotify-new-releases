@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { createStructuredSelector } from "reselect";
 import { compose, withPropsOnChange } from "recompact";
-import { flatMap, map, get, filter, slice } from "lodash";
+import { flatMap, map, get, filter, slice, size, thru } from "lodash";
 import {
     toggleNewReleaseAlbum,
     showSideBar,
@@ -122,8 +122,12 @@ export default compose(
             playAllUris: slice(
                 newReleasesTableShowAllTracks
                     ? map(rows, "uri")
-                    : flatMap(filter(rows, ({ isTrack }) => !isTrack), ({ id }) =>
-                          map(get(albums, `${id}.tracks.items`), "uri")
+                    : // HACK - Check if there are albums first, else show songs
+                      thru(
+                          flatMap(filter(rows, ({ isTrack }) => !isTrack), ({ id }) =>
+                              map(get(albums, `${id}.tracks.items`), "uri")
+                          ),
+                          albumIds => (size(albumIds) ? albumIds : map(rows, "uri"))
                       ),
                 0,
                 500
