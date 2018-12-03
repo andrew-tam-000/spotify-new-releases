@@ -11,6 +11,7 @@ import Seek from "./PlayDash/Seek";
 import styled from "styled-components";
 import materialStyled from "../materialStyled";
 import PlayDashMenu from "./PlayDash/PlayDashMenu";
+import AddToLibrary from "./Table/AddToLibrary";
 
 const typographyStyles = {
     whiteSpace: "nowrap",
@@ -49,13 +50,23 @@ const SummaryWrapper = styled.div`
     overflow: hidden;
 `;
 
+const TitleWithAdd = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+`;
+
 const PlayDash = ({ uri, track }) => (
     <PlayDashWrapper>
         <PlaySection>
             <SummaryWrapper>
                 <PlayButton />
                 <Summary>
-                    <Title variant="body1">{track.name}</Title>
+                    <TitleWithAdd>
+                        <Title variant="body1">{track.name}</Title>
+                        <AddToLibrary id={track.id} fontSize="small" color="action" />
+                    </TitleWithAdd>
                     <Artist variant="caption">{first(track.artists).name}</Artist>
                 </Summary>
             </SummaryWrapper>

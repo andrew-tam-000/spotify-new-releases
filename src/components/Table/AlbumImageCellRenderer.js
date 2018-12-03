@@ -1,16 +1,11 @@
 import React from "react";
 import { map } from "lodash";
-import { connect } from "react-redux";
-import { compose, withProps } from "recompact";
-import { createStructuredSelector } from "reselect";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
-import AddIcon from "@material-ui/icons/Add";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
-import { addToMySavedTracksStart } from "../../redux/actions";
-import { accessTokenSelector } from "../../selectors";
+import AddToLibrary from "./AddToLibrary";
 
 import materialStyled from "../../materialStyled";
 import PlayButtonProvider from "../core/PlayButtonProvider";
@@ -87,20 +82,6 @@ const NewReleasesTrackPlayButton = props => (
         }
     </PlayButtonProvider>
 );
-
-const AddToLibrary = compose(
-    connect(
-        createStructuredSelector({
-            accessToken: accessTokenSelector
-        }),
-        { addToMySavedTracksStart }
-    ),
-    withProps(({ addToMySavedTracksStart, id }) => ({
-        onClick: () => addToMySavedTracksStart([id])
-    }))
-)(function _AddIcon({ accessToken, ...props }) {
-    return accessToken && <AddIcon {...props} />;
-});
 
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
