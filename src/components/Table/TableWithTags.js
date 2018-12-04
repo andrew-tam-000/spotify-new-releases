@@ -8,23 +8,32 @@ import Typography from "@material-ui/core/Typography";
 import { connect } from "react-redux";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Table from "../Table";
+import IconButton from "@material-ui/core/IconButton";
 import {
     toggleNewReleaseAlbum,
     toggleNewReleaseSong,
     reorderTags,
     openNewReleaseModal,
-    reorderQueryTags
+    reorderQueryTags,
+    setLocalStorage,
+    getSongsStart,
+    getNewReleasesStart
 } from "../../redux/actions";
-import { get, size, join, first, map, find } from "lodash";
+import { get, size, join, first, map, find, includes } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import _ItemTagList from "./ItemTagList";
 import Settings from "./Settings";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
-import { genreColorsSelector, queryParamsTagsSelector } from "../../selectors";
+import {
+    genreColorsSelector,
+    queryParamsTagsSelector,
+    routerPathnameSelector
+} from "../../selectors";
 import materialStyled from "../../materialStyled";
 import _Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
+import RefreshIcon from "@material-ui/icons/Refresh";
 
 const Button = materialStyled(_Button)({
     minWidth: 30
@@ -136,6 +145,25 @@ class NewReleasesAlbumsTable extends Component {
 
     handleTagSort = ({ oldIndex, newIndex }) => this.props.reorderTags(oldIndex, newIndex);
 
+    refreshData = () => {
+        const { setLocalStorage, routerPathname, getNewReleasesStart, getSongsStart } = this.props;
+        const mode = includes(routerPathname, "new-release")
+            ? "newRelease"
+            : includes(routerPathname, "analyzer")
+                ? "library"
+                : null;
+
+        if (mode) {
+            if (mode === "newRelease") {
+                setLocalStorage("newReleaseData", "", new Date().getTime() + 1000 * 60 * 60 * 24);
+                getNewReleasesStart();
+            } else if (mode === "library") {
+                setLocalStorage("library", "", new Date().getTime() + 1000 * 60 * 60 * 24);
+                getSongsStart();
+            }
+        }
+    };
+
     render() {
         const {
             openNewReleaseModal,
@@ -173,6 +201,9 @@ class NewReleasesAlbumsTable extends Component {
                                     useDragHandle={true}
                                 />
                             </Tags>
+                            <IconButton onClick={this.refreshData}>
+                                <RefreshIcon fontSize="small" color="action" />
+                            </IconButton>
                         </TagsWithButton>
                         <Table
                             tableData={tableData}
@@ -206,6 +237,7 @@ export default compose(
     connect(
         createStructuredSelector({
             genreColors: genreColorsSelector,
+            routerPathname: routerPathnameSelector,
             queryParamsTags: queryParamsTagsSelector
         }),
         {
@@ -213,7 +245,10 @@ export default compose(
             toggleNewReleaseSong,
             reorderTags,
             reorderQueryTags,
-            openNewReleaseModal
+            openNewReleaseModal,
+            setLocalStorage,
+            getSongsStart,
+            getNewReleasesStart
         }
     )
 )(NewReleasesAlbumsTable);

@@ -338,6 +338,11 @@ export const artistImageForTrackIdSelector = createSelector(
         artistImageForArtistId(get(artistForTrackId(trackId), "id"))
 );
 
+export const routerPathnameSelector = createSelector(
+    state => get(state, "router.location.pathname"),
+    pathname => pathname
+);
+
 export const queryParamsSelector = createSelector(
     state => get(state, "router.location.search"),
     query => qs.parse(query.substring(1))

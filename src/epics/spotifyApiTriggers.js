@@ -427,8 +427,12 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
         mergeMap(
             action =>
                 thru(
-                    get(getKeyFromLocalStorage("newReleaseData"), "expiration"),
-                    expiration => expiration && expiration > new Date().getTime()
+                    [
+                        get(getKeyFromLocalStorage("newReleaseData"), "expiration"),
+                        get(getKeyFromLocalStorage("newReleaseData"), "value")
+                    ],
+                    ([expiration, value]) =>
+                        value && expiration && expiration > new Date().getTime()
                 )
                     ? thru(
                           getKeyFromLocalStorage("newReleaseData") || {},
