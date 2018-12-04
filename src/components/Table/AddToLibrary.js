@@ -2,10 +2,12 @@ import React from "react";
 import { connect } from "react-redux";
 import { compose, withProps } from "recompact";
 import { createStructuredSelector } from "reselect";
-import AddIcon from "@material-ui/icons/Add";
+import _AddIcon from "@material-ui/icons/Add";
+import materialStyled from "../../materialStyled";
 import { addToMySavedTracksStart } from "../../redux/actions";
 import { accessTokenSelector } from "../../selectors";
 
+const AddIcon = materialStyled(_AddIcon)({ cursor: "pointer" });
 const AddToLibrary = compose(
     connect(
         createStructuredSelector({

@@ -82,7 +82,6 @@ class NewReleasesAddTagModal extends Component {
     render() {
         const {
             availableGenres,
-            genreColorsMap,
             newReleasesTableModal,
             closeNewReleaseModal,
             newReleasesTableModalGenre,
@@ -103,13 +102,10 @@ class NewReleasesAddTagModal extends Component {
                                   }
                                 : undefined
                         }
-                        options={map(
-                            filter(
-                                availableGenres,
-                                availableGenre => !genreColorsMap[availableGenre.genre]
-                            ),
-                            ({ genre }) => ({ value: genre, label: genre })
-                        )}
+                        options={map(availableGenres, ({ genre }) => ({
+                            value: genre,
+                            label: genre
+                        }))}
                     />
                     <ChromePicker
                         color={newReleasesTableModalColor}
