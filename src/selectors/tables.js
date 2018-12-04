@@ -136,7 +136,7 @@ const createHydratedRowFromParamsSelector = createSelector(
                         tableRow: formatRow({
                             rowData,
                             genreColorsMap,
-                            newReleasesTableShowColors
+                            showColors: newReleasesTableShowColors
                         })
                     })
                 )
