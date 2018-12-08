@@ -1,5 +1,5 @@
 import React from "react";
-import { map } from "lodash";
+import { get, map } from "lodash";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
@@ -86,24 +86,20 @@ const NewReleasesTrackPlayButton = props => (
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
 // <StartTreeButton uri={uri} />
-const AlbumImageCellRenderer = ({
-    cellData,
-    rowData: {
+const AlbumImageCellRenderer = ({ className, data = [], index }) => {
+    const {
         uri,
         image,
         artist,
         track,
-        type,
         album,
         isTrack,
-        meta: { genres, parents },
+        meta: { parents },
         id
-    },
-    modalOpen,
-    setModalOpen
-}) =>
-    isTrack ? (
-        <TrackBlurbCellRendererWrapper>
+    } = get(data, `rows.${index}`) || {};
+
+    return isTrack ? (
+        <TrackBlurbCellRendererWrapper className={className}>
             {map(parents, (parent, idx) => (
                 <ChevronRightIcon
                     style={{ marginLeft: idx ? -15 : undefined }}
@@ -124,7 +120,7 @@ const AlbumImageCellRenderer = ({
             </Description>
         </TrackBlurbCellRendererWrapper>
     ) : (
-        <AlbumImageCellRendererWrapper>
+        <AlbumImageCellRendererWrapper className={className}>
             <AlbumWrapper>
                 <NewReleasesAlbumPlayButton context_uri={uri} />
                 <AlbumImage alt="test" src={image} />
@@ -137,5 +133,6 @@ const AlbumImageCellRenderer = ({
             </Description>
         </AlbumImageCellRendererWrapper>
     );
+};
 
 export default AlbumImageCellRenderer;

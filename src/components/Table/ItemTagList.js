@@ -21,15 +21,6 @@ const Tag = styled.span`
 const Genres = styled.div`
     display: flex;
     flex-wrap: nowrap;
-
-    // Hack to get margin/padding working in beginning
-    &:after,
-    &:before {
-        content: "";
-        display: block;
-        margin-left: 6px;
-        border: 1px solid transparent;
-    }
 `;
 
 const withOpenModal = compose(

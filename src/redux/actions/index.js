@@ -912,3 +912,10 @@ export function getRelatedTracksSuccess(relatedTracks) {
         payload: relatedTracks
     };
 }
+
+export function toggleSort(sortColumn) {
+    return {
+        type: "TOGGLE_SORT_COLUMN",
+        payload: sortColumn
+    };
+}

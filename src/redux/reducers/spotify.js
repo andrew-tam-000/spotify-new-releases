@@ -14,7 +14,7 @@ import {
     getDevicesSuccess,
     getRelatedTracksSuccess
 } from "../actions/";
-import { reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
+import { uniq, reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
 function mergeNewItems(obj, arr, idGetter) {
     return {
@@ -144,7 +144,10 @@ export default (state = {}, { type, payload = {} }) => {
                 ...state,
                 relatedTracks: {
                     ...state.relatedTracks,
-                    [first(payload.seeds).id]: map(payload.tracks, "id")
+                    [first(payload.seeds).id]: uniq([
+                        ...(state.relatedTracks[first(payload.seeds).id] || []),
+                        ...map(payload.tracks, "id")
+                    ])
                 }
             };
         default:

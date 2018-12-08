@@ -1,14 +1,18 @@
 import React, { Component } from "react";
 import { createStructuredSelector } from "reselect";
 import TagList from "./TagList";
-import { defaultTableRowRenderer } from "react-virtualized";
 import { compose } from "recompact";
 import styled from "styled-components";
 import Typography from "@material-ui/core/Typography";
 import { connect } from "react-redux";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Table from "../Table";
+import Stars from "@material-ui/icons/Stars";
+import PersonIcon from "@material-ui/icons/Person";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import IconButton from "@material-ui/core/IconButton";
+import { AutoSizer } from "react-virtualized";
 import {
     toggleNewReleaseAlbum,
     toggleNewReleaseSong,
@@ -17,23 +21,26 @@ import {
     reorderQueryTags,
     setLocalStorage,
     getSongsStart,
-    getNewReleasesStart
+    getNewReleasesStart,
+    toggleSort
 } from "../../redux/actions";
 import { get, size, join, first, map, find, includes } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
-import _ItemTagList from "./ItemTagList";
+import ItemTagList from "./ItemTagList";
 import Settings from "./Settings";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
 import {
     genreColorsSelector,
     queryParamsTagsSelector,
+    queryParamsSortSelector,
     routerPathnameSelector
 } from "../../selectors";
 import materialStyled from "../../materialStyled";
 import _Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import { FixedSizeList } from "react-window";
 
 const Button = materialStyled(_Button)({
     minWidth: 30
@@ -53,21 +60,11 @@ const TagsWithButton = styled.div`
     align-items: center;
 `;
 
-const ItemTagList = styled(_ItemTagList)`
-    margin: 0 2px;
-`;
-
 const NewReleasesAlbumsTableWrapper = styled.div`
     display: flex;
     height: 100%;
     flex: 1;
     flex-direction: column;
-`;
-
-const HeaderCell = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
 `;
 
 const SearchColumn = styled.div`
@@ -76,74 +73,150 @@ const SearchColumn = styled.div`
     align-items: center;
 `;
 
-const ColumnCellRenderer = ({ cellData }) => <Typography variant="caption">{cellData}</Typography>;
-const HeaderCellRenderer = ({ label, dataKey, sortIndicator }) => (
-    <HeaderCell>
-        <Typography title={label}>{label}</Typography>
-        <Typography>{sortIndicator && sortIndicator}</Typography>
-    </HeaderCell>
-);
-
-const RowRenderer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-`;
-
 const Loader = styled.div`
     display: flex;
     height: 100%;
     justify-content: center;
     align-items: center;
 `;
-class NewReleasesAlbumsTable extends Component {
-    virtualizedConfig = {
-        onRowClick: ({ event, index, rowData: { uri, id, isTrack } }) =>
-            !isTrack ? this.props.toggleNewReleaseAlbum(id) : this.props.toggleNewReleaseSong(id),
-        rowStyle: ({ index }) => {
-            const {
-                tableData: { rows }
-            } = this.props;
-            const backgroundColors = get(rows, `${index}.meta.backgroundColors`);
+
+const Columns = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+`;
+
+const ReleaseDateCell = styled.div`
+    flex: 1 1 70px;
+`;
+
+const PopularityCell = styled.div`
+    flex: 1 1 35px;
+`;
+
+const InfoColumn = styled(AlbumImageCellRenderer)`
+    flex: 1 1 160px;
+`;
+
+const PlainInfoColumn = styled.div`
+    flex: 1 1 160px;
+`;
+
+const TableWrapper = styled.div`
+    flex: 1;
+`;
+
+const _RowRenderer = connect(
+    createStructuredSelector({
+        genreColors: genreColorsSelector,
+        routerPathname: routerPathnameSelector,
+        queryParamsTags: queryParamsTagsSelector
+    }),
+    {
+        toggleNewReleaseAlbum,
+        toggleNewReleaseSong,
+        reorderTags,
+        reorderQueryTags,
+        openNewReleaseModal,
+        setLocalStorage,
+        getSongsStart,
+        getNewReleasesStart
+    }
+)(
+    class _RowRenderer extends Component {
+        getItem = () => get(this.props.data, `rows.${this.props.index}`) || {};
+
+        handleClick = () => {
+            const { isTrack, id } = this.getItem();
+            return !isTrack
+                ? this.props.toggleNewReleaseAlbum(id)
+                : this.props.toggleNewReleaseSong(id);
+        };
+
+        rowStyle = () => {
+            const { style } = this.props;
+            const backgroundColors = get(this.getItem(), "meta.backgroundColors");
             const linearGradientString = join(backgroundColors, ", ");
-            return (
-                size(backgroundColors) && {
-                    background:
-                        size(backgroundColors) > 1
-                            ? `linear-gradient(90deg, ${linearGradientString})`
-                            : first(backgroundColors)
-                }
-            );
-        },
-        rowHeight: 80,
-        headerHeight: 32,
-        rowRenderer: ({ style, onRowClick, ...props }) => {
-            const { index, rowData, key } = props;
+
+            return {
+                ...style,
+                ...(size(backgroundColors)
+                    ? {
+                          background:
+                              size(backgroundColors) > 1
+                                  ? `linear-gradient(90deg, ${linearGradientString})`
+                                  : first(backgroundColors)
+                      }
+                    : {})
+            };
+        };
+
+        render() {
+            const { className, data, index } = this.props;
             const {
-                meta: { genres }
-            } = rowData;
+                albumPopularity,
+                artistPopularity,
+                releaseDate,
+                meta: { genres } = {}
+            } = this.getItem();
+
             return (
-                <RowRenderer
-                    key={key}
-                    onClick={event => onRowClick({ event, index, rowData })}
-                    style={style}
-                >
-                    {defaultTableRowRenderer(props)}
+                <div onClick={this.handleClick} className={className} style={this.rowStyle()}>
+                    <Columns>
+                        <InfoColumn data={data} index={index} />
+                        <ReleaseDateCell>
+                            <Typography variant="caption">{releaseDate}</Typography>
+                        </ReleaseDateCell>
+                        <PopularityCell>
+                            <Typography variant="caption">{albumPopularity}</Typography>
+                        </PopularityCell>
+                        <PopularityCell>
+                            <Typography variant="caption">{artistPopularity}</Typography>
+                        </PopularityCell>
+                    </Columns>
                     <ItemTagList genres={genres} />
-                </RowRenderer>
+                </div>
             );
         }
-    };
+    }
+);
 
-    columnConfig = {
-        cellRenderer: ColumnCellRenderer,
-        headerRenderer: HeaderCellRenderer
-    };
+const RowRenderer = styled(_RowRenderer)`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+`;
 
+const SortColumn = connect(
+    createStructuredSelector({
+        queryParamsSort: queryParamsSortSelector
+    }),
+    {
+        toggleSort
+    }
+)(function SortColumn({ toggleSort, queryParamsSort, className, children, name }) {
+    return (
+        <div className={className} onClick={() => toggleSort(name)}>
+            {children}
+            {get(queryParamsSort, `sortDirection.${name}`) === "DESC" ? (
+                <ExpandMoreIcon fontSize="small" color="action" />
+            ) : get(queryParamsSort, `sortDirection.${name}`) === "ASC" ? (
+                <ExpandLessIcon fontSize="small" color="action" />
+            ) : null}
+        </div>
+    );
+});
+
+const ReleaseDateColumn = styled(SortColumn)`
+    flex: 1 1 70px;
+`;
+const PopularityColumn = styled(SortColumn)`
+    flex: 1 1 35px;
+`;
+
+class NewReleasesAlbumsTable extends Component {
     handleQueryTagSort = ({ oldIndex, newIndex }) =>
         this.props.reorderQueryTags(oldIndex, newIndex);
-
-    handleTagSort = ({ oldIndex, newIndex }) => this.props.reorderTags(oldIndex, newIndex);
 
     refreshData = () => {
         const { setLocalStorage, routerPathname, getNewReleasesStart, getSongsStart } = this.props;
@@ -170,7 +243,8 @@ class NewReleasesAlbumsTable extends Component {
             tableData,
             loading,
             genreColors,
-            queryParamsTags
+            queryParamsTags,
+            toggleSort
         } = this.props;
         const active = map(
             queryParamsTags,
@@ -187,6 +261,7 @@ class NewReleasesAlbumsTable extends Component {
                     </Loader>
                 ) : (
                     <React.Fragment>
+                        <NewReleasesAddTagModal />
                         <TagsWithButton>
                             <Button size="small" onClick={openNewReleaseModal}>
                                 <AddIcon fontSize="small" color="action" />
@@ -205,27 +280,39 @@ class NewReleasesAlbumsTable extends Component {
                                 <RefreshIcon fontSize="small" color="action" />
                             </IconButton>
                         </TagsWithButton>
-                        <Table
-                            tableData={tableData}
-                            prefixColumnsProps={[
-                                {
-                                    cellRenderer: AlbumImageCellRenderer,
-                                    key: "album",
-                                    width: 160,
-                                    headerRenderer: () => (
-                                        <SearchColumn>
-                                            <Settings tableData={tableData} />
-                                            <NewReleasesAddTagModal />
-                                            <SearchBar />
-                                        </SearchColumn>
-                                    ),
-                                    disableSort: true,
-                                    flexGrow: 5
-                                }
-                            ]}
-                            virtualizedConfig={this.virtualizedConfig}
-                            columnConfig={this.columnConfig}
-                        />
+                        <Columns>
+                            <PlainInfoColumn>
+                                <SearchColumn>
+                                    <Settings tableData={tableData} />
+                                    <NewReleasesAddTagModal />
+                                    <SearchBar />
+                                </SearchColumn>
+                            </PlainInfoColumn>
+                            <ReleaseDateColumn name="releaseDate">
+                                <CalendarTodayIcon fontSize="small" color="action" />
+                            </ReleaseDateColumn>
+                            <PopularityColumn name="albumPopularity">
+                                <Stars fontSize="small" color="action" />
+                            </PopularityColumn>
+                            <PopularityColumn name="artistPopularity">
+                                <PersonIcon fontSize="small" color="action" />
+                            </PopularityColumn>
+                        </Columns>
+                        <TableWrapper>
+                            <AutoSizer>
+                                {({ height, width }) => (
+                                    <FixedSizeList
+                                        itemData={tableData}
+                                        height={height}
+                                        itemCount={size(tableData.rows)}
+                                        itemSize={80}
+                                        width={width}
+                                    >
+                                        {RowRenderer}
+                                    </FixedSizeList>
+                                )}
+                            </AutoSizer>
+                        </TableWrapper>
                     </React.Fragment>
                 )}
             </NewReleasesAlbumsTableWrapper>

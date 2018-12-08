@@ -6,7 +6,8 @@ import {
     toggleTagFromQuery,
     addTagToQuery,
     removeTagFromQuery,
-    reorderQueryTags
+    reorderQueryTags,
+    toggleSort
 } from "../redux/actions";
 import { push } from "react-router-redux";
 import qs from "qs";
@@ -17,7 +18,7 @@ import {
     queryParamsSelector
 } from "../selectors";
 import lzString from "lz-string";
-import { difference, map, includes, thru, filter, concat } from "lodash";
+import { get, difference, map, includes, thru, filter, concat } from "lodash";
 import { arrayMove } from "react-sortable-hoc";
 
 const onAddGenreEpic = (action$, state$, { spotifyApi }) =>
@@ -86,7 +87,44 @@ const reorderQueryTagsEpic = (action$, state$, { spotifyApi }) =>
         })
     );
 
-export default (...args) =>
-    merge(onAddGenreEpic(...args), toggleTagEpic(...args), reorderQueryTagsEpic(...args)).pipe(
-        catchError(e => console.error(e))
+/*
+            sort: {
+                sortBy: ["artist", "popularity"],
+                sortDirection: {
+                    popularity: "DESC",
+                    artist: "ASC"
+                }
+            },
+            */
+const toggleSortQuery = (action$, state$, { spotifyApi }) =>
+    action$.pipe(
+        ofType(toggleSort().type),
+        mergeMap(({ payload }) => {
+            const queryParamsSort = queryParamsSortSelector(state$.value);
+            const queryParams = queryParamsSelector(state$.value);
+            const sortDirection = get(queryParamsSort, `sortDirection.${payload}`);
+            return of(
+                push({
+                    search:
+                        "?" +
+                        qs.stringify({
+                            ...queryParams,
+                            sort: {
+                                sortBy: [payload],
+                                sortDirection: {
+                                    [payload]: sortDirection === "DESC" ? "ASC" : "DESC"
+                                }
+                            }
+                        })
+                })
+            );
+        })
     );
+
+export default (...args) =>
+    merge(
+        toggleSortQuery(...args),
+        onAddGenreEpic(...args),
+        toggleTagEpic(...args),
+        reorderQueryTagsEpic(...args)
+    ).pipe(catchError(e => console.error(e)));

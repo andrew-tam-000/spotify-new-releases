@@ -26,7 +26,6 @@ const VirtualizedTable = styled(_VirtualizedTable)`
 const TableWrapper = styled.div`
     flex: 1;
 `;
-
 class Table extends Component {
     sortState = createMultiSort(
         // Don't do anything if we have a noop
