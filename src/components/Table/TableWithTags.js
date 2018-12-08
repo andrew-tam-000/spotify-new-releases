@@ -243,8 +243,7 @@ class NewReleasesAlbumsTable extends Component {
             tableData,
             loading,
             genreColors,
-            queryParamsTags,
-            toggleSort
+            queryParamsTags
         } = this.props;
         const active = map(
             queryParamsTags,
