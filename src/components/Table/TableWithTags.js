@@ -23,7 +23,7 @@ import {
     getNewReleasesStart,
     toggleSort
 } from "../../redux/actions";
-import { get, size, join, first, map, find, includes, noop } from "lodash";
+import { get, size, join, first, map, findLast, find, includes, noop } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import ItemTagList from "./ItemTagList";
@@ -230,9 +230,9 @@ class NewReleasesAlbumsTable extends Component {
     handleItemsRendered = ({ visibleStartIndex }) =>
         this.setState({
             currentDate: get(
-                find(
+                findLast(
                     this.props.tableData.rows,
-                    ({ meta: { cellType } }) => cellType === "album",
+                    ({ meta: { cellType } }) => cellType === "date",
                     visibleStartIndex
                 ),
                 "releaseDate"
@@ -309,7 +309,7 @@ class NewReleasesAlbumsTable extends Component {
                                 <PersonIcon fontSize="small" color="action" />
                             </PopularityColumn>
                         </Columns>
-                        <Date date={this.state.currentDate} />
+                        {this.state.currentDate ? <Date date={this.state.currentDate} /> : null}
                         <TableWrapper>
                             <AutoSizer>
                                 {({ height, width }) => (

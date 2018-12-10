@@ -26,7 +26,7 @@ const AlbumImage = styled.img`
 `;
 
 const AlbumTitle = materialStyled(Typography)({
-    lineHeight: 1
+    lineHeight: 1.2
 });
 
 const Description = styled.div`
@@ -112,9 +112,9 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
             <NewReleasesTrackPlayButton uri={uri} />
             <Description>
                 <TitleWithAdd>
-                    <Typography noWrap={true} variant="body2">
+                    <AlbumTitle noWrap={true} variant="body2">
                         {track}
-                    </Typography>
+                    </AlbumTitle>
                     <AddToLibrary id={id} fontSize="small" color="action" />
                 </TitleWithAdd>
                 <Typography noWrap={true} variant="body1">
@@ -129,9 +129,9 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
                 <AlbumImage alt="test" src={image} />
             </AlbumWrapper>
             <Description>
-                <Typography noWrap={true} variant="body2">
+                <AlbumTitle noWrap={true} variant="body2">
                     {album}
-                </Typography>
+                </AlbumTitle>
                 <AlbumTitle noWrap={true} variant="body1">
                     {artist}
                 </AlbumTitle>

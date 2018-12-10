@@ -1,5 +1,4 @@
 import {
-    slice,
     values,
     keyBy,
     uniq,
@@ -55,25 +54,21 @@ const rowHasSearch = ({ row, search }) =>
 
 // Preserve the order of the filters
 const tableDataFilter = ({ search, tags, rows }) =>
-    // Pop off the first item, since its a date cell we don't care about
-    slice(
-        // Filter again to remove dates that don't have songs in them
+    // Filter again to remove dates that don't have songs in them
+    filter(
+        // tags
         filter(
-            // tags
-            filter(
-                // Search bar
-                filter(rows, row => rowHasSearch({ row, search })),
-                row => rowHasTags({ row, tags })
-            ),
-            (row, idx, list) =>
-                !(
-                    (get(row, "meta.cellType") === "date" &&
-                        list[idx + 1] &&
-                        get(list[idx + 1], "meta.cellType") === "date") ||
-                    !list[idx + 1]
-                )
+            // Search bar
+            filter(rows, row => rowHasSearch({ row, search })),
+            row => rowHasTags({ row, tags })
         ),
-        1
+        (row, idx, list) =>
+            !(
+                (get(row, "meta.cellType") === "date" &&
+                    list[idx + 1] &&
+                    get(list[idx + 1], "meta.cellType") === "date") ||
+                (get(row, "meta.cellType") === "date" && !list[idx + 1])
+            )
     );
 
 const formatRow = ({ rowData, genreColorsMap, showColors }) =>
@@ -274,9 +269,12 @@ const newReleasesByAlbumTableDataSelector = createSelector(
     ) =>
         thru(
             {
-                sortBy: ["releaseDate", ...sortBy],
+                sortBy: [
+                    ...(newReleasesTableShowAllTracks ? [] : ["releaseDate"]),
+                    ...(sortBy || [])
+                ],
                 sortDirection: {
-                    ...sortDirection,
+                    ...(sortDirection || {}),
                     releaseDate: "desc"
                 }
             },
@@ -308,10 +306,11 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                             // Ignore first date change
                                             // But look for subsequent date changes
                                             // and insert row
-                                            ...(idx === 0 ||
-                                            get(rowData, "meta.release_date") !==
-                                                albumListData[orderedAlbumsListData[idx - 1].id]
-                                                    .rowData.meta.release_date
+                                            ...(!newReleasesTableShowAllTracks &&
+                                            (idx === 0 ||
+                                                get(rowData, "meta.release_date") !==
+                                                    albumListData[orderedAlbumsListData[idx - 1].id]
+                                                        .rowData.meta.release_date)
                                                 ? [
                                                       {
                                                           releaseDate: get(
@@ -326,6 +325,7 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                                   ]
                                                 : []),
 
+                                            // Don't show albums for track mode
                                             ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
                                             ...(newReleasesTableShowAllTracks ||
                                             newReleasesTableOpenAlbums[albumRow.id]
