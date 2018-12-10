@@ -10,7 +10,6 @@ import Stars from "@material-ui/icons/Stars";
 import PersonIcon from "@material-ui/icons/Person";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import CalendarTodayIcon from "@material-ui/icons/CalendarToday";
 import IconButton from "@material-ui/core/IconButton";
 import { AutoSizer } from "react-virtualized";
 import {
@@ -24,7 +23,7 @@ import {
     getNewReleasesStart,
     toggleSort
 } from "../../redux/actions";
-import { get, size, join, first, map, find, includes } from "lodash";
+import { get, size, join, first, map, find, includes, noop } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import ItemTagList from "./ItemTagList";
@@ -41,6 +40,7 @@ import _Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { FixedSizeList } from "react-window";
+import Date from "./Date";
 
 const Button = materialStyled(_Button)({
     minWidth: 30
@@ -86,20 +86,16 @@ const Columns = styled.div`
     align-items: center;
 `;
 
-const ReleaseDateCell = styled.div`
-    flex: 1 1 70px;
-`;
-
 const PopularityCell = styled.div`
     flex: 1 1 35px;
 `;
 
 const InfoColumn = styled(AlbumImageCellRenderer)`
-    flex: 1 1 160px;
+    flex: 10 1 160px;
 `;
 
 const PlainInfoColumn = styled.div`
-    flex: 1 1 160px;
+    flex: 10 1 160px;
 `;
 
 const TableWrapper = styled.div`
@@ -127,10 +123,15 @@ const _RowRenderer = connect(
         getItem = () => get(this.props.data, `rows.${this.props.index}`) || {};
 
         handleClick = () => {
-            const { isTrack, id } = this.getItem();
-            return !isTrack
+            const {
+                meta: { cellType },
+                id
+            } = this.getItem();
+            return cellType === "album"
                 ? this.props.toggleNewReleaseAlbum(id)
-                : this.props.toggleNewReleaseSong(id);
+                : cellType === "track"
+                    ? this.props.toggleNewReleaseSong(id)
+                    : noop;
         };
 
         rowStyle = () => {
@@ -153,20 +154,12 @@ const _RowRenderer = connect(
 
         render() {
             const { className, data, index } = this.props;
-            const {
-                albumPopularity,
-                artistPopularity,
-                releaseDate,
-                meta: { genres } = {}
-            } = this.getItem();
+            const { albumPopularity, artistPopularity, meta: { genres } = {} } = this.getItem();
 
             return (
                 <div onClick={this.handleClick} className={className} style={this.rowStyle()}>
                     <Columns>
                         <InfoColumn data={data} index={index} />
-                        <ReleaseDateCell>
-                            <Typography variant="caption">{releaseDate}</Typography>
-                        </ReleaseDateCell>
                         <PopularityCell>
                             <Typography variant="caption">{albumPopularity}</Typography>
                         </PopularityCell>
@@ -207,9 +200,6 @@ const SortColumn = connect(
     );
 });
 
-const ReleaseDateColumn = styled(SortColumn)`
-    flex: 1 1 70px;
-`;
 const PopularityColumn = styled(SortColumn)`
     flex: 1 1 35px;
 `;
@@ -237,6 +227,30 @@ class NewReleasesAlbumsTable extends Component {
         }
     };
 
+    handleItemsRendered = ({ visibleStartIndex }) =>
+        this.setState({
+            currentDate: get(
+                find(
+                    this.props.tableData.rows,
+                    ({ meta: { cellType } }) => cellType === "album",
+                    visibleStartIndex
+                ),
+                "releaseDate"
+            )
+        });
+
+    state = {
+        currentDate: null
+    };
+
+    /*
+    getItemSize = index =>
+        // TODO: Fix bug where dropdown doeesn't work properly
+        get(this.props.tableData.rows[index], "meta.cellType") === "date" ? 80 : 80;
+        */
+
+    getItemSize = 80;
+
     render() {
         const {
             openNewReleaseModal,
@@ -245,6 +259,7 @@ class NewReleasesAlbumsTable extends Component {
             genreColors,
             queryParamsTags
         } = this.props;
+
         const active = map(
             queryParamsTags,
             tagGenre =>
@@ -287,9 +302,6 @@ class NewReleasesAlbumsTable extends Component {
                                     <SearchBar />
                                 </SearchColumn>
                             </PlainInfoColumn>
-                            <ReleaseDateColumn name="releaseDate">
-                                <CalendarTodayIcon fontSize="small" color="action" />
-                            </ReleaseDateColumn>
                             <PopularityColumn name="albumPopularity">
                                 <Stars fontSize="small" color="action" />
                             </PopularityColumn>
@@ -297,14 +309,16 @@ class NewReleasesAlbumsTable extends Component {
                                 <PersonIcon fontSize="small" color="action" />
                             </PopularityColumn>
                         </Columns>
+                        <Date date={this.state.currentDate} />
                         <TableWrapper>
                             <AutoSizer>
                                 {({ height, width }) => (
                                     <FixedSizeList
+                                        onItemsRendered={this.handleItemsRendered}
+                                        itemSize={this.getItemSize}
                                         itemData={tableData}
                                         height={height}
                                         itemCount={size(tableData.rows)}
-                                        itemSize={80}
                                         width={width}
                                     >
                                         {RowRenderer}

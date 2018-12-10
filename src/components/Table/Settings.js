@@ -124,8 +124,9 @@ export default compose(
                     ? map(rows, "uri")
                     : // HACK - Check if there are albums first, else show songs
                       thru(
-                          flatMap(filter(rows, ({ isTrack }) => !isTrack), ({ id }) =>
-                              map(get(albums, `${id}.tracks.items`), "uri")
+                          flatMap(
+                              filter(rows, ({ meta: { cellType } }) => cellType === "album"),
+                              ({ id }) => map(get(albums, `${id}.tracks.items`), "uri")
                           ),
                           albumIds => (size(albumIds) ? albumIds : map(rows, "uri"))
                       ),

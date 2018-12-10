@@ -3,6 +3,14 @@ import { thru } from "lodash";
 import lzString from "lz-string";
 import { memoize } from "lodash";
 
+export function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    });
+}
+
 export function getAccessTokenFromUrl(win) {
     const hash = win.location.hash || "";
     return qs.parse(hash.substr(hash.indexOf("access_token"))).access_token;

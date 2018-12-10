@@ -7,6 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
 import AddToLibrary from "./AddToLibrary";
 
+import Date from "./Date";
 import materialStyled from "../../materialStyled";
 import PlayButtonProvider from "../core/PlayButtonProvider";
 
@@ -92,13 +93,13 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
         image,
         artist,
         track,
+        releaseDate,
         album,
-        isTrack,
-        meta: { parents },
+        meta: { parents, cellType },
         id
     } = get(data, `rows.${index}`) || {};
 
-    return isTrack ? (
+    return cellType === "track" ? (
         <TrackBlurbCellRendererWrapper className={className}>
             {map(parents, (parent, idx) => (
                 <ChevronRightIcon
@@ -111,28 +112,34 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
             <NewReleasesTrackPlayButton uri={uri} />
             <Description>
                 <TitleWithAdd>
-                    <Typography noWrap={true}>{track}</Typography>
+                    <Typography noWrap={true} variant="body2">
+                        {track}
+                    </Typography>
                     <AddToLibrary id={id} fontSize="small" color="action" />
                 </TitleWithAdd>
-                <Typography noWrap={true} variant="caption">
+                <Typography noWrap={true} variant="body1">
                     {artist}
                 </Typography>
             </Description>
         </TrackBlurbCellRendererWrapper>
-    ) : (
+    ) : cellType === "album" ? (
         <AlbumImageCellRendererWrapper className={className}>
             <AlbumWrapper>
                 <NewReleasesAlbumPlayButton context_uri={uri} />
                 <AlbumImage alt="test" src={image} />
             </AlbumWrapper>
             <Description>
-                <Typography noWrap={true}>{album}</Typography>
-                <AlbumTitle noWrap={true} variant="caption">
+                <Typography noWrap={true} variant="body2">
+                    {album}
+                </Typography>
+                <AlbumTitle noWrap={true} variant="body1">
                     {artist}
                 </AlbumTitle>
             </Description>
         </AlbumImageCellRendererWrapper>
-    );
+    ) : cellType === "date" ? (
+        <Date date={releaseDate} />
+    ) : null;
 };
 
 export default AlbumImageCellRenderer;

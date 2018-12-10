@@ -35,22 +35,10 @@ export default [
         getter: "track.name"
     },
     {
-        label: <CalendarTodayIcon fontSize="small" />,
+        label: "Release Date",
         dataKey: "releaseDate",
-        formatter: row => {
-            const releaseDate = get(row, "meta.release_date");
-
-            if (!releaseDate) {
-                return "";
-            }
-
-            const date = new Date(releaseDate);
-            const year = date.getFullYear();
-            const month = ("0" + (date.getMonth() + 1)).slice(-2);
-            const day = ("0" + date.getDate()).slice(-2);
-            return `${year}-${month}-${day}`;
-        },
-        width: 70
+        hidden: true,
+        getter: "meta.release_date"
     },
     {
         label: "Artist",
@@ -81,12 +69,6 @@ export default [
         label: "Type",
         dataKey: "type",
         getter: "album.album_type",
-        hidden: true
-    },
-    {
-        label: "noop",
-        dataKey: "isTrack",
-        formatter: row => !!get(row, "track"),
         hidden: true
     }
 ];

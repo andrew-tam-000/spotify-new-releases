@@ -1,4 +1,5 @@
 import {
+    slice,
     values,
     keyBy,
     uniq,
@@ -39,7 +40,7 @@ import {
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
 
 const rowHasTags = ({ row, tags }) =>
-    size(tags)
+    size(tags) && get(row, "meta.cellType") !== "date"
         ? // Check that the size is right
           // Check that the order is right
           size(intersection(get(row, "meta.genres"), tags)) === size(tags) &&
@@ -54,11 +55,25 @@ const rowHasSearch = ({ row, search }) =>
 
 // Preserve the order of the filters
 const tableDataFilter = ({ search, tags, rows }) =>
-    // tags
-    filter(
-        // Search bar
-        filter(rows, row => rowHasSearch({ row, search })),
-        row => rowHasTags({ row, tags })
+    // Pop off the first item, since its a date cell we don't care about
+    slice(
+        // Filter again to remove dates that don't have songs in them
+        filter(
+            // tags
+            filter(
+                // Search bar
+                filter(rows, row => rowHasSearch({ row, search })),
+                row => rowHasTags({ row, tags })
+            ),
+            (row, idx, list) =>
+                !(
+                    (get(row, "meta.cellType") === "date" &&
+                        list[idx + 1] &&
+                        get(list[idx + 1], "meta.cellType") === "date") ||
+                    !list[idx + 1]
+                )
+        ),
+        1
     );
 
 const formatRow = ({ rowData, genreColorsMap, showColors }) =>
@@ -70,6 +85,8 @@ const formatRow = ({ rowData, genreColorsMap, showColors }) =>
         }),
         {
             meta: {
+                // Check what kind of cell to render
+                cellType: rowData.track ? "track" : "album",
                 // Here to keep track of parents
                 parents: rowData.parents,
                 // Here for searchability
@@ -256,52 +273,83 @@ const newReleasesByAlbumTableDataSelector = createSelector(
         createFlatRecursiveSongRows
     ) =>
         thru(
-            reduce(
-                newReleases,
-                (acc, item) =>
-                    thru(
-                        createHydratedRowFromParams({
-                            type: "newRelease",
-                            item
-                        }),
-                        hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
-                    ),
-                {}
-            ),
-            albumListData =>
+            {
+                sortBy: ["releaseDate", ...sortBy],
+                sortDirection: {
+                    ...sortDirection,
+                    releaseDate: "desc"
+                }
+            },
+            ({ sortBy, sortDirection }) =>
                 thru(
-                    orderBy(
-                        map(values(albumListData), ({ tableRow }) => tableRow),
-                        sortBy,
-                        map(sortBy, sort => toLower(sortDirection[sort]))
-                    ),
-                    orderedAlbumsListData =>
-                        thru(
-                            flatMap(orderedAlbumsListData, albumRow =>
-                                thru(albumListData[albumRow.id].rowData, rowData => [
-                                    ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
-                                    ...(newReleasesTableShowAllTracks ||
-                                    newReleasesTableOpenAlbums[albumRow.id]
-                                        ? createFlatRecursiveSongRows({
-                                              list: map(
-                                                  get(albums[albumRow.id], "tracks.items"),
-                                                  ({ id }) => songs[id]
-                                              ),
-                                              parents: [albumRow.id]
-                                          })
-                                        : [])
-                                ])
+                    reduce(
+                        newReleases,
+                        (acc, item) =>
+                            thru(
+                                createHydratedRowFromParams({
+                                    type: "newRelease",
+                                    item
+                                }),
+                                hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
                             ),
-                            rows => ({
-                                rows: newReleasesTableShowAllTracks
-                                    ? orderBy(
-                                          rows,
-                                          sortBy,
-                                          map(sortBy, sort => toLower(sortDirection[sort]))
-                                      )
-                                    : rows,
-                                config: newReleasesByAlbumConfig
-                            })
+                        {}
+                    ),
+                    albumListData =>
+                        thru(
+                            orderBy(
+                                map(values(albumListData), ({ tableRow }) => tableRow),
+                                sortBy,
+                                map(sortBy, sort => toLower(sortDirection[sort]))
+                            ),
+                            orderedAlbumsListData =>
+                                thru(
+                                    flatMap(orderedAlbumsListData, (albumRow, idx) =>
+                                        thru(albumListData[albumRow.id].rowData, rowData => [
+                                            // Ignore first date change
+                                            // But look for subsequent date changes
+                                            // and insert row
+                                            ...(idx === 0 ||
+                                            get(rowData, "meta.release_date") !==
+                                                albumListData[orderedAlbumsListData[idx - 1].id]
+                                                    .rowData.meta.release_date
+                                                ? [
+                                                      {
+                                                          releaseDate: get(
+                                                              rowData,
+                                                              "meta.release_date"
+                                                          ),
+                                                          meta: {
+                                                              cellType: "date",
+                                                              parents: []
+                                                          }
+                                                      }
+                                                  ]
+                                                : []),
+
+                                            ...(newReleasesTableShowAllTracks ? [] : [albumRow]),
+                                            ...(newReleasesTableShowAllTracks ||
+                                            newReleasesTableOpenAlbums[albumRow.id]
+                                                ? createFlatRecursiveSongRows({
+                                                      list: map(
+                                                          get(albums[albumRow.id], "tracks.items"),
+                                                          ({ id }) => songs[id]
+                                                      ),
+                                                      parents: [albumRow.id]
+                                                  })
+                                                : [])
+                                        ])
+                                    ),
+                                    rows => ({
+                                        rows: newReleasesTableShowAllTracks
+                                            ? orderBy(
+                                                  rows,
+                                                  sortBy,
+                                                  map(sortBy, sort => toLower(sortDirection[sort]))
+                                              )
+                                            : rows,
+                                        config: newReleasesByAlbumConfig
+                                    })
+                                )
                         )
                 )
         )

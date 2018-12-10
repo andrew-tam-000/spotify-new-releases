@@ -56,7 +56,7 @@ const ItemTagList = ({ className, genres }) => (
                                 genre={genre}
                                 color={active ? color || "transparent" : undefined}
                             >
-                                <Typography variant="caption">{genre}</Typography>
+                                <Typography>{genre}</Typography>
                             </TagWithOpenModal>
                         )}
                     </TagProvider>
