@@ -23,7 +23,7 @@ import {
     getNewReleasesStart,
     toggleSort
 } from "../../redux/actions";
-import { get, size, join, first, map, findLast, find, includes, noop } from "lodash";
+import { slice, get, size, join, first, map, findLast, find, includes, noop } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import ItemTagList from "./ItemTagList";
@@ -233,7 +233,7 @@ class NewReleasesAlbumsTable extends Component {
                 findLast(
                     this.props.tableData.rows,
                     ({ meta: { cellType } }) => cellType === "date",
-                    visibleStartIndex
+                    visibleStartIndex + 1
                 ),
                 "releaseDate"
             )
@@ -316,9 +316,12 @@ class NewReleasesAlbumsTable extends Component {
                                     <FixedSizeList
                                         onItemsRendered={this.handleItemsRendered}
                                         itemSize={this.getItemSize}
-                                        itemData={tableData}
+                                        itemData={{
+                                            ...tableData,
+                                            rows: slice(tableData.rows, 1)
+                                        }}
                                         height={height}
-                                        itemCount={size(tableData.rows)}
+                                        itemCount={size(slice(tableData.rows, 1))}
                                         width={width}
                                     >
                                         {RowRenderer}

@@ -10,7 +10,7 @@ import Scrollbar from "react-smooth-scrollbar";
 
 const Tag = styled.span`
     background-color: ${props => props.color};
-    padding: 5px;
+    padding: 2px 4px;
     border: 1px solid rgba(255, 255, 255, 0.6);
     margin-right: 2px;
     cursor: pointer;
