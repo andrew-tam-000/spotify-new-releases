@@ -919,3 +919,17 @@ export function toggleSort(sortColumn) {
         payload: sortColumn
     };
 }
+
+export function getPlaylistStart(playlistId) {
+    return {
+        type: "spotify|GET_PLAYLIST_START",
+        payload: playlistId
+    };
+}
+
+export function getPlaylistSuccess(playlist) {
+    return {
+        type: "spotify|GET_PLAYLIST_SUCCESS",
+        payload: playlist
+    };
+}

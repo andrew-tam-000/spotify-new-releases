@@ -14,6 +14,7 @@ import StartTreeButton from "./Discover/StartTreeButton";
 import { connect } from "react-redux";
 import { setSearchText, addTracksToPlaylistStart } from "../redux/actions";
 import {
+    searchPlaylistsSelector,
     searchTracksSelector,
     searchAlbumsSelector,
     searchArtistsSelector,
@@ -54,6 +55,7 @@ class Search extends Component {
 
     render() {
         const {
+            searchPlaylists,
             searchTracks,
             searchArtists,
             searchAlbums,
@@ -66,10 +68,11 @@ class Search extends Component {
         return (
             <StyledSearch {...props}>
                 <SearchTextField value={searchText} onChange={e => setSearchText(e.target.value)} />
-                <Tabs value={this.state.active} onChange={this.handleChange}>
+                <Tabs textColor="active" value={this.state.active} onChange={this.handleChange}>
                     <Tab label="Tracks" />
                     <Tab label="Artists" />
                     <Tab label="Albums" />
+                    <Tab label="Playlists" />
                 </Tabs>
                 <SearchResultsList>
                     {this.state.active === 0 &&
@@ -102,6 +105,16 @@ class Search extends Component {
                                 />
                             </ListItem>
                         ))}
+                    {this.state.active === 3 &&
+                        map(searchPlaylists, playlist => (
+                            <ListItem key={playlist.id} button>
+                                <PlayButton context_uri={playlist.uri} />
+                                <ListItemText
+                                    primary={playlist.name}
+                                    secondary={playlist.owner.display_name}
+                                />
+                            </ListItem>
+                        ))}
                 </SearchResultsList>
             </StyledSearch>
         );
@@ -110,6 +123,7 @@ class Search extends Component {
 
 export default connect(
     createStructuredSelector({
+        searchPlaylists: searchPlaylistsSelector,
         searchTracks: searchTracksSelector,
         searchAlbums: searchAlbumsSelector,
         searchArtists: searchArtistsSelector,

@@ -7,11 +7,7 @@ import styled from "styled-components";
 import _AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
 import Toolbar from "@material-ui/core/Toolbar";
-import Spotify from "./Spotify";
 import Analyzer from "./Analyzer";
-import App from "./App";
-import SongDetails from "./SongDetails";
-import Discover from "./Discover";
 import Sidebar from "./Sidebar";
 import AlbumList from "./NewReleases/AlbumList";
 import NowPlaying from "./NowPlaying";
@@ -87,7 +83,7 @@ class RouteProvider extends Component {
             history.push({ pathname: "/now-playing", search: history.location.search });
         }
         if (val === 3) {
-            this.props.searchOpenPanel();
+            history.push({ pathname: "/search", search: history.location.search });
         }
         /*
         if (val === 3) {
@@ -125,14 +121,12 @@ class RouteProvider extends Component {
                                     path="/new-releases"
                                     component={NewReleasesAlbumsTable}
                                 />
+                                <Route exact path="/search" component={Search} />
                                 <Route exact path="/analyzer" component={Analyzer} />
                                 <Route exact path="/now-playing" component={NowPlaying} />
                                 <Route exact path="/" component={NewReleasesAlbumsTable} />
                             </Switch>
                         </Scrollable>
-                        <Drawer anchor="right" open={searchPanel} onClose={searchClosePanel}>
-                            <Search />
-                        </Drawer>
                         <Sidebar>
                             <AlbumList />
                         </Sidebar>
@@ -145,6 +139,7 @@ class RouteProvider extends Component {
                         <BottomNavigationAction label="Library" icon={<LibraryMusicIcon />} />
                         <BottomNavigationAction label="New Releases" icon={<NewReleasesIcon />} />
                         <BottomNavigationAction label="Now Playing" icon={<PlayArrowIcon />} />
+                        <BottomNavigationAction label="Search" icon={<SearchIcon />} />
                     </BottomNavigation>
                 </AppWrapper>
             </Router>

@@ -44,6 +44,11 @@ export const firebaseUserIdSelector = createSelector(
     userId => userId
 );
 
+export const searchPlaylistsSelector = createSelector(
+    state => get(state, "app.search.playlists.items") || [],
+    tracks => tracks
+);
+
 export const searchTracksSelector = createSelector(
     state => get(state, "app.search.tracks.items") || [],
     tracks => tracks

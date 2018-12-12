@@ -18,7 +18,9 @@ import {
     compact,
     orderBy,
     values,
-    range
+    range,
+    split,
+    nth
 } from "lodash";
 import { merge } from "rxjs/observable/merge";
 import { EMPTY, concat, if as if$, from, timer, of, interval, forkJoin } from "rxjs";
@@ -91,7 +93,9 @@ import {
     addToMySavedTracksStart,
     addToMySavedTracksSuccess,
     getRelatedTracksStart,
-    getRelatedTracksSuccess
+    getRelatedTracksSuccess,
+    getPlaylistStart,
+    getPlaylistSuccess
 } from "../redux/actions";
 import { apiObservable, basicSpotifyApiWrapper } from "./helpers";
 import { getKeyFromLocalStorage } from "../utils";
@@ -236,10 +240,24 @@ const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
         debounce(() => timer(400)),
         switchMap(
             ({ payload: searchText }) =>
-                searchText
-                    ? from(
+            !searchText ?  EMPTY : thru(
+                split(searchText, ':'),
+                query  => nth(query, -2) ===  'playlist'  ? concat(
+                    of(getPlaylistStart(nth(query, -1))),
+                      action$.pipe(
+                          ofType(getPlaylistSuccess().type),
+                          take(1),
+                          mergeMap(({payload})=> of(setSearchResults(({playlists: {items: [payload]}}))))
+                      )
+
+                ) : from(
                           basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
-                              basicSpotifyApi.search(searchText, ["artist", "track", "album"])
+                              basicSpotifyApi.search(searchText, [
+                                  "artist",
+                                  "track",
+                                  "album",
+                                  "playlist"
+                              ])
                           )
                       ).pipe(
                           mergeMap(resp =>
@@ -261,7 +279,7 @@ const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
                           catchError(e => of({ type: "error", payload: e }))
                       )
                     : EMPTY
-        )
+        ))
     );
 
 const pauseSong = (action$, state$, { firebaseApp, spotifyApi }) =>
@@ -601,6 +619,18 @@ const getRelatedTracks = (action$, state$, { spotifyApi }) =>
         )
     );
 
+const getPlaylist = (action$, state$, { basicSpotifyApi }) =>
+    action$.pipe(
+        ofType(getPlaylistStart().type),
+        mergeMap(({ payload }) =>
+            from(
+                basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
+                    basicSpotifyApi.getPlaylist(payload)
+                )
+            ).pipe(mergeMap(playlistData => of(getPlaylistSuccess(playlistData))))
+        )
+    );
+
 export default (...args) =>
     merge(
         getArtistTopTracks(...args),
@@ -622,5 +652,6 @@ export default (...args) =>
         getDevices(...args),
         transferPlayback(...args),
         addToMySavedTracks(...args),
-        getRelatedTracks(...args)
+        getRelatedTracks(...args),
+        getPlaylist(...args)
     ).pipe(catchError(e => console.error(e)));
