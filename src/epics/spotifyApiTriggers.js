@@ -240,46 +240,56 @@ const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
         debounce(() => timer(400)),
         switchMap(
             ({ payload: searchText }) =>
-            !searchText ?  EMPTY : thru(
-                split(searchText, ':'),
-                query  => nth(query, -2) ===  'playlist'  ? concat(
-                    of(getPlaylistStart(nth(query, -1))),
-                      action$.pipe(
-                          ofType(getPlaylistSuccess().type),
-                          take(1),
-                          mergeMap(({payload})=> of(setSearchResults(({playlists: {items: [payload]}}))))
+                !searchText
+                    ? EMPTY
+                    : thru(
+                          split(searchText, ":"),
+                          query =>
+                              nth(query, -2) === "playlist"
+                                  ? concat(
+                                        of(getPlaylistStart(nth(query, -1))),
+                                        action$.pipe(
+                                            ofType(getPlaylistSuccess().type),
+                                            take(1),
+                                            mergeMap(({ payload }) =>
+                                                of(
+                                                    setSearchResults({
+                                                        playlists: { items: [payload] }
+                                                    })
+                                                )
+                                            )
+                                        )
+                                    )
+                                  : from(
+                                        basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
+                                            basicSpotifyApi.search(searchText, [
+                                                "artist",
+                                                "track",
+                                                "album",
+                                                "playlist"
+                                            ])
+                                        )
+                                    ).pipe(
+                                        mergeMap(resp =>
+                                            concat(
+                                                of(
+                                                    getArtistsStart(
+                                                        flatMap(resp.tracks.items, track =>
+                                                            map(track.artists, artist => artist.id)
+                                                        )
+                                                    )
+                                                ),
+                                                action$.pipe(
+                                                    ofType(getArtistsSuccess().type),
+                                                    take(1),
+                                                    mapTo(setSearchResults(resp))
+                                                )
+                                            )
+                                        ),
+                                        catchError(e => of({ type: "error", payload: e }))
+                                    )
                       )
-
-                ) : from(
-                          basicSpotifyApiWrapper(basicSpotifyApi, basicSpotifyApi =>
-                              basicSpotifyApi.search(searchText, [
-                                  "artist",
-                                  "track",
-                                  "album",
-                                  "playlist"
-                              ])
-                          )
-                      ).pipe(
-                          mergeMap(resp =>
-                              concat(
-                                  of(
-                                      getArtistsStart(
-                                          flatMap(resp.tracks.items, track =>
-                                              map(track.artists, artist => artist.id)
-                                          )
-                                      )
-                                  ),
-                                  action$.pipe(
-                                      ofType(getArtistsSuccess().type),
-                                      take(1),
-                                      mapTo(setSearchResults(resp))
-                                  )
-                              )
-                          ),
-                          catchError(e => of({ type: "error", payload: e }))
-                      )
-                    : EMPTY
-        ))
+        )
     );
 
 const pauseSong = (action$, state$, { firebaseApp, spotifyApi }) =>
