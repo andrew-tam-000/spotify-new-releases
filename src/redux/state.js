@@ -50,8 +50,9 @@ export default {
         ],
         spotify: {
             albums: {},
+            playlists: {},
             nowPlaying: {},
-            artistData: [],
+            artistData: {},
             newReleases: [],
             artistTopTracks: {},
             relatedArtists: {},

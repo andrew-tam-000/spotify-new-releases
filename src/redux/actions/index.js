@@ -547,18 +547,6 @@ export function setSearchText(text) {
     };
 }
 
-export function searchOpenPanel() {
-    return {
-        type: "search|OPEN_PANEL"
-    };
-}
-
-export function searchClosePanel() {
-    return {
-        type: "search|CLOSE_PANEL"
-    };
-}
-
 ////////////////////////////////////////////////////
 //
 //

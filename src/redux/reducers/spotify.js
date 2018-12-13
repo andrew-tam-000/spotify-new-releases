@@ -7,12 +7,13 @@ import {
     getRelatedArtistsSuccess,
     getArtistTopTracksSuccess,
     getRecommendationsSuccess,
-    setSearchResults,
     getTracksSuccess,
     getNewReleasesSuccess,
     getAlbumsSuccess,
     getDevicesSuccess,
-    getRelatedTracksSuccess
+    getRelatedTracksSuccess,
+    setSearchResults,
+    setSearchText
 } from "../actions/";
 import { uniq, reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
 
@@ -39,16 +40,10 @@ export default (state = {}, { type, payload = {} }) => {
         case setSearchResults().type:
             return {
                 ...state,
-                songs: reduce(
-                    get(payload, "tracks.items"),
-                    (acc, track) => (acc[track.id] ? acc : set(acc, track.id, track)),
-                    state.songs
-                ),
-                artistData: reduce(
-                    get(payload, "artists.items"),
-                    (acc, artist) => (acc[artist.id] ? acc : set(acc, artist.id, artist)),
-                    state.artistData
-                )
+                songs: mergeNewItems(state.songs, get(payload, "tracks.items"), "id"),
+                artistData: mergeNewItems(state.artistData, get(payload, "artists.items"), "id"),
+                playlists: mergeNewItems(state.playlists, get(payload, "playlists.items"), "id"),
+                search: payload
             };
         case getCurrentlyPlayingTrackSuccess().type:
             return {
@@ -149,6 +144,11 @@ export default (state = {}, { type, payload = {} }) => {
                         ...map(payload.tracks, "id")
                     ])
                 }
+            };
+        case setSearchText().type:
+            return {
+                ...state,
+                text: payload
             };
         default:
             return state;

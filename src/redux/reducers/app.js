@@ -53,32 +53,6 @@ const appReducer = combineReducers({
                 return state;
         }
     },
-    search: (state = {}, { type, payload }) => {
-        switch (type) {
-            case "search|OPEN_PANEL":
-                return {
-                    ...state,
-                    isOpen: true
-                };
-            case "search|CLOSE_PANEL":
-                return {
-                    ...state,
-                    isOpen: false
-                };
-            case "SET_SEARCH_RESULTS":
-                return {
-                    ...state,
-                    ...payload
-                };
-            case "SET_SEARCH_TEXT":
-                return {
-                    ...state,
-                    text: payload
-                };
-            default:
-                return state;
-        }
-    },
     spotify,
     playlist: (state = {}, { type, payload }) => {
         switch (type) {

@@ -24,12 +24,7 @@ import Search from "./Search";
 import NewReleases from "./NewReleases";
 import NewReleasesAlbumsTable from "./NewReleases/NewReleasesAlbumsTable";
 import _Drawer from "@material-ui/core/Drawer";
-import {
-    searchOpenPanel,
-    searchClosePanel,
-    analyzerOpenSearchPanel,
-    initializeAppStart
-} from "../redux/actions";
+import { analyzerOpenSearchPanel, initializeAppStart } from "../redux/actions";
 import { searchPanelSelector } from "../selectors";
 import { createStructuredSelector } from "reselect";
 
@@ -100,7 +95,7 @@ class RouteProvider extends Component {
     }
 
     render() {
-        const { searchPanel, searchClosePanel } = this.props;
+        const { searchPanel } = this.props;
         //<SongDetails />
         return (
             <Router history={history}>
@@ -151,5 +146,5 @@ export default connect(
     createStructuredSelector({
         searchPanel: searchPanelSelector
     }),
-    { initializeAppStart, searchOpenPanel, searchClosePanel, analyzerOpenSearchPanel }
+    { initializeAppStart, analyzerOpenSearchPanel }
 )(RouteProvider);
