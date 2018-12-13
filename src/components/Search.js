@@ -20,11 +20,14 @@ import {
     searchArtistsSelector,
     searchTextSelector
 } from "../selectors";
+import { searchTableDataSelector } from "../selectors/tables";
 import { withStyles } from "@material-ui/core/styles";
 import PlayButton from "./Analyzer/PlayButton";
 import AddToAdvancedSearchButton from "./Analyzer/AddToAdvancedSearchButton";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+
+import TableWithTags from "./Table/TableWithTags";
 
 const StyledSearch = styled.div`
     display: flex;
@@ -40,11 +43,9 @@ const SearchTextField = withStyles({
     }
 })(TextField);
 
-const SearchResultsList = withStyles({
-    root: {
-        overflow: "auto"
-    }
-})(List);
+const SearchResultsList = styled.div`
+    flex: 1;
+`;
 
 class Search extends Component {
     state = {
@@ -55,15 +56,21 @@ class Search extends Component {
 
     render() {
         const {
-            searchPlaylists,
-            searchTracks,
-            searchArtists,
-            searchAlbums,
             searchText,
             setSearchText,
             addTracksToPlaylistStart,
+            searchTableData,
             ...props
         } = this.props;
+        const { searchPlaylists, searchTracks, searchArtists, searchAlbums } = searchTableData;
+        const tableData =
+            this.state.active === 0
+                ? searchTracks
+                : this.state.active === 1
+                    ? searchArtists
+                    : this.state.active === 2
+                        ? searchAlbums
+                        : searchPlaylists;
 
         return (
             <StyledSearch {...props}>
@@ -75,46 +82,7 @@ class Search extends Component {
                     <Tab label="Playlists" />
                 </Tabs>
                 <SearchResultsList>
-                    {this.state.active === 0 &&
-                        map(searchTracks, track => (
-                            <ListItem key={track.id} button>
-                                <PlayButton uri={track.uri} />
-                                <StartTreeButton uri={track.uri} />
-                                <AddToAdvancedSearchButton id={track.id} />
-                                <ListItemText
-                                    primary={track.name}
-                                    secondary={track.artists.map(artist => artist.name).join(", ")}
-                                />
-                            </ListItem>
-                        ))}
-                    {this.state.active === 1 &&
-                        map(searchArtists, artist => (
-                            <ListItem key={artist.id} button>
-                                <PlayButton context_uri={artist.uri} />
-                                <StartTreeButton uri={artist.uri} />
-                                <ListItemText primary={artist.name} />
-                            </ListItem>
-                        ))}
-                    {this.state.active === 2 &&
-                        map(searchAlbums, track => (
-                            <ListItem key={track.id} button>
-                                <PlayButton context_uri={track.uri} />
-                                <ListItemText
-                                    primary={track.name}
-                                    secondary={track.artists.map(artist => artist.name).join(", ")}
-                                />
-                            </ListItem>
-                        ))}
-                    {this.state.active === 3 &&
-                        map(searchPlaylists, playlist => (
-                            <ListItem key={playlist.id} button>
-                                <PlayButton context_uri={playlist.uri} />
-                                <ListItemText
-                                    primary={playlist.name}
-                                    secondary={playlist.owner.display_name}
-                                />
-                            </ListItem>
-                        ))}
+                    <TableWithTags tableData={tableData} />
                 </SearchResultsList>
             </StyledSearch>
         );
@@ -127,7 +95,8 @@ export default connect(
         searchTracks: searchTracksSelector,
         searchAlbums: searchAlbumsSelector,
         searchArtists: searchArtistsSelector,
-        searchText: searchTextSelector
+        searchText: searchTextSelector,
+        searchTableData: searchTableDataSelector
     }),
     { setSearchText, addTracksToPlaylistStart }
 )(Search);

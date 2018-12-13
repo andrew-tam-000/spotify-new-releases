@@ -1,6 +1,5 @@
 import {
     values,
-    keyBy,
     uniq,
     set,
     orderBy,
@@ -33,7 +32,11 @@ import {
     queryParamsSearchSelector,
     newReleasesTableOpenAlbumsSelector,
     newReleasesTableOpenSongsSelector,
-    relatedTracksForIdSelector
+    relatedTracksForIdSelector,
+    searchPlaylistsSelector,
+    searchTracksSelector,
+    searchAlbumsSelector,
+    searchArtistsSelector
 } from "./";
 
 import newReleasesByAlbumConfig from "../tableConfigs/newReleasesByAlbum";
@@ -127,21 +130,30 @@ const createHydratedRowFromParamsSelector = createSelector(
                                   release_date: item.release_date
                               }
                           }
-                        : type === "album"
+                        : type === "artist"
                             ? {
                                   ...defaultFormatter,
-                                  album: item
+                                  artists: [item]
                               }
-                            : type === "track"
+                            : type === "playlist"
                                 ? {
-                                      ...defaultFormatter,
-                                      album: albums[get(item, "album.id")],
-                                      track: item,
-                                      meta: {
-                                          release_date: get(item, "album.release_date")
-                                      }
+                                      ...defaultFormatter
                                   }
-                                : {},
+                                : type === "album"
+                                    ? {
+                                          ...defaultFormatter,
+                                          album: item
+                                      }
+                                    : type === "track"
+                                        ? {
+                                              ...defaultFormatter,
+                                              album: albums[get(item, "album.id")],
+                                              track: item,
+                                              meta: {
+                                                  release_date: get(item, "album.release_date")
+                                              }
+                                          }
+                                        : {},
                     rowData => ({
                         item,
                         rowData,
@@ -154,6 +166,20 @@ const createHydratedRowFromParamsSelector = createSelector(
                 )
         )
 );
+
+const createHydratedList = ({ list, createHydratedRowFromParams, itemResolver, type }) =>
+    reduce(
+        list,
+        (acc, item) =>
+            thru(
+                createHydratedRowFromParams({
+                    type,
+                    item: itemResolver ? itemResolver(item) : item
+                }),
+                hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
+            ),
+        {}
+    );
 
 const createFlatRecursiveSongRowsSelector = createSelector(
     newReleasesTableOpenSongsSelector,
@@ -205,18 +231,12 @@ export const myLibraryDataSelector = createSelector(
         createFlatRecursiveSongRows
     ) =>
         thru(
-            reduce(
-                librarySongs,
-                (acc, item) =>
-                    thru(
-                        createHydratedRowFromParams({
-                            type: "track",
-                            item: set(item.track, "album.release_date", item.added_at)
-                        }),
-                        hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
-                    ),
-                {}
-            ),
+            createHydratedList({
+                list: librarySongs,
+                createHydratedRowFromParams,
+                itemResolver: item => set(item.track, "album.release_date", item.added_at),
+                type: "track"
+            }),
             librarySongs =>
                 thru(
                     orderBy(
@@ -280,18 +300,11 @@ const newReleasesByAlbumTableDataSelector = createSelector(
             },
             ({ sortBy, sortDirection }) =>
                 thru(
-                    reduce(
-                        newReleases,
-                        (acc, item) =>
-                            thru(
-                                createHydratedRowFromParams({
-                                    type: "newRelease",
-                                    item
-                                }),
-                                hydratedRow => set(acc, hydratedRow.rowData.id, hydratedRow)
-                            ),
-                        {}
-                    ),
+                    createHydratedList({
+                        list: newReleases,
+                        createHydratedRowFromParams,
+                        type: "newRelease"
+                    }),
                     albumListData =>
                         thru(
                             orderBy(
@@ -378,4 +391,59 @@ export const newReleasesByAlbumTableDataWithFiltersSelector = createSelector(
         ...newReleasesByAlbumTableData,
         rows: tableDataFilter({ tags, search, rows })
     })
+);
+
+export const searchTableDataSelector = createSelector(
+    createHydratedRowFromParamsSelector,
+    searchPlaylistsSelector,
+    searchTracksSelector,
+    searchAlbumsSelector,
+    searchArtistsSelector,
+    (createHydratedRowFromParams, searchPlaylists, searchTracks, searchAlbums, searchArtists) =>
+        thru(
+            [
+                {
+                    type: "searchTracks",
+                    data: createHydratedList({
+                        list: searchTracks,
+                        createHydratedRowFromParams,
+                        type: "track"
+                    })
+                },
+                {
+                    type: "searchAlbums",
+                    data: createHydratedList({
+                        list: searchAlbums,
+                        createHydratedRowFromParams,
+                        type: "album"
+                    })
+                },
+                {
+                    type: "searchArtists",
+                    data: createHydratedList({
+                        list: searchArtists,
+                        createHydratedRowFromParams,
+                        type: "artist"
+                    })
+                },
+                {
+                    type: "searchPlaylists",
+                    data: createHydratedList({
+                        list: searchPlaylists,
+                        createHydratedRowFromParams,
+                        type: "playlist"
+                    })
+                }
+            ],
+            hydratedData =>
+                reduce(
+                    hydratedData,
+                    (acc, { type, data }) =>
+                        set(acc, type, {
+                            rows: map(values(data), "tableRow"),
+                            config: newReleasesByAlbumConfig
+                        }),
+                    {}
+                )
+        )
 );

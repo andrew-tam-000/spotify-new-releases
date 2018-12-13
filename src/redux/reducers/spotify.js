@@ -41,6 +41,7 @@ export default (state = {}, { type, payload = {} }) => {
             return {
                 ...state,
                 songs: mergeNewItems(state.songs, get(payload, "tracks.items"), "id"),
+                albums: mergeNewItems(state.albums, get(payload, "albums.items"), "id"),
                 artistData: mergeNewItems(state.artistData, get(payload, "artists.items"), "id"),
                 playlists: mergeNewItems(state.playlists, get(payload, "playlists.items"), "id"),
                 search: payload
