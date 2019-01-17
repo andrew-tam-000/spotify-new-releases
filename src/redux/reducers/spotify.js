@@ -15,12 +15,18 @@ import {
     setSearchResults,
     setSearchText
 } from "../actions/";
-import { uniq, reduce, set, get, keyBy, compact, filter, first, map } from "lodash";
+import { uniq, get, keyBy, compact, filter, first, map } from "lodash";
 
-function mergeNewItems(obj, arr, idGetter) {
+function mergeNewItems({ obj, arr, idGetter, isSimplified }) {
     return {
         ...obj,
-        ...keyBy(filter(compact(arr), item => !obj[get(item, idGetter)]), idGetter)
+        ...keyBy(
+            map(arr, entity => ({
+                ...entity,
+                isSimplified
+            })),
+            idGetter
+        )
     };
 }
 
@@ -35,15 +41,37 @@ export default (state = {}, { type, payload = {} }) => {
         case getNewReleasesSuccess().type:
             return {
                 ...state,
-                newReleases: payload
+                newReleases: payload,
+                albums: mergeNewItems({
+                    obj: state.albums,
+                    arr: payload,
+                    idGetter: "id",
+                    isSimplified: true
+                })
             };
         case setSearchResults().type:
             return {
                 ...state,
-                songs: mergeNewItems(state.songs, get(payload, "tracks.items"), "id"),
-                albums: mergeNewItems(state.albums, get(payload, "albums.items"), "id"),
-                artistData: mergeNewItems(state.artistData, get(payload, "artists.items"), "id"),
-                playlists: mergeNewItems(state.playlists, get(payload, "playlists.items"), "id"),
+                songs: mergeNewItems({
+                    obj: state.songs,
+                    arr: get(payload, "tracks.items"),
+                    idGetter: "id"
+                }),
+                albums: mergeNewItems({
+                    obj: state.albums,
+                    arr: get(payload, "albums.items"),
+                    idGetter: "id"
+                }),
+                artistData: mergeNewItems({
+                    obj: state.artistData,
+                    arr: get(payload, "artists.items"),
+                    idGetter: "id"
+                }),
+                playlists: mergeNewItems({
+                    obj: state.playlists,
+                    arr: get(payload, "playlists.items"),
+                    idGetter: "id"
+                }),
                 search: payload
             };
         case getCurrentlyPlayingTrackSuccess().type:
@@ -54,15 +82,23 @@ export default (state = {}, { type, payload = {} }) => {
         case getTracksSuccess().type:
             return {
                 ...state,
-                songs: mergeNewItems(state.songs, payload, "id")
+                songs: mergeNewItems({ obj: state.songs, arr: payload, idGetter: "id" })
             };
 
         case getSongsSuccess().type:
             return {
                 ...state,
                 library: payload.songs,
-                artistData: mergeNewItems(state.artistData, payload.artists, "id"),
-                songs: mergeNewItems(state.songs, map(payload.songs, "track"), "id")
+                artistData: mergeNewItems({
+                    obj: state.artistData,
+                    arr: payload.artists,
+                    idGetter: "id"
+                }),
+                songs: mergeNewItems({
+                    obj: state.songs,
+                    arr: map(payload.songs, "track"),
+                    idGetter: "id"
+                })
             };
         case getSongDataSuccess().type:
             return {
@@ -128,7 +164,7 @@ export default (state = {}, { type, payload = {} }) => {
         case getAlbumsSuccess().type:
             return {
                 ...state,
-                albums: mergeNewItems(state.albums, payload, "id")
+                albums: mergeNewItems({ obj: state.albums, arr: payload, idGetter: "id" })
             };
         case getDevicesSuccess().type:
             return {

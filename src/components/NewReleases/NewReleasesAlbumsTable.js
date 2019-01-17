@@ -1,8 +1,13 @@
-import { compose } from "recompact";
+import { compose, withHandlers } from "recompact";
+import { get, flatMap, map, slice, compact, debounce } from "lodash";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
 import { newReleasesByAlbumTableDataWithFiltersSelector } from "../../selectors/tables";
-import { loadingNewReleasesTableSelector } from "../../selectors/";
+import {
+    loadingNewReleasesTableSelector,
+    artistDataSelector,
+    albumsSelector
+} from "../../selectors/";
 import {
     toggleNewReleaseAlbum,
     showSideBar,
@@ -12,7 +17,10 @@ import {
     toggleNewReleaseColors,
     openNewReleaseModal,
     reorderTags,
-    reorderQueryTags
+    reorderQueryTags,
+    getAlbumsStart,
+    getArtistsStart,
+    getTracksStart
 } from "../../redux/actions";
 import fetchNewReleases from "../../hoc/fetchNewReleases";
 
@@ -20,7 +28,9 @@ import TableWithTags from "../Table/TableWithTags";
 
 const mapStateToProps = createStructuredSelector({
     tableData: newReleasesByAlbumTableDataWithFiltersSelector,
-    loading: loadingNewReleasesTableSelector
+    loading: loadingNewReleasesTableSelector,
+    artistData: artistDataSelector,
+    albums: albumsSelector
 });
 
 export default compose(
@@ -28,6 +38,8 @@ export default compose(
     connect(
         mapStateToProps,
         {
+            getAlbumsStart,
+            getArtistsStart,
             showSideBar,
             addGenreColors,
             toggleNewReleaseAlbum,
@@ -36,7 +48,30 @@ export default compose(
             toggleNewReleaseColors,
             openNewReleaseModal,
             reorderTags,
-            reorderQueryTags
+            reorderQueryTags,
+            getTracksStart
         }
-    )
+    ),
+    withHandlers({
+        // Only handled for album view right now
+        onItemsRendered: ({
+            tableData,
+            getAlbumsStart,
+            getArtistsStart,
+            artistData,
+            albums,
+            getTracksStart
+        }) =>
+            debounce(({ overscanStartIndex, overscanStopIndex }) => {
+                getTracksStart(
+                    flatMap(
+                        // List of album ids
+                        compact(
+                            map(slice(tableData.rows, overscanStartIndex, overscanStopIndex), "id")
+                        ),
+                        id => map(get(albums, `${id}.tracks.items`), "id")
+                    )
+                );
+            }, 100)
+    })
 )(TableWithTags);

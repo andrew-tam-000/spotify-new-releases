@@ -227,7 +227,10 @@ class NewReleasesAlbumsTable extends Component {
         }
     };
 
-    handleItemsRendered = ({ visibleStartIndex }) =>
+    handleItemsRendered = params => {
+        const { visibleStartIndex } = params;
+        this.props.onItemsRendered && this.props.onItemsRendered(params);
+        // Set the date, and also try to fetch data
         this.setState({
             currentDate: get(
                 findLast(
@@ -238,6 +241,7 @@ class NewReleasesAlbumsTable extends Component {
                 "releaseDate"
             )
         });
+    };
 
     state = {
         currentDate: null

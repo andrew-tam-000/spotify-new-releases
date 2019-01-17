@@ -343,9 +343,14 @@ const newReleasesByAlbumTableDataSelector = createSelector(
                                             ...(newReleasesTableShowAllTracks ||
                                             newReleasesTableOpenAlbums[albumRow.id]
                                                 ? createFlatRecursiveSongRows({
-                                                      list: map(
-                                                          get(albums[albumRow.id], "tracks.items"),
-                                                          ({ id }) => songs[id]
+                                                      list: compact(
+                                                          map(
+                                                              get(
+                                                                  albums[albumRow.id],
+                                                                  "tracks.items"
+                                                              ),
+                                                              ({ id }) => songs[id]
+                                                          )
                                                       ),
                                                       parents: [albumRow.id]
                                                   })

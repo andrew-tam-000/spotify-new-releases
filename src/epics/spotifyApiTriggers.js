@@ -459,8 +459,8 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
                         get(getKeyFromLocalStorage("newReleaseData"), "expiration"),
                         get(getKeyFromLocalStorage("newReleaseData"), "value")
                     ],
-                    ([expiration, value]) =>
-                        value && expiration && expiration > new Date().getTime()
+                    ([expiration, value]) => false
+                    // value && expiration && expiration > new Date().getTime()
                 )
                     ? thru(
                           getKeyFromLocalStorage("newReleaseData") || {},
@@ -500,7 +500,18 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
                                   .then(results => flatMap(results, "albums.items"))
                           )
                       ).pipe(
-                          mergeMap(albums =>
+                          mergeMap(
+                              albums =>
+                                  concat(
+                                      of(getAlbumsStart(map(albums, "id"))),
+                                      of(
+                                          getArtistsStart(
+                                              flatMap(albums, album => map(album.artists, "id"))
+                                          )
+                                      ),
+                                      of(getNewReleasesSuccess(albums))
+                                  )
+                              /*
                               concat(
                                   of(getAlbumsStart(map(albums, "id"))),
                                   action$.pipe(
@@ -532,6 +543,7 @@ const getNewReleases = (action$, state$, { basicSpotifyApi }) =>
                                       })
                                   )
                               )
+                              */
                           )
                       )
         )
@@ -551,7 +563,9 @@ const getAlbums = (action$, state$, { basicSpotifyApi }) =>
             const idsToFetch = uniq(
                 filter(
                     isArray(action.payload) ? action.payload : [action.payload],
-                    albumId => !albums[albumId]
+                    // keep the id if the no album exists for it,
+                    // or the existing album is simplified
+                    albumId => !albums[albumId] || get(albums, `${albumId}.isSimplified`)
                 )
             );
             // TODO: Bug here - we should fetch the artists after we fetch all the tracks
@@ -564,7 +578,10 @@ const getAlbums = (action$, state$, { basicSpotifyApi }) =>
                       )
                   ).pipe(
                       switchMap(nestedAlbumsArray =>
-                          thru(flatMap(nestedAlbumsArray, ({ albums }) => albums), albums =>
+                          thru(
+                              flatMap(nestedAlbumsArray, ({ albums }) => albums),
+                              albums => of(getAlbumsSuccess(albums))
+                              /*
                               concat(
                                   of(getArtistsStart(flatMap(flatMap(albums, "artists"), "id"))),
                                   of(getTracksStart(map(flatMap(albums, "tracks.items"), "id"))),
@@ -579,6 +596,7 @@ const getAlbums = (action$, state$, { basicSpotifyApi }) =>
                                       )
                                   ).pipe(mapTo(getAlbumsSuccess(albums)))
                               )
+                              */
                           )
                       )
                   )
