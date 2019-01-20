@@ -31,15 +31,18 @@ import { createStructuredSelector } from "reselect";
 const history = createHashHistory();
 
 const AppWrapper = styled.div`
+    position: absolute;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: 100%;
 `;
 
 const Scrollable = styled.div`
     overflow: auto;
-    flex: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
 `;
 
 const Drawer = withStyles({
@@ -51,6 +54,7 @@ const Drawer = withStyles({
 const MainContent = styled.div`
     display: flex;
     flex: 1;
+    position: relative;
 `;
 
 const AppBar = styled(_AppBar)`
