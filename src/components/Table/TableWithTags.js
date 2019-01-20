@@ -10,6 +10,7 @@ import Stars from "@material-ui/icons/Stars";
 import PersonIcon from "@material-ui/icons/Person";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import IconButton from "@material-ui/core/IconButton";
 import { AutoSizer } from "react-virtualized";
 import {
@@ -22,9 +23,26 @@ import {
     getSongsStart,
     getNewReleasesStart,
     toggleSort,
-    getTracksStart
+    getTracksStart,
+    playSongStart
 } from "../../redux/actions";
-import { slice, get, size, join, first, map, findLast, find, includes, noop } from "lodash";
+import {
+    filter,
+    range,
+    slice,
+    get,
+    size,
+    join,
+    first,
+    map,
+    findLastIndex,
+    findIndex,
+    findLast,
+    find,
+    includes,
+    flatMap,
+    noop
+} from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
 import ItemTagList from "./ItemTagList";
@@ -47,6 +65,19 @@ import Date from "./Date";
 const Button = materialStyled(_Button)({
     minWidth: 30
 });
+
+const buttonStyles = {
+    color: "white",
+    cursor: "pointer",
+    marginRight: "10px"
+};
+
+const DateHeader = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const PlayButton = materialStyled(PlayCircleOutlineIcon)(buttonStyles);
 
 const Tags = styled.div`
     -webkit-overflow-scrolling: touch;
@@ -238,6 +269,19 @@ class NewReleasesAlbumsTable extends Component {
 
     handleItemsRendered = params => {
         const { visibleStartIndex } = params;
+        const nextDate =
+            findIndex(
+                this.props.tableData.rows,
+                ({ meta: { cellType } }) => cellType === "date",
+                visibleStartIndex + 2
+            ) || this.props.tableData.rows.length - 1;
+        const previousDate =
+            findLastIndex(
+                this.props.tableData.rows,
+                ({ meta: { cellType } }) => cellType === "date",
+                visibleStartIndex + 1
+            ) || 0;
+
         this.props.onItemsRendered && this.props.onItemsRendered(params);
         // Set the date, and also try to fetch data
         this.setState({
@@ -248,12 +292,14 @@ class NewReleasesAlbumsTable extends Component {
                     visibleStartIndex + 1
                 ),
                 "releaseDate"
-            )
+            ),
+            rowsForDate: range(previousDate + 1, nextDate)
         });
     };
 
     state = {
-        currentDate: null
+        currentDate: null,
+        rowsForDate: []
     };
 
     /*
@@ -263,6 +309,22 @@ class NewReleasesAlbumsTable extends Component {
         */
 
     getItemSize = 80;
+
+    playSongsForDate = () => {
+        const albumIds = map(
+            filter(
+                map(this.state.rowsForDate, rowIdx => this.props.tableData.rows[rowIdx]),
+                rowData => get(rowData, "meta.cellType") === "album"
+            ),
+            "id"
+        );
+
+        this.props.playSongStart({
+            uris: flatMap(albumIds, albumId =>
+                map(get(this.props.albums, `${albumId}.tracks.items`), "uri")
+            )
+        });
+    };
 
     render() {
         const {
@@ -322,7 +384,12 @@ class NewReleasesAlbumsTable extends Component {
                                 <PersonIcon fontSize="small" color="action" />
                             </PopularityColumn>
                         </Columns>
-                        {this.state.currentDate ? <Date date={this.state.currentDate} /> : null}
+                        {this.state.currentDate ? (
+                            <DateHeader>
+                                <PlayButton onClick={this.playSongsForDate} />
+                                <Date date={this.state.currentDate} />{" "}
+                            </DateHeader>
+                        ) : null}
                         <TableWrapper>
                             <AutoSizer>
                                 {({ height, width }) => (
@@ -354,7 +421,8 @@ export default compose(
         createStructuredSelector({
             genreColors: genreColorsSelector,
             routerPathname: routerPathnameSelector,
-            queryParamsTags: queryParamsTagsSelector
+            queryParamsTags: queryParamsTagsSelector,
+            albums: albumsSelector
         }),
         {
             toggleNewReleaseAlbum,
@@ -364,7 +432,8 @@ export default compose(
             openNewReleaseModal,
             setLocalStorage,
             getSongsStart,
-            getNewReleasesStart
+            getNewReleasesStart,
+            playSongStart
         }
     )
 )(NewReleasesAlbumsTable);
