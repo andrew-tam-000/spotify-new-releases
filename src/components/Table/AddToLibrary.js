@@ -25,7 +25,7 @@ class AddToLibrary extends Component {
     handleClick = e => {
         e.stopPropagation();
         this.setState({ open: true });
-        //this.props.onClick();
+        this.props.onClick();
     };
 
     handleClose = () => this.setState({ open: false });
