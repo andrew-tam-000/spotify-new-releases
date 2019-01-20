@@ -51,7 +51,8 @@ export default compose(
             reorderQueryTags,
             getTracksStart
         }
-    ),
+    )
+    /*
     withHandlers({
         // Only handled for album view right now
         onItemsRendered: ({
@@ -74,4 +75,5 @@ export default compose(
                 );
             }, 100)
     })
+    */
 )(TableWithTags);

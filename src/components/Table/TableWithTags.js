@@ -21,7 +21,8 @@ import {
     setLocalStorage,
     getSongsStart,
     getNewReleasesStart,
-    toggleSort
+    toggleSort,
+    getTracksStart
 } from "../../redux/actions";
 import { slice, get, size, join, first, map, findLast, find, includes, noop } from "lodash";
 import SearchBar from "./SearchBar";
@@ -30,6 +31,7 @@ import ItemTagList from "./ItemTagList";
 import Settings from "./Settings";
 import NewReleasesAddTagModal from "../NewReleases/NewReleasesAddTagModal";
 import {
+    albumsSelector,
     genreColorsSelector,
     queryParamsTagsSelector,
     queryParamsSortSelector,
@@ -106,7 +108,8 @@ const _RowRenderer = connect(
     createStructuredSelector({
         genreColors: genreColorsSelector,
         routerPathname: routerPathnameSelector,
-        queryParamsTags: queryParamsTagsSelector
+        queryParamsTags: queryParamsTagsSelector,
+        albums: albumsSelector
     }),
     {
         toggleNewReleaseAlbum,
@@ -116,7 +119,8 @@ const _RowRenderer = connect(
         openNewReleaseModal,
         setLocalStorage,
         getSongsStart,
-        getNewReleasesStart
+        getNewReleasesStart,
+        getTracksStart
     }
 )(
     class _RowRenderer extends Component {
@@ -128,7 +132,12 @@ const _RowRenderer = connect(
                 id
             } = this.getItem();
             return cellType === "album"
-                ? this.props.toggleNewReleaseAlbum(id)
+                ? [
+                      this.props.toggleNewReleaseAlbum(id),
+                      this.props.getTracksStart(
+                          map(get(this.props.albums, `${id}.tracks.items`), "id")
+                      )
+                  ]
                 : cellType === "track"
                     ? this.props.toggleNewReleaseSong(id)
                     : noop;

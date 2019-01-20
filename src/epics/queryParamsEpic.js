@@ -109,12 +109,15 @@ const toggleSortQuery = (action$, state$, { spotifyApi }) =>
                         "?" +
                         qs.stringify({
                             ...queryParams,
-                            sort: {
-                                sortBy: [payload],
-                                sortDirection: {
-                                    [payload]: sortDirection === "DESC" ? "ASC" : "DESC"
-                                }
-                            }
+                            sort:
+                                sortDirection === "ASC"
+                                    ? {}
+                                    : {
+                                          sortBy: [payload],
+                                          sortDirection: {
+                                              [payload]: sortDirection === "DESC" ? "ASC" : "DESC"
+                                          }
+                                      }
                         })
                 })
             );

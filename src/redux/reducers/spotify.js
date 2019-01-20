@@ -15,7 +15,7 @@ import {
     setSearchResults,
     setSearchText
 } from "../actions/";
-import { uniq, get, keyBy, compact, filter, first, map } from "lodash";
+import { flatMap, uniq, get, keyBy, compact, filter, first, map } from "lodash";
 
 function mergeNewItems({ obj, arr, idGetter, isSimplified }) {
     return {
@@ -164,7 +164,13 @@ export default (state = {}, { type, payload = {} }) => {
         case getAlbumsSuccess().type:
             return {
                 ...state,
-                albums: mergeNewItems({ obj: state.albums, arr: payload, idGetter: "id" })
+                albums: mergeNewItems({ obj: state.albums, arr: payload, idGetter: "id" }),
+                songs: mergeNewItems({
+                    obj: state.songs,
+                    arr: flatMap(payload, "tracks.items"),
+                    idGetter: "id",
+                    isSimplified: true
+                })
             };
         case getDevicesSuccess().type:
             return {

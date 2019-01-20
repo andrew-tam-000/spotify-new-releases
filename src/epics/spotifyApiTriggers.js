@@ -143,7 +143,9 @@ const getTracks = (action$, state$, { basicSpotifyApi }) =>
             const idsToFetch = uniq(
                 filter(
                     isArray(action.payload) ? action.payload : [action.payload],
-                    songId => !tracks[songId]
+                    // keep the id if the no album exists for it,
+                    // or the existing album is simplified
+                    songId => !tracks[songId] || get(tracks, `${songId}.isSimplified`)
                 )
             );
             // Fixing rate limit issue
