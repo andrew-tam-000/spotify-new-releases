@@ -15,16 +15,30 @@ import {
     setSearchResults,
     setSearchText
 } from "../actions/";
-import { flatMap, uniq, get, keyBy, compact, filter, first, map } from "lodash";
+import { flatMap, uniq, get, keyBy, compact, filter, first, map, thru } from "lodash";
 
 function mergeNewItems({ obj, arr, idGetter, isSimplified }) {
     return {
         ...obj,
         ...keyBy(
-            map(arr, entity => ({
-                ...entity,
-                isSimplified
-            })),
+            filter(
+                map(arr, entity => ({
+                    ...entity,
+                    isSimplified
+                })),
+                entity =>
+                    thru(
+                        obj[get(entity, idGetter)],
+                        existingEntity =>
+                            // If somethign already exists, then
+                            // don't replace it if its not simplified
+                            existingEntity
+                                ? !existingEntity.isSimplified && entity.isSimplified
+                                    ? false
+                                    : true
+                                : true
+                    )
+            ),
             idGetter
         )
     };
