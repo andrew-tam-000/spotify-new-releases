@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import TagProvider from "../Table/TagProvider";
-import React from "react";
+import React, { Component } from "react";
 import Typography from "@material-ui/core/Typography";
 import { map } from "lodash";
 import { connect } from "react-redux";
 import { compose, withProps } from "recompact";
 import { openNewReleaseModal, setNewReleaseModalGenre } from "../../redux/actions";
-import Scrollbar from "react-smooth-scrollbar";
+import Scrollbar from "smooth-scrollbar";
 
 const Tag = styled.span`
     background-color: ${props => props.color};
@@ -45,9 +45,25 @@ const ItemTagListWrapper = styled.div`
     }
 `;
 
+class ReactScrollbar extends Component {
+    constructor(props) {
+        super(props);
+        this.wrapper = React.createRef();
+    }
+    componentDidMount() {
+        this.scrollbar = Scrollbar.init(this.wrapper.current);
+    }
+    render() {
+        return <div ref={this.wrapper}>{this.props.children}</div>;
+    }
+    componentWillUnmount() {
+        this.scrollbar.destroy();
+    }
+}
+
 const ItemTagList = ({ className, genres }) => (
     <ItemTagListWrapper className={className}>
-        <Scrollbar>
+        <ReactScrollbar>
             <Genres>
                 {map(genres, genre => (
                     <TagProvider key={genre} id={genre}>
@@ -62,7 +78,7 @@ const ItemTagList = ({ className, genres }) => (
                     </TagProvider>
                 ))}
             </Genres>
-        </Scrollbar>
+        </ReactScrollbar>
     </ItemTagListWrapper>
 );
 
