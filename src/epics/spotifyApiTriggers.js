@@ -240,7 +240,7 @@ const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
     action$.pipe(
         ofType("SET_SEARCH_TEXT"),
         debounce(() => timer(400)),
-        switchMap(
+        mergeMap(
             ({ payload: searchText }) =>
                 !searchText
                     ? EMPTY
@@ -281,11 +281,12 @@ const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
                                                         )
                                                     )
                                                 ),
-                                                action$.pipe(
-                                                    ofType(getArtistsSuccess().type),
-                                                    take(1),
-                                                    mapTo(setSearchResults(resp))
-                                                )
+                                                of(
+                                                    getAlbumsStart(
+                                                        map(resp.tracks.items, "album.id")
+                                                    )
+                                                ),
+                                                of(setSearchResults(resp))
                                             )
                                         ),
                                         catchError(e => of({ type: "error", payload: e }))
