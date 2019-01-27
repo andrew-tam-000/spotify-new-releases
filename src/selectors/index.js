@@ -45,22 +45,22 @@ export const firebaseUserIdSelector = createSelector(
 );
 
 export const searchPlaylistsSelector = createSelector(
-    state => get(state, "app.spotify.search.playlists.items") || [],
+    state => get(state, "app.spotify.search.playlists") || [],
     tracks => tracks
 );
 
 export const searchTracksSelector = createSelector(
-    state => get(state, "app.spotify.search.tracks.items") || [],
+    state => get(state, "app.spotify.search.tracks") || [],
     tracks => tracks
 );
 
 export const searchAlbumsSelector = createSelector(
-    state => get(state, "app.spotify.search.albums.items") || [],
+    state => get(state, "app.spotify.search.albums") || [],
     albums => albums
 );
 
 export const searchArtistsSelector = createSelector(
-    state => get(state, "app.spotify.search.artists.items") || [],
+    state => get(state, "app.spotify.search.artists") || [],
     artists => artists
 );
 

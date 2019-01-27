@@ -404,13 +404,25 @@ export const searchTableDataSelector = createSelector(
     searchTracksSelector,
     searchAlbumsSelector,
     searchArtistsSelector,
-    (createHydratedRowFromParams, searchPlaylists, searchTracks, searchAlbums, searchArtists) =>
+    songsSelector,
+    albumsSelector,
+    artistDataSelector,
+    (
+        createHydratedRowFromParams,
+        searchPlaylists,
+        searchTracks,
+        searchAlbums,
+        searchArtists,
+        songs,
+        albums,
+        artistData
+    ) =>
         thru(
             [
                 {
                     type: "searchTracks",
                     data: createHydratedList({
-                        list: searchTracks,
+                        list: map(searchTracks, id => songs[id]),
                         createHydratedRowFromParams,
                         type: "track"
                     })
@@ -418,7 +430,7 @@ export const searchTableDataSelector = createSelector(
                 {
                     type: "searchAlbums",
                     data: createHydratedList({
-                        list: searchAlbums,
+                        list: map(searchAlbums, id => albums[id]),
                         createHydratedRowFromParams,
                         type: "album"
                     })
@@ -426,7 +438,7 @@ export const searchTableDataSelector = createSelector(
                 {
                     type: "searchArtists",
                     data: createHydratedList({
-                        list: searchArtists,
+                        list: map(searchArtists, id => artistData[id]),
                         createHydratedRowFromParams,
                         type: "artist"
                     })

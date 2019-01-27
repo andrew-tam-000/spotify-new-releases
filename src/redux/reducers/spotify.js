@@ -15,7 +15,7 @@ import {
     setSearchResults,
     setSearchText
 } from "../actions/";
-import { flatMap, uniq, get, keyBy, compact, filter, first, map, thru } from "lodash";
+import { flatMap, uniq, get, keyBy, compact, filter, first, map, thru, mapValues } from "lodash";
 
 function mergeNewItems({ obj, arr, idGetter, isSimplified }) {
     return {
@@ -74,7 +74,8 @@ export default (state = {}, { type, payload = {} }) => {
                 albums: mergeNewItems({
                     obj: state.albums,
                     arr: get(payload, "albums.items"),
-                    idGetter: "id"
+                    idGetter: "id",
+                    isSimplified: true
                 }),
                 artistData: mergeNewItems({
                     obj: state.artistData,
@@ -86,7 +87,7 @@ export default (state = {}, { type, payload = {} }) => {
                     arr: get(payload, "playlists.items"),
                     idGetter: "id"
                 }),
-                search: payload
+                search: mapValues(payload, entities => map(entities.items, "id"))
             };
         case getCurrentlyPlayingTrackSuccess().type:
             return {

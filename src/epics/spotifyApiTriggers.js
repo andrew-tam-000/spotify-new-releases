@@ -282,9 +282,10 @@ const getSearchResults = (action$, state$, { basicSpotifyApi }) =>
                                                     )
                                                 ),
                                                 of(
-                                                    getAlbumsStart(
-                                                        map(resp.tracks.items, "album.id")
-                                                    )
+                                                    getAlbumsStart([
+                                                        ...map(resp.tracks.items, "album.id"),
+                                                        ...map(resp.albums.items, "id")
+                                                    ])
                                                 ),
                                                 of(setSearchResults(resp))
                                             )

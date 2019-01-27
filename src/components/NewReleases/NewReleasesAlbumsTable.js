@@ -1,4 +1,4 @@
-import { compose, withHandlers } from "recompact";
+import { compose, withHandlers, withProps } from "recompact";
 import { get, flatMap, map, slice, compact, debounce } from "lodash";
 import { createStructuredSelector } from "reselect";
 import { connect } from "react-redux";
@@ -51,7 +51,10 @@ export default compose(
             reorderQueryTags,
             getTracksStart
         }
-    )
+    ),
+    withProps(props => ({
+        hideFirstRow: true
+    }))
     /*
     withHandlers({
         // Only handled for album view right now

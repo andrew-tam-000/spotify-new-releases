@@ -41,7 +41,8 @@ import {
     find,
     includes,
     flatMap,
-    noop
+    noop,
+    thru
 } from "lodash";
 import SearchBar from "./SearchBar";
 import AlbumImageCellRenderer from "./AlbumImageCellRenderer";
@@ -332,7 +333,8 @@ class NewReleasesAlbumsTable extends Component {
             tableData,
             loading,
             genreColors,
-            queryParamsTags
+            queryParamsTags,
+            hideFirstRow
         } = this.props;
 
         const active = map(
@@ -387,7 +389,7 @@ class NewReleasesAlbumsTable extends Component {
                         {this.state.currentDate ? (
                             <DateHeader>
                                 <PlayButton onClick={this.playSongsForDate} />
-                                <Date date={this.state.currentDate} />{" "}
+                                <Date date={this.state.currentDate} />
                             </DateHeader>
                         ) : null}
                         <TableWrapper>
@@ -396,12 +398,19 @@ class NewReleasesAlbumsTable extends Component {
                                     <FixedSizeList
                                         onItemsRendered={this.handleItemsRendered}
                                         itemSize={this.getItemSize}
-                                        itemData={{
-                                            ...tableData,
-                                            rows: slice(tableData.rows, 1)
-                                        }}
+                                        itemData={
+                                            hideFirstRow
+                                                ? {
+                                                      ...tableData,
+                                                      rows: slice(tableData.rows, 1)
+                                                  }
+                                                : tableData
+                                        }
                                         height={height}
-                                        itemCount={size(slice(tableData.rows, 1))}
+                                        itemCount={thru(
+                                            size(tableData.rows),
+                                            itemCount => (hideFirstRow ? itemCount - 1 : itemCount)
+                                        )}
                                         width={width}
                                     >
                                         {RowRenderer}
