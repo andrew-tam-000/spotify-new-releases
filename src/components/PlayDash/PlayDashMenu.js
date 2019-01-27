@@ -7,8 +7,6 @@ import { transferPlaybackStart, getDevicesStart } from "../../redux/actions/";
 import { spotifyDevicesSelector, nowPlayingDeviceIdSelector } from "../../selectors";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import SkipToNextButton from "./SkipToNextButton";
-import SkipToPreviousButton from "./SkipToPreviousButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import IconButton from "@material-ui/core/IconButton";
 
@@ -45,8 +43,6 @@ class Devices extends Component {
                     open={Boolean(anchorEl)}
                     onClose={this.handleClose}
                 >
-                    <SkipToPreviousButton />
-                    <SkipToNextButton />
                     {map(spotifyDevices, spotifyDevice => (
                         <MenuItem
                             onClick={() => {

@@ -4,6 +4,8 @@ import { compose, mapProps } from "recompose";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import PlayButton from "./Analyzer/PlayButton";
+import SkipToNextButton from "./PlayDash/SkipToNextButton";
+import SkipToPreviousButton from "./PlayDash/SkipToPreviousButton";
 import { accessTokenSelector, nowPlayingSongUriSelector, songsSelector } from "../selectors";
 import Login from "./Login";
 import Typography from "@material-ui/core/Typography";
@@ -62,6 +64,8 @@ const PlayDash = ({ uri, track }) => (
         <PlaySection>
             <SummaryWrapper>
                 <PlayButton />
+                <SkipToPreviousButton />
+                <SkipToNextButton />
                 <Summary>
                     <TitleWithAdd>
                         <Title variant="body1">{track.name}</Title>

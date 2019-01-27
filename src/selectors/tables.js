@@ -407,6 +407,8 @@ export const searchTableDataSelector = createSelector(
     songsSelector,
     albumsSelector,
     artistDataSelector,
+    newReleasesTableOpenAlbumsSelector,
+    createFlatRecursiveSongRowsSelector,
     (
         createHydratedRowFromParams,
         searchPlaylists,
@@ -415,7 +417,9 @@ export const searchTableDataSelector = createSelector(
         searchArtists,
         songs,
         albums,
-        artistData
+        artistData,
+        newReleasesTableOpenAlbums,
+        createFlatRecursiveSongRows
     ) =>
         thru(
             [
@@ -429,11 +433,38 @@ export const searchTableDataSelector = createSelector(
                 },
                 {
                     type: "searchAlbums",
-                    data: createHydratedList({
-                        list: map(searchAlbums, id => albums[id]),
-                        createHydratedRowFromParams,
-                        type: "album"
-                    })
+                    data: thru(
+                        createHydratedList({
+                            list: map(searchAlbums, id => albums[id]),
+                            createHydratedRowFromParams,
+                            type: "album"
+                        }),
+                        albumListData =>
+                            flatMap(
+                                albumListData,
+                                albumRow =>
+                                    newReleasesTableOpenAlbums[albumRow.rowData.id]
+                                        ? [
+                                              albumRow,
+                                              ...map(
+                                                  createFlatRecursiveSongRows({
+                                                      list: compact(
+                                                          map(
+                                                              get(
+                                                                  albums[albumRow.rowData.id],
+                                                                  "tracks.items"
+                                                              ),
+                                                              ({ id }) => songs[id]
+                                                          )
+                                                      ),
+                                                      parents: [albumRow.rowData.id]
+                                                  }),
+                                                  tableRow => ({ tableRow })
+                                              )
+                                          ]
+                                        : albumRow
+                            )
+                    )
                 },
                 {
                     type: "searchArtists",
