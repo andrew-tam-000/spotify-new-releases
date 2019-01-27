@@ -16,6 +16,7 @@ export default function onLoginEpic(action$, state$, { spotifyApi }) {
             spotifyApi.setAccessToken(payload);
             return concat(
                 of(getDevicesStart()),
+                of(getCurrentlyPlayingTrackStart()),
                 interval(5000).pipe(
                     takeWhile(() => accessTokenSelector(state$.value)),
                     mergeMap(() => of(getCurrentlyPlayingTrackStart()))

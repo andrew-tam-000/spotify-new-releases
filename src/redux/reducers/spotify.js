@@ -169,10 +169,11 @@ export default (state = {}, { type, payload = {} }) => {
         case getRecommendationsSuccess().type:
             return {
                 ...state,
-                songs: {
-                    ...state.songs,
-                    ...keyBy(filter(payload.tracks, ({ id }) => !state.songs[id]), "id")
-                }
+                songs: mergeNewItems({
+                    obj: state.songs,
+                    arr: payload.tracks,
+                    idGetter: "id"
+                })
             };
 
         case getAlbumsSuccess().type:

@@ -464,10 +464,7 @@ export const loadingAnalyzerTableSelector = createSelector(
     loading => loading
 );
 
-export const loadingNewReleasesTableSelector = createSelector(
-    state => get(state, "app.newReleases.loading"),
-    loading => loading
-);
+export const loadingNewReleasesTableSelector = createSelector(state => get(), loading => loading);
 
 export const errorMessageSelector = createSelector(
     state => get(state, "app.error.message"),

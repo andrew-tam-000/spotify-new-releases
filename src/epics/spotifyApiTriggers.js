@@ -386,7 +386,15 @@ const getRecommendations = (action$, state$, { basicSpotifyApi }) =>
                     basicSpotifyApi.getRecommendations(action.payload)
                 )
             ).pipe(
-                mergeMap(resp =>
+                mergeMap(
+                    resp =>
+                        of(
+                            getRecommendationsSuccess({
+                                ...resp,
+                                tracks: orderBy(resp.tracks, "popularity", "desc")
+                            })
+                        )
+                    /*
                     concat(
                         of(getAlbumsStart(map(resp.tracks, "album.id"))),
                         action$.pipe(
@@ -402,6 +410,7 @@ const getRecommendations = (action$, state$, { basicSpotifyApi }) =>
                             )
                         )
                     )
+                    */
                 )
             )
         )
@@ -641,7 +650,19 @@ const getRelatedTracks = (action$, state$, { spotifyApi }) =>
                 action$.pipe(
                     ofType(getRecommendationsSuccess().type),
                     take(1),
-                    mergeMap(({ payload }) => of(getRelatedTracksSuccess(payload)))
+                    mergeMap(({ payload }) =>
+                        concat(
+                            of(getRelatedTracksSuccess(payload)),
+                            of(
+                                getArtistsStart(
+                                    flatMap(payload.tracks, track =>
+                                        map(get(track, "artists"), "id")
+                                    )
+                                )
+                            ),
+                            of(getAlbumsStart(map(payload.tracks, "album.id")))
+                        )
+                    )
                 )
             )
         )

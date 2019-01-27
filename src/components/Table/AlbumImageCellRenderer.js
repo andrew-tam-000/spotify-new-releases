@@ -72,18 +72,6 @@ const NewReleasesAlbumPlayButton = props => (
     </PlayButtonProvider>
 );
 
-const NewReleasesTrackPlayButton = props => (
-    <PlayButtonProvider {...props}>
-        {({ isPlaying, pauseSongStart, playSongStart }) =>
-            isPlaying ? (
-                <PauseButton fontSize="small" onClick={pauseSongStart} />
-            ) : (
-                <PlayButton fontSize="small" onClick={playSongStart} />
-            )
-        }
-    </PlayButtonProvider>
-);
-
 // <AddToAdvancedSearchButton id={id} />
 // <AddToPlaylistButton uri={uri} />
 // <StartTreeButton uri={uri} />
@@ -95,8 +83,7 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
         track,
         releaseDate,
         album,
-        meta: { parents, cellType },
-        id
+        meta: { parents, cellType }
     } = get(data, `rows.${index}`) || {};
 
     return cellType === "track" ? (
@@ -109,13 +96,18 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
                     key={parent}
                 />
             ))}
-            <NewReleasesTrackPlayButton uri={uri} />
+            <AlbumWrapper>
+                <NewReleasesAlbumPlayButton uri={uri} />
+                <AlbumImage alt="test" src={image} />
+            </AlbumWrapper>
             <Description>
                 <TitleWithAdd>
                     <AlbumTitle noWrap={true} variant="body2">
                         {track}
                     </AlbumTitle>
+                    {/*
                     <AddToLibrary id={id} fontSize="small" color="action" />
+                    */}
                 </TitleWithAdd>
                 <Typography noWrap={true} variant="body1">
                     {artist}
