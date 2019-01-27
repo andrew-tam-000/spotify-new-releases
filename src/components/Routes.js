@@ -105,11 +105,6 @@ class RouteProvider extends Component {
             <Router history={history}>
                 <AppWrapper>
                     <AppBar position="static" color="default">
-                        <Toolbar>
-                            <Typography variant="title" color="inherit">
-                                Music
-                            </Typography>
-                        </Toolbar>
                         <PlayDash />
                     </AppBar>
                     <MainContent>

@@ -215,16 +215,22 @@ const createFlatRecursiveSongRowsSelector = createSelector(
     }
 );
 
+const sortedRowsWithRowsSelector = createSelector(
+    queryParamsSortSelector,
+    ({ sortBy, sortDirection }) => tableRows =>
+        orderBy(tableRows, sortBy, map(sortBy, sort => toLower(sortDirection[sort])))
+);
+
 export const myLibraryDataSelector = createSelector(
     librarySongsSelector,
-    queryParamsSortSelector,
+    sortedRowsWithRowsSelector,
     queryParamsTagsSelector,
     queryParamsSearchSelector,
     createHydratedRowFromParamsSelector,
     createFlatRecursiveSongRowsSelector,
     (
         librarySongs,
-        { sortBy, sortDirection },
+        sortedRowsWithRows,
         tags,
         search,
         createHydratedRowFromParams,
@@ -239,11 +245,7 @@ export const myLibraryDataSelector = createSelector(
             }),
             librarySongs =>
                 thru(
-                    orderBy(
-                        map(values(librarySongs), ({ tableRow }) => tableRow),
-                        sortBy,
-                        map(sortBy, sort => toLower(sortDirection[sort]))
-                    ),
+                    sortedRowsWithRows(map(values(librarySongs), ({ tableRow }) => tableRow)),
                     orderedLibrarySongs => ({
                         rows: tableDataFilter({
                             tags,
@@ -409,6 +411,7 @@ export const searchTableDataSelector = createSelector(
     artistDataSelector,
     newReleasesTableOpenAlbumsSelector,
     createFlatRecursiveSongRowsSelector,
+    sortedRowsWithRowsSelector,
     (
         createHydratedRowFromParams,
         searchPlaylists,
@@ -419,7 +422,8 @@ export const searchTableDataSelector = createSelector(
         albums,
         artistData,
         newReleasesTableOpenAlbums,
-        createFlatRecursiveSongRows
+        createFlatRecursiveSongRows,
+        sortedRowsWithRows
     ) =>
         thru(
             [
@@ -488,7 +492,7 @@ export const searchTableDataSelector = createSelector(
                     hydratedData,
                     (acc, { type, data }) =>
                         set(acc, type, {
-                            rows: map(values(data), "tableRow"),
+                            rows: sortedRowsWithRows(map(values(data), "tableRow")),
                             config: newReleasesByAlbumConfig
                         }),
                     {}

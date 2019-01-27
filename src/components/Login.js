@@ -4,6 +4,7 @@ import Button from "@material-ui/core/Button";
 import { getAccessTokenFromUrl, getKeyFromLocalStorage, setKeyInLocalStorage } from "../utils";
 import { connect } from "react-redux";
 import { createAccessTokenSuccess, updateFirebaseUserStart } from "../redux/actions";
+import materialStyled from "../materialStyled";
 
 const scopes = [
     "user-modify-playback-state",
@@ -22,6 +23,10 @@ const scopes = [
 const tokenUrl = `https://accounts.spotify.com/authorize?show_dialog=false&client_id=27135c7bda1c48f3ba0f6be1161b0561&redirect_uri=${
     window.location.protocol
 }//${window.location.host}&response_type=token&show_dialog=true&scope=${join(scopes, " ")}`;
+
+const StyledButton = materialStyled(Button)({
+    margin: 10
+});
 
 class Login extends Component {
     state = {
@@ -62,9 +67,9 @@ class Login extends Component {
 
     render() {
         return (
-            <Button onClick={this.openLogin} variant="contained">
+            <StyledButton onClick={this.openLogin} variant="contained">
                 Login
-            </Button>
+            </StyledButton>
         );
     }
 }
