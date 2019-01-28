@@ -3,12 +3,22 @@ import { connect } from "react-redux";
 import { map } from "lodash";
 import { createStructuredSelector } from "reselect";
 import Typography from "@material-ui/core/Typography";
-import { transferPlaybackStart, getDevicesStart } from "../../redux/actions/";
-import { spotifyDevicesSelector, nowPlayingDeviceIdSelector } from "../../selectors";
+import {
+    transferPlaybackStart,
+    getDevicesStart,
+    toggleNewReleaseColors
+} from "../../redux/actions/";
+import {
+    newReleasesTableShowColorsSelector,
+    spotifyDevicesSelector,
+    nowPlayingDeviceIdSelector
+} from "../../selectors";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import IconButton from "@material-ui/core/IconButton";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 
 class Devices extends Component {
     state = {
@@ -24,7 +34,12 @@ class Devices extends Component {
 
     render() {
         const { anchorEl } = this.state;
-        const { spotifyDevices, nowPlayingDeviceId } = this.props;
+        const {
+            spotifyDevices,
+            nowPlayingDeviceId,
+            newReleasesTableShowColors,
+            toggleNewReleaseColors
+        } = this.props;
 
         return (
             <React.Fragment>
@@ -43,6 +58,15 @@ class Devices extends Component {
                     open={Boolean(anchorEl)}
                     onClose={this.handleClose}
                 >
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={newReleasesTableShowColors}
+                                onChange={toggleNewReleaseColors}
+                            />
+                        }
+                        label="Colors?"
+                    />
                     {map(spotifyDevices, spotifyDevice => (
                         <MenuItem
                             onClick={() => {
@@ -70,7 +94,8 @@ class Devices extends Component {
 export default connect(
     createStructuredSelector({
         spotifyDevices: spotifyDevicesSelector,
-        nowPlayingDeviceId: nowPlayingDeviceIdSelector
+        nowPlayingDeviceId: nowPlayingDeviceIdSelector,
+        newReleasesTableShowColors: newReleasesTableShowColorsSelector
     }),
-    { getDevicesStart, transferPlaybackStart }
+    { getDevicesStart, transferPlaybackStart, toggleNewReleaseColors }
 )(Devices);

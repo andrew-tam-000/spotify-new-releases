@@ -130,6 +130,7 @@ const InfoColumn = styled(AlbumImageCellRenderer)`
 
 const PlainInfoColumn = styled.div`
     flex: 10 1 160px;
+    overflow: auto;
 `;
 
 const TableWrapper = styled.div`
@@ -353,30 +354,31 @@ class NewReleasesAlbumsTable extends Component {
                 ) : (
                     <React.Fragment>
                         <NewReleasesAddTagModal />
-                        <TagsWithButton>
-                            <Button size="small" onClick={openNewReleaseModal}>
-                                <AddIcon fontSize="small" color="action" />
-                                {size(active) ? "" : "Add Genre"}
-                            </Button>
-                            <Tags>
-                                <TagList
-                                    axis="x"
-                                    lockAxis="x"
-                                    tags={active}
-                                    onSortEnd={this.handleQueryTagSort}
-                                    useDragHandle={true}
-                                />
-                            </Tags>
-                            <IconButton onClick={this.refreshData}>
-                                <RefreshIcon fontSize="small" color="action" />
-                            </IconButton>
-                        </TagsWithButton>
                         <Columns>
                             <PlainInfoColumn>
                                 <SearchColumn>
-                                    <Settings tableData={tableData} />
-                                    <NewReleasesAddTagModal />
-                                    <SearchBar />
+                                    <TagsWithButton>
+                                        <Button size="small" onClick={openNewReleaseModal}>
+                                            <AddIcon fontSize="small" color="action" />
+                                            {size(active) ? "" : "Add Genre"}
+                                        </Button>
+                                        <Tags>
+                                            <TagList
+                                                axis="x"
+                                                lockAxis="x"
+                                                tags={active}
+                                                onSortEnd={this.handleQueryTagSort}
+                                                useDragHandle={true}
+                                            />
+                                        </Tags>
+                                        {/*
+                                        <IconButton onClick={this.refreshData}>
+                                            <RefreshIcon fontSize="small" color="action" />
+                                        </IconButton>
+                                        */}
+                                    </TagsWithButton>
+                                    {/*<Settings tableData={tableData} />*/}
+                                    {/*<SearchBar />*/}
                                 </SearchColumn>
                             </PlainInfoColumn>
                             <PopularityColumn name="albumPopularity">
