@@ -5,7 +5,7 @@ import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import Typography from "@material-ui/core/Typography";
 import styled from "styled-components";
-import AddToLibrary from "./AddToLibrary";
+import PlayAll from "./PlayAll";
 
 import Date from "./Date";
 import materialStyled from "../../materialStyled";
@@ -63,13 +63,21 @@ const buttonStyles = {
 const PauseButton = materialStyled(PauseCircleOutlineIcon)(buttonStyles);
 const PlayButton = materialStyled(PlayCircleOutlineIcon)(buttonStyles);
 const NewReleasesAlbumPlayButton = props => (
-    <PlayButtonProvider {...props}>
-        {({ isPlaying, pauseSongStart, playSongStart }) => (
-            <ButtonWrapper onClick={isPlaying ? pauseSongStart : playSongStart}>
-                {isPlaying ? <PauseButton fontSize="small" /> : <PlayButton fontSize="small" />}
-            </ButtonWrapper>
+    <PlayAll {...props}>
+        {({ uris }) => (
+            <PlayButtonProvider uris={uris}>
+                {({ isPlaying, pauseSongStart, playSongStart }) => (
+                    <ButtonWrapper onClick={isPlaying ? pauseSongStart : playSongStart}>
+                        {isPlaying ? (
+                            <PauseButton fontSize="small" />
+                        ) : (
+                            <PlayButton fontSize="small" />
+                        )}
+                    </ButtonWrapper>
+                )}
+            </PlayButtonProvider>
         )}
-    </PlayButtonProvider>
+    </PlayAll>
 );
 
 // <AddToAdvancedSearchButton id={id} />
@@ -83,6 +91,7 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
         track,
         releaseDate,
         album,
+        id,
         meta: { parents, cellType }
     } = get(data, `rows.${index}`) || {};
 
@@ -97,7 +106,7 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
                 />
             ))}
             <AlbumWrapper>
-                <NewReleasesAlbumPlayButton uri={uri} />
+                <NewReleasesAlbumPlayButton id={id} rows={data.rows} />
                 <AlbumImage alt="test" src={image} />
             </AlbumWrapper>
             <Description>
@@ -117,7 +126,7 @@ const AlbumImageCellRenderer = ({ className, data = [], index }) => {
     ) : cellType === "album" ? (
         <AlbumImageCellRendererWrapper className={className}>
             <AlbumWrapper>
-                <NewReleasesAlbumPlayButton context_uri={uri} />
+                <NewReleasesAlbumPlayButton id={id} rows={data.rows} />
                 <AlbumImage alt="test" src={image} />
             </AlbumWrapper>
             <Description>

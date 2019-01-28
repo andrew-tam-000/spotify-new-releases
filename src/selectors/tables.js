@@ -492,7 +492,7 @@ export const searchTableDataSelector = createSelector(
                     hydratedData,
                     (acc, { type, data }) =>
                         set(acc, type, {
-                            rows: sortedRowsWithRows(map(values(data), "tableRow")),
+                            rows: map(values(data), "tableRow"),
                             config: newReleasesByAlbumConfig
                         }),
                     {}

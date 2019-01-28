@@ -1,5 +1,5 @@
 import { compose, withPropsOnChange } from "recompact";
-import { isUndefined, omitBy } from "lodash";
+import { isUndefined, omitBy, slice, thru, first } from "lodash";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import {
@@ -22,8 +22,17 @@ const mapDispatchToProps = (dispatch, { uris, uri, context_uri, offset }) => ({
         e.stopPropagation();
         dispatch(
             playSongStart(
-                omitBy({ uris: uris ? uris : uri ? [uri] : undefined, context_uri }, val =>
-                    isUndefined(val)
+                thru(
+                    omitBy({ uris: uris ? uris : uri ? [uri] : undefined, context_uri }, val =>
+                        isUndefined(val)
+                    ),
+                    params =>
+                        params.uris
+                            ? {
+                                  ...params,
+                                  uris: slice(params.uris, 0, 500)
+                              }
+                            : params
                 )
             )
         );
@@ -40,16 +49,35 @@ export default compose(
         mapDispatchToProps
     ),
     withPropsOnChange(
-        ["uri", "nowPlayingSongUri", "context_uri", "nowPlayingContextUri", "nowPlayingIsPlaying"],
-        ({ uri, nowPlayingSongUri, context_uri, nowPlayingContextUri, nowPlayingIsPlaying }) => ({
+        [
+            "uris",
+            "uri",
+            "nowPlayingSongUri",
+            "context_uri",
+            "nowPlayingContextUri",
+            "nowPlayingIsPlaying"
+        ],
+        ({
+            uris,
+            uri,
+            nowPlayingSongUri,
+            context_uri,
+            nowPlayingContextUri,
+            nowPlayingIsPlaying
+        }) => ({
             isPlaying:
-                // If id is supplied then check against the supplied id
-                // Otherwise, just pause and play
-                uri || context_uri
-                    ? nowPlayingIsPlaying &&
-                      ((uri && uri === nowPlayingSongUri) ||
-                          (context_uri && context_uri === nowPlayingContextUri))
-                    : nowPlayingIsPlaying
+                // If uris are provided, then just check the first uri
+                thru(
+                    uris ? first(uris) : uri,
+                    uri =>
+                        // If id is supplied then check against the supplied id
+                        // Otherwise, just pause and play
+                        uri || context_uri
+                            ? nowPlayingIsPlaying &&
+                              ((uri && uri === nowPlayingSongUri) ||
+                                  (context_uri && context_uri === nowPlayingContextUri))
+                            : nowPlayingIsPlaying
+                )
         })
     )
 )(PlayButtonProvider);

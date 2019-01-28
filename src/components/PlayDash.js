@@ -26,8 +26,8 @@ const Artist = materialStyled(Typography)({ ...typographyStyles, marginTop: 5 })
 
 const Controls = styled.div`
     display: flex;
-    flex-direction: column;
     margin-top: 5px;
+    align-items: center;
 `;
 
 const PlayDashWrapper = styled.div`
@@ -59,13 +59,15 @@ const TitleWithAdd = styled.div`
     flex: 1;
 `;
 
+const SeekWrapper = styled.div`
+    margin-left: 10px;
+    flex: 1;
+`;
+
 const PlayDash = ({ uri, track }) => (
     <PlayDashWrapper>
         <PlaySection>
             <SummaryWrapper>
-                <PlayButton />
-                <SkipToPreviousButton />
-                <SkipToNextButton />
                 <Summary>
                     <TitleWithAdd>
                         <Title variant="body1">{track.name}</Title>
@@ -77,7 +79,12 @@ const PlayDash = ({ uri, track }) => (
             <PlayDashMenu />
         </PlaySection>
         <Controls>
-            <Seek />
+            <PlayButton />
+            <SkipToPreviousButton />
+            <SkipToNextButton />
+            <SeekWrapper>
+                <Seek />
+            </SeekWrapper>
         </Controls>
     </PlayDashWrapper>
 );
