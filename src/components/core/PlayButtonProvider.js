@@ -30,6 +30,7 @@ const mapDispatchToProps = (dispatch, { uris, uri, context_uri, offset }) => ({
                         params.uris
                             ? {
                                   ...params,
+                                  // TODO: API does not accept arbitrarily long ID's
                                   uris: slice(params.uris, 0, 500)
                               }
                             : params

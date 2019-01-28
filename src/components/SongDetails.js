@@ -15,7 +15,6 @@ import _ListItemText from "@material-ui/core/ListItemText";
 import { compose, mapProps } from "recompose";
 import Typography from "@material-ui/core/Typography";
 import PlayButton from "./Analyzer/PlayButton";
-import PlayAll from "./PlayAll";
 import styled from "styled-components";
 import UpdateNodeUriButton from "./UpdateNodeUriButton";
 import StarsIcon from "@material-ui/icons/Stars";
@@ -81,7 +80,6 @@ const ArtistPanel = compose(
             <Typography variant="display1" gutterBottom>
                 {artistData.name}
             </Typography>
-            <PlayAll uris={map(topTracks, track => track.uri)} />
             <List>
                 {map(topTracks, track => (
                     <TrackRow key={track.id} track={track} nodeId={nodeId} />
@@ -133,7 +131,6 @@ const TrackPanel = compose(
                     </ListItem>
                 ))}
             </List>
-            <PlayAll uris={map(relatedTracks, track => track.uri)} />
             <List>
                 {map(relatedTracks, track => (
                     <TrackRow key={track.id} track={track} nodeId={nodeId} />

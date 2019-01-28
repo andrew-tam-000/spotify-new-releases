@@ -13,7 +13,6 @@ import {
 import { connect } from "react-redux";
 import materialStyled from "../../materialStyled";
 import _SettingsIcon from "@material-ui/icons/Settings";
-import PlayAll from "../PlayAll";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -53,8 +52,7 @@ class Settings extends Component {
         const {
             newReleasesTableShowColors,
             newReleasesTableShowAllTracks,
-            toggleNewReleaseColors,
-            playAllUris
+            toggleNewReleaseColors
         } = this.props;
 
         return (
@@ -68,7 +66,6 @@ class Settings extends Component {
                     open={Boolean(this.state.anchorEl)}
                     onClose={this.closeMenu}
                 >
-                    <PlayAll uris={playAllUris} />
                     <FormControlLabel
                         control={
                             <Switch
@@ -114,25 +111,5 @@ export default compose(
             hideAllNewReleaseTracks,
             toggleNewReleaseColors
         }
-    ),
-    withPropsOnChange(
-        ["tableData", "newReleasesTableShowAllTracks", "albums"],
-        ({ tableData: { rows }, newReleasesTableShowAllTracks, albums }) => ({
-            // BUG - spotify doesn't accept arbitrarily large uri's
-            playAllUris: slice(
-                newReleasesTableShowAllTracks
-                    ? map(rows, "uri")
-                    : // HACK - Check if there are albums first, else show songs
-                      thru(
-                          flatMap(
-                              filter(rows, ({ meta: { cellType } }) => cellType === "album"),
-                              ({ id }) => map(get(albums, `${id}.tracks.items`), "uri")
-                          ),
-                          albumIds => (size(albumIds) ? albumIds : map(rows, "uri"))
-                      ),
-                0,
-                500
-            )
-        })
     )
 )(Settings);
